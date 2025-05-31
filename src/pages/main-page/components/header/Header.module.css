@@ -1,0 +1,117 @@
+.container {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+.header {
+    height: 70px;
+    background-color: #202222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.header__content{
+    display: flex;
+    justify-content: space-between;
+}
+
+.header__leftSide{
+    display: flex;
+}
+
+.header__logo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header__rightSide{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header__user img{
+    width: 16px;
+    height: 16px;
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.header__search{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+}
+
+.header__search img{
+    width: 11px;
+    height: 11px;
+    cursor: pointer;
+}
+
+.header__search-input{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-right: 4px;
+}
+
+.header__search-input img{
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    top: 7px;
+    left: 7px;
+}
+
+.header__search-input input{
+    width: 222px;
+    height: 27px;
+    border: 1px solid #8D9191;
+    border-radius: 4px;
+    background-color: #191A1A;
+    padding-left: 24px;
+    color: #8D9191;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.header__search-input input::placeholder{
+    color: #8D9191;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.header__logout{
+    width: 57px;
+    height: 26px;
+    background-color: #FECDC8;
+    border: 1px solid red;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.5s ease
+}
+
+.header__logout:hover{
+    background-color: #FFB4AD;
+}
+
+.header__logout a{
+    font-weight: 600;
+    font-size: 11px;
+    color: #CC0303;
+}
+

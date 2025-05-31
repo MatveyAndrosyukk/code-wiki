@@ -1,0 +1,57 @@
+.fileTree{
+    min-width: 340px!important;
+    min-height: 290px;
+    border-radius: 14px;
+    background-color: #202222;
+    border: 1px solid #2B2C2D;
+    margin-top: 30px;
+    padding: 10px;
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.fileTree__content{
+
+}
+
+.fileTree__buttons{
+    display: flex;
+    justify-content: space-between;
+}
+
+.fileTree__buttons-create{
+    width: 161px;
+    height: 28px;
+    background-color: #191A1A;
+    border: 1px solid #8D9191;
+    color: #8D9191;
+    font-size: 13px;
+    border-radius: 22px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fileTree__buttons-lock{
+    width: 30px;
+    height: 30px;
+    background-color: #191A1A;
+    border: 1px solid #8D9191;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fileTree__buttons-lock img{
+    width: 12px;
+    height: 12px;
+}
+
+.fileTree__files{
+
+}

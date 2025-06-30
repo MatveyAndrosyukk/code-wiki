@@ -78,12 +78,12 @@
     width: 222px;
     height: 27px;
     border: 1px solid #8D9191;
-    border-radius: 4px;
+    border-radius: 22px;
     background-color: #191A1A;
     padding-left: 24px;
     color: #8D9191;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .header__search-input input::placeholder{
@@ -95,8 +95,7 @@
 .header__logout{
     width: 57px;
     height: 26px;
-    background-color: #FECDC8;
-    border: 1px solid red;
+    background-color: #FFB4AD;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -106,12 +105,12 @@
 }
 
 .header__logout:hover{
-    background-color: #FFB4AD;
+    background-color: #fbada6;
 }
 
 .header__logout a{
     font-weight: 600;
     font-size: 11px;
-    color: #CC0303;
+    color: #CC032D;
 }
 

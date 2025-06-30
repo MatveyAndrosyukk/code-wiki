@@ -1,0 +1,25 @@
+.terminal-block {
+    background-color: #191A1A;
+    padding: 0 1em 1em 1em;
+    border-radius: 8px;
+    font-family: "DM Mono", monospace;
+    font-weight: 300;
+    font-size: 13px;
+    line-height: 18px;
+    color: #E8E8E6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 500px;
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #8D9191 #191A1A;
+}
+
+.terminal-block-header{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    margin-bottom: 1em;
+    border-bottom: 1px solid #2B2C2D;
+}

@@ -1,0 +1,79 @@
+.emptyFile {
+    width: 890px;
+    height: calc(100vh - 70px - 20px - 20px);
+    background-color: #202222;
+    border-radius: 14px;
+    border: 1px solid #2B2C2D;
+    margin-top: 20px;
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #8D9191 #191A1A;
+}
+
+.emptyFile__content {
+    padding: 0 9px;
+    height: calc(100% - 31px); /* чтобы смайлик был по центру */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.emptyFile__smileWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.emptyFile__smile {
+    animation: spin 2.5s linear infinite, pulse 1.5s ease-in-out infinite;
+    /* Можно добавить drop-shadow для объёма */
+    filter: drop-shadow(0 2px 8px #0002);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1);}
+    50% { transform: scale(1.07);}
+}
+
+.emptyFile__caption {
+    font-family: "Bitcount Grid Double", system-ui;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-variation-settings:
+            "slnt" 0,
+            "CRSV" 0.5,
+            "ELSH" 0,
+            "ELXP" 0;
+    font-size: 25px;
+    line-height: 19px;
+    margin-top: 18px;
+    color: #E8E8E6;
+    text-align: center;
+    opacity: 0.7;
+    user-select: none;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 92%, 100% {
+        transform: scaleY(1);
+    }
+    95%, 97% {
+        transform: scaleY(0.1);
+    }
+}
+
+.eye {
+    transform-origin: center 55px; /* центр глаза по вертикали */
+    animation: blink 3.5s infinite;
+}

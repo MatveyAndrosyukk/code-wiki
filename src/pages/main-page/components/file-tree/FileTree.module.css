@@ -1,11 +1,14 @@
 .fileTree{
-    min-width: 340px!important;
+    width: 340px;
+    overflow: auto;
     min-height: 290px;
     border-radius: 14px;
     background-color: #202222;
     border: 1px solid #2B2C2D;
-    margin-top: 30px;
+    margin-top: 20px;
     padding: 10px;
+    flex-grow: 0;
+    align-self: flex-start;
     font-family: "Inter", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
@@ -21,18 +24,22 @@
 }
 
 .fileTree__buttons-create{
-    width: 161px;
+    width: 146px;
     height: 28px;
     background-color: #191A1A;
     border: 1px solid #8D9191;
     color: #8D9191;
     font-size: 13px;
-    border-radius: 22px;
+    border-radius: 7px;
     cursor: pointer;
     font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.fileTree__buttons-create:hover{
+    background-color: #202222;
 }
 
 .fileTree__buttons-lock{
@@ -47,11 +54,23 @@
     justify-content: center;
 }
 
+.fileTree__buttons-lock:hover{
+    background-color: #202222;
+}
+
 .fileTree__buttons-lock img{
     width: 12px;
     height: 12px;
 }
 
 .fileTree__files{
+ margin-top: 6px;
+}
 
+.add_folder_modal{
+    width: 350px;
+    height: 200px;
+    background-color: #191A1A;
+    border: 1px solid #8D9191;
+    position: absolute;
 }

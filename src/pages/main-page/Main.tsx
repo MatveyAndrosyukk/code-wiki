@@ -15,7 +15,7 @@ const Main: FC = () => {
     const dispatch = useDispatch();
     const files = useSelector((state: RootState) => state.fileTree.files)
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAddFolderModalOpen, setIsAddFolderModalOpen] = useState(false);
     const [newFolderTitle, setNewFolderTitle] = useState("");
         const [copiedFile, setCopiedFile] = useState<File | null>(null);
 
@@ -42,18 +42,18 @@ const Main: FC = () => {
     }, [dispatch]);
 
     const handleCreateRootFolder = useCallback(() => {
-        setIsModalOpen(true);
+        setIsAddFolderModalOpen(true);
     }, [])
 
-    const handleCloseModal = useCallback(() => {
-        setIsModalOpen(false);
+    const handleCloseAddFolderModal = useCallback(() => {
+        setIsAddFolderModalOpen(false);
     }, [])
 
     const handleCreateNewFolder = () => {
         if (newFolderTitle.trim() === "") return;
         dispatch(createRootFolder({title: newFolderTitle.trim()}));
         setNewFolderTitle("")
-        setIsModalOpen(false);
+        setIsAddFolderModalOpen(false);
     }
 
     return (
@@ -69,7 +69,7 @@ const Main: FC = () => {
                 />
                 {openedFile ? <OpenedFile file={openedFile}/> : <EmptyFile/>}
             </div>
-            <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+            <Modal isOpen={isAddFolderModalOpen} onClose={handleCloseAddFolderModal}>
                 <div className={styles['createFolder__overlay']}>
                     <div className={styles['createFolder-form']}>
                         <input

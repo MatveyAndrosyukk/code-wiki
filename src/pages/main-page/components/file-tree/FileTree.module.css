@@ -12,6 +12,8 @@
     font-family: "Inter", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
+    scrollbar-width: thin;
+    scrollbar-color: #8D9191 #191A1A;
 }
 
 .fileTree__content{

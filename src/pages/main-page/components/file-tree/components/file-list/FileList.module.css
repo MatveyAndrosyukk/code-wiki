@@ -20,14 +20,20 @@
 }
 
 .fileList__node-line{
-    margin-left: 11px;
+    /*margin-left: 11px;*/
+    width: 10px;
+    flex-shrink: 0;
+    margin-left: 0;
     margin-right: 10px;
 }
 
 .fileList__node-space {
     margin-right: 10px;
-    width: 2px;
-    display: block;
+    width: 10px;
+    flex-shrink: 0;
+    /*width: 2px;*/
+    /*display: block;*/
+    display: inline-block;
 }
 
 .fileList__node-container {

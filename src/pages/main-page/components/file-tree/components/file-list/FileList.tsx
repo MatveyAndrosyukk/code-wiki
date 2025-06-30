@@ -65,47 +65,36 @@ const FileList: React.FC<FileListProps> = ({
             const linesBlock = (
                 // Пропуск 1 элемента, для него line не нужна.
                 <span className={styles['fileList__node-lineBlock']}>
-                {ancestors.slice(1).map((hasSibling, i) =>
-                    hasSibling ? (
-                        <img
-                            className={styles['fileList__node-line']}
-                            key={i}
-                            src={Line}
-                            alt="line"
-                            style={{
-                                marginLeft: i === 0 ? 3 : 11,
-                                marginRight: 10,
-                            }}
-                        />
-                    ) : (
-                        <span
-                            key={i}
-                            className={styles['fileList__node-space']}
-                            style={{
-                                marginLeft: i === 0 ? 3 : 11,
-                            }}
-                        />
-                    )
-                )}
-                    {level > 0 && (
-                        <img
-                            className={styles['fileList__node-line']}
-                            src={
-                                nodes.length === 1
-                                    ? LastChildLine
-                                    : idx === 0
-                                        ? ChildLine
-                                        : isLast
-                                            ? LastChildLine
-                                            : Line
-                            }
-                            alt="line"
-                            style={{
-                                marginLeft: ancestors.length === 1 ? 3 : 11,
-                                marginRight: 10,
-                            }}
-                        />
+                    {ancestors.slice(1).map((hasSibling, i) =>
+                        hasSibling ? (
+                            <img
+                                className={styles['fileList__node-line']}
+                                key={i}
+                                src={Line}
+                                alt="line"
+                                style={{height: 27, width: 2}}
+                            />
+                        ) : (
+                            <span
+                                key={i}
+                                className={styles['fileList__node-space']}
+                            />
+                        )
                     )}
+                    {level > 0 && (() => {
+                        const isLast = idx === nodes.length - 1;
+                        const lineSrc = isLast ? LastChildLine : ChildLine;
+                        const lineWidth = 10; // или нужная ширина
+
+                        return (
+                            <img
+                                className={styles['fileList__node-line']}
+                                src={lineSrc}
+                                alt="line"
+                                style={{height: 27, width: lineWidth, marginRight: 10}}
+                            />
+                        );
+                    })()}
             </span>
             );
 

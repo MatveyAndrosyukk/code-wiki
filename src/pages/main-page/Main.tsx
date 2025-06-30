@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useState} from 'react';
+import React, {FC, useCallback, useEffect, useRef, useState} from 'react';
 import Header from "./components/header/Header";
 import styles from './Main.module.css'
 import FileTree from "./components/file-tree/FileTree";
@@ -13,16 +13,27 @@ import {File} from "../../types/file";
 
 const Main: FC = () => {
     const dispatch = useDispatch();
+
     const files = useSelector((state: RootState) => state.fileTree.files)
 
+    const addFolderInputRef = useRef<HTMLInputElement>(null)
+
     const [isAddFolderModalOpen, setIsAddFolderModalOpen] = useState(false);
+
     const [newFolderTitle, setNewFolderTitle] = useState("");
-        const [copiedFile, setCopiedFile] = useState<File | null>(null);
+
+    const [copiedFile, setCopiedFile] = useState<File | null>(null);
 
     // Из всех файлов ищет единственный открытый.
     const openedFile = useSelector((state: RootState) => {
         return findOpenedFile(state.fileTree.files);
     });
+
+    useEffect(() => {
+        if (isAddFolderModalOpen && addFolderInputRef.current){
+            addFolderInputRef.current.focus()
+        }
+    }, [isAddFolderModalOpen]);
 
     // Вставляет скопированный файл.
     const handlePasteFile = useCallback((id: number) => {
@@ -73,6 +84,7 @@ const Main: FC = () => {
                 <div className={styles['createFolder__overlay']}>
                     <div className={styles['createFolder-form']}>
                         <input
+                            ref={addFolderInputRef}
                             type='text'
                             placeholder='Enter the title'
                             className={styles['createFolder-input']}

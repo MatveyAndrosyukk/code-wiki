@@ -21,7 +21,7 @@ function findAndUpdate(
     return false;
 }
 
-// У скопированного файла изменяется все id по вложенности
+// У скопированного файла изменяется все id по вложенности.
 function deepCloneWithNewIds(file: File): File {
     const newId = Date.now() + Math.floor(Math.random() * 1000000);
     return {
@@ -54,6 +54,15 @@ function closeAllChildren(nodes: File[]): File[] {
         status: node.type === FileType.Folder ? FileStatus.Closed : node.status,
         children: node.children ? closeAllChildren(node.children) : [],
     }));
+}
+
+function deleteById(nodes: File[], id: number): File[] {
+    return nodes
+        .filter(node => node.id !== id)
+        .map(node => ({
+            ...node,
+            children: node.children ? deleteById(node.children, id) : [],
+        }));
 }
 
 // Тип состояния.
@@ -105,6 +114,7 @@ const fileTreeSlice = createSlice({
 
             state.files = toggle(state.files);
         },
+        // Добавляет корневую папку с переданным названием.
         createRootFolder(state, action: PayloadAction<{ title: string }>) {
             const newFolder: File = {
                 id: Date.now(), // или nanoid() если подключите
@@ -118,6 +128,7 @@ const fileTreeSlice = createSlice({
             };
             state.files.push(newFolder);
         },
+        // Вставляет скопированный файл в переданную папку по id.
         pasteFile(state, action: PayloadAction<{ targetFolderId: number; file: File }>) {
             findAndUpdate(state.files, action.payload.targetFolderId, (node) => {
                 if (node.type === FileType.Folder) {
@@ -126,9 +137,49 @@ const fileTreeSlice = createSlice({
                 }
             });
         },
+        //Создает папку в переданной по id папке.
+        addFolder(state, action: PayloadAction<{ parentId: number; title: string }>) {
+            findAndUpdate(state.files, action.payload.parentId, (node) => {
+                if (node.type === FileType.Folder) {
+                    const newFolder: File = {
+                        id: Date.now(),
+                        name: action.payload.title,
+                        type: FileType.Folder,
+                        status: FileStatus.Closed,
+                        author: 'user',
+                        content: "",
+                        likes: 0,
+                        children: [],
+                    };
+                    node.children = [...(node.children || []), newFolder];
+                }
+            });
+        },
+        //Создает файл в переданной по id папке.
+        addFile(state, action: PayloadAction<{ parentId: number; title: string }>) {
+            findAndUpdate(state.files, action.payload.parentId, (node) => {
+                if (node.type === FileType.Folder) {
+                    const newFolder: File = {
+                        id: Date.now(),
+                        name: action.payload.title,
+                        type: FileType.File,
+                        status: FileStatus.Closed,
+                        author: 'user',
+                        content: "",
+                        likes: 0,
+                        children: [],
+                    };
+                    node.children = [...(node.children || []), newFolder];
+                }
+            });
+        },
+        deleteFile(state, action: PayloadAction<{ id: number }>) {
+            state.files = deleteById(state.files, action.payload.id);
+        },
     },
+
 });
 
-export const {openFile, toggleFolder, createRootFolder, pasteFile} = fileTreeSlice.actions;
+export const {openFile, toggleFolder, createRootFolder, pasteFile, addFolder, addFile, deleteFile} = fileTreeSlice.actions;
 export default fileTreeSlice.reducer;
 

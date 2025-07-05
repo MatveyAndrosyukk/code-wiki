@@ -21,15 +21,25 @@
 
 .fileList__node-line{
     /*margin-left: 11px;*/
-    width: 10px;
+    width: 12px;
     flex-shrink: 0;
+    display: inline-block;
+    position: relative;
     margin-left: 0;
     margin-right: 10px;
+    height: 27px;
+}
+
+.fileList__node-line img{
+    position: absolute;
+    top: 0;
+    left: 2px;
+    height: 27px;
 }
 
 .fileList__node-space {
     margin-right: 10px;
-    width: 10px;
+    width: 12px;
     flex-shrink: 0;
     /*width: 2px;*/
     /*display: block;*/

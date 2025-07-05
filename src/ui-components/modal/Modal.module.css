@@ -15,4 +15,6 @@
     background-color: #202222;
     border: 1px solid #2B2C2D;
     border-radius: 9px;
+    position: absolute;
+    top: 4px;
 }

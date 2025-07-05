@@ -99,7 +99,7 @@
 }
 
 .openedFile__rightSide-like:hover {
-    color: #18A0FB;
+    color: #18A184;
 }
 
 .openedFile__rightSide-delete {
@@ -116,6 +116,10 @@
     cursor: pointer;
 }
 
+.openedFile__rightSide-edit:hover {
+    color: #18A184;
+}
+
 .openedFile__content {
     padding: 0 9px 0 9px;
 }
@@ -123,7 +127,7 @@
 .openedFile__content-text {
     font-family: "Roboto", sans-serif;
     font-optical-sizing: auto;
-    font-weight: 400;
+    font-weight: 300;
     font-style: normal;
     font-size: 14px;
     line-height: 19px;
@@ -161,7 +165,7 @@
 .openedFile__content-point {
     font-family: "Roboto", sans-serif;
     font-optical-sizing: auto;
-    font-weight: 400;
+    font-weight: 300;
     font-style: normal;
     font-size: 14px;
     line-height: 19px;

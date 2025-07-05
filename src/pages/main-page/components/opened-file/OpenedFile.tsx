@@ -48,11 +48,11 @@ const OpenedFile: FC<OpenedFileProps> = ({file}) => {
                     <div className={styles['openedFile__rightSide-like']}>
                         Like
                     </div>
-                    <div className={styles['openedFile__rightSide-delete']}>
-                        Delete
-                    </div>
                     <div className={styles['openedFile__rightSide-edit']}>
                         Edit
+                    </div>
+                    <div className={styles['openedFile__rightSide-delete']}>
+                        Delete
                     </div>
                 </div>
             </div>

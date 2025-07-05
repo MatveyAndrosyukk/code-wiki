@@ -2,7 +2,6 @@
     position: fixed;
     z-index: 1000;
     background-color: #191A1A;
-    padding: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -19,7 +18,7 @@
 }
 
 .contextMenu li {
-    padding: 5px 0;
+    padding: 7px 7px;
     text-align: center;
     cursor: pointer;
     position: relative;
@@ -44,4 +43,8 @@
 .contextMenu li:last-child:after {
     width: 0;
     height: 0;
+}
+
+.contextMenu li.contextMenu__item-delete:hover {
+    color: #D32F2F;
 }

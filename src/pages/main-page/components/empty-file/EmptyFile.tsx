@@ -5,23 +5,23 @@ const EmptyFile = () => {
     return (
         <div className={styles['emptyFile']}>
             <div className={styles['emptyFile__content']}>
-                <div className={styles['emptyFile__smileWrapper']}>
-                    <svg
-                        className={styles['emptyFile__smile']}
-                        width="120"
-                        height="120"
-                        viewBox="0 0 120 120"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <rect x="10" y="10" width="100" height="100" rx="25" stroke="#A0A0A0" strokeWidth="4" fill="none" />
-                        <ellipse className={styles['eye']} cx="45" cy="55" rx="7" ry="9" fill="#A0A0A0"/>
-                        <ellipse className={styles['eye']} cx="75" cy="55" rx="7" ry="9" fill="#A0A0A0"/>
-                        <path d="M50 80 Q60 95 70 80" stroke="#A0A0A0" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                <div className={styles['emptyFile__bookWrapper']}>
+                    <svg className={styles['book-svg']} width="200" height="200" viewBox="0 0 22 22" fill="none"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <g className={styles['book-right']}>
+                            <path
+                                d="M11 3.99995C12.8839 2.91716 14.9355 2.15669 17.07 1.74995C17.551 1.63467 18.0523 1.63283 18.5341 1.74458C19.016 1.85632 19.4652 2.07852 19.8464 2.39375C20.2276 2.70897 20.5303 3.10856 20.7305 3.56086C20.9307 4.01316 21.0229 4.50585 21 4.99995V13.9999C20.9699 15.117 20.5666 16.1917 19.8542 17.0527C19.1419 17.9136 18.1617 18.5112 17.07 18.7499C14.9355 19.1567 12.8839 19.9172 11 20.9999"
+                                stroke="#E8E8E6" strokeWidth="0.7" strokeLinecap="round" strokeLinejoin="round"/>
+                        </g>
+                        <g className={styles['book-left']}>
+                            <path
+                                d="M10.9995 3.99995C9.1156 2.91716 7.06409 2.15669 4.92957 1.74995C4.44856 1.63467 3.94731 1.63283 3.46546 1.74458C2.98362 1.85632 2.53439 2.07852 2.15321 2.39375C1.77203 2.70897 1.46933 3.10856 1.26911 3.56086C1.0689 4.01316 0.976598 4.50585 0.999521 4.99995V13.9999C1.0296 15.117 1.433 16.1917 2.14533 17.0527C2.85767 17.9136 3.83793 18.5112 4.92957 18.7499C7.06409 19.1567 9.1156 19.9172 10.9995 20.9999"
+                                stroke="#E8E8E6" strokeWidth="0.7" strokeLinecap="round" strokeLinejoin="round"/>
+                        </g>
+                        <path className={styles['book-spine']} d="M11 21V4" stroke="#E8E8E6" strokeWidth="0.7"
+                              strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    <div className={styles['emptyFile__caption']}>
-                        Open your file
-                    </div>
+                    <div className={styles['emptyFile__text']}>Open your file</div>
                 </div>
             </div>
         </div>

@@ -12,20 +12,31 @@ import {toggleFolder} from "../../../../../../store/slices/fileTreeSlice";
 import ContextMenu from "../../../../../../ui-components/context-menu/ContextMenu";
 
 interface FileListProps {
-    files: File[];
-    onFileClick: (id: number) => void;
-    onCopyFile: (file: File) => void;
-    onPasteFile: (id: number) => void;
+    files: File[]; // Все файлы.
+    copiedFile: File | null; // Скопированный файл для логики отрисовки Paste.
+    onFileClick: (id: number) => void; // Открывает файл и закрывает остальные.
+    onOpenModal: (args: {reason: string, id: number | null}) => void; // Открывает модальное окно с опр. причиной.
+    onCopyFile: (file: File) => void; // Копирует файл.
+    onPasteFile: (id: number) => void; // Вставляет файл.
+    onDeleteFile: (file: File) => void;
+    onRenameFile: (file: File) => void;
 }
 
-const FileList: React.FC<FileListProps> = ({
-                                               files,
-                                               onFileClick,
-                                               onCopyFile,
-                                               onPasteFile,
-                                           }) => {
+const FileList: React.FC<FileListProps> = (
+    {
+        files,
+        copiedFile,
+        onFileClick,
+        onCopyFile,
+        onPasteFile,
+        onOpenModal,
+        onDeleteFile,
+        onRenameFile,
+    }
+) => {
     const dispatch = useDispatch();
 
+    // Состояние контекстного меню.
     const [contextMenu, setContextMenu] = React.useState<{
         visible: boolean,
         x: number,
@@ -33,11 +44,12 @@ const FileList: React.FC<FileListProps> = ({
         file: File | null;
     }>({visible: false, x: 0, y: 0, file: null});
 
-    // При нажатии на папку вызывается slice открытия/закрытия папки.
+    // Открывает / закрывает папку (также ее children).
     const onFolderClick = (id: number) => {
         dispatch(toggleFolder({id}))
     };
 
+    // Открывает контекстное меню там, где нажал пользователь.
     const onContextMenuHandler = (event: React.MouseEvent, file: File) => {
         event.preventDefault();
         setContextMenu({
@@ -48,11 +60,12 @@ const FileList: React.FC<FileListProps> = ({
         });
     };
 
+    // Закрывает контекстное меню.
     const closeContextMenu = () => {
         setContextMenu({...contextMenu, visible: false});
     }
 
-    // Вся логика отрисовки файлов/папок.
+    // Вся логика отрисовки файлов / папок.
     const renderTree = (
         nodes: File[],
         level = 0,
@@ -61,19 +74,22 @@ const FileList: React.FC<FileListProps> = ({
         return nodes.map((node, idx) => {
             const isLast = idx === nodes.length - 1;
 
-            // Логика отрисовки нужных линий перед файлом/папкой.
+            // Логика отрисовки нужных линий перед файлом / папкой.
             const linesBlock = (
                 // Пропуск 1 элемента, для него line не нужна.
                 <span className={styles['fileList__node-lineBlock']}>
                     {ancestors.slice(1).map((hasSibling, i) =>
                         hasSibling ? (
-                            <img
-                                className={styles['fileList__node-line']}
+                            <span
                                 key={i}
-                                src={Line}
-                                alt="line"
-                                style={{height: 27, width: 2}}
-                            />
+                                className={styles['fileList__node-line']}
+                            >
+                                     <img
+                                         style={{width: 2}}
+                                         src={Line}
+                                         alt="line"
+                                     />
+                            </span>
                         ) : (
                             <span
                                 key={i}
@@ -81,18 +97,21 @@ const FileList: React.FC<FileListProps> = ({
                             />
                         )
                     )}
+
                     {level > 0 && (() => {
                         const isLast = idx === nodes.length - 1;
                         const lineSrc = isLast ? LastChildLine : ChildLine;
-                        const lineWidth = 10; // или нужная ширина
 
                         return (
-                            <img
+                            <span
                                 className={styles['fileList__node-line']}
-                                src={lineSrc}
-                                alt="line"
-                                style={{height: 27, width: lineWidth, marginRight: 10}}
-                            />
+                            >
+                                     <img
+                                         style={{width: 10}}
+                                         src={lineSrc}
+                                         alt="line"
+                                     />
+                            </span>
                         );
                     })()}
             </span>
@@ -152,9 +171,13 @@ const FileList: React.FC<FileListProps> = ({
                 x={contextMenu.x}
                 y={contextMenu.y}
                 file={contextMenu.file}
+                copiedFile={copiedFile}
                 onClose={closeContextMenu}
                 onCopyFile={onCopyFile}
                 onPasteFile={onPasteFile}
+                onOpenModal={onOpenModal}
+                onRenameFile={onRenameFile}
+                onDeleteFile={onDeleteFile}
             />
         )}
     </div>;

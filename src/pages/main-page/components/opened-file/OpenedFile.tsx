@@ -5,8 +5,8 @@ import DownloadBtn from './images/opened-file-download.svg'
 import {File} from "../../../../types/file";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../store";
-import findFilePath from "../../../../utils/findFilePath";
-import {parseFile} from "../../../../utils/parseFile";
+import {parseFile} from "./utils/parseFile";
+import findFilePath from "./utils/findFilePath";
 
 interface OpenedFileProps {
     file: File;

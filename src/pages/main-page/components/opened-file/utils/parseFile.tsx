@@ -1,7 +1,7 @@
-import styles from '../pages/main-page/components/opened-file/OpenedFile.module.css'
+import styles from '../OpenedFile.module.css'
 import {ReactNode} from "react";
-import CodeBlock from "../pages/main-page/components/opened-file/components/code-block/CodeBlock";
-import TerminalBlock from "../pages/main-page/components/opened-file/components/terminal-block/TerminalBlock";
+import CodeBlock from "../components/code-block/CodeBlock";
+import TerminalBlock from "../components/terminal-block/TerminalBlock";
 
 // Рекурсивный парсер для inline тегов
 function parseInline(text: string): ReactNode[] {

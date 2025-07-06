@@ -1,6 +1,6 @@
-import {File} from "../types/file";
-
 // Возвращает массив file.name от корневой папки до файла.
+import {File} from "../../../../../types/file";
+
 export default function findFilePath(nodes: File[], targetId: number, path: string[] = []): string[] | null {
     for (const node of nodes) {
         const currentPath = [...path, node.name];

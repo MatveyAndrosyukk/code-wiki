@@ -1,4 +1,4 @@
-import {File, FileStatus, FileType} from "../types/file";
+import {File, FileStatus, FileType} from "../../../types/file";
 
 // Из всех файлов ищет единственный открытый.
 export default function findOpenedFile(nodes: File[]): File | null {

@@ -56,6 +56,7 @@ function closeAllChildren(nodes: File[]): File[] {
     }));
 }
 
+// Удаляет файл/папку по id.
 function deleteById(nodes: File[], id: number): File[] {
     return nodes
         .filter(node => node.id !== id)

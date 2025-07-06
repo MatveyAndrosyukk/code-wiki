@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal from "../../ui-components/modal/Modal";
-import styles from '../../pages/main-page/Main.module.css';
+import styles from '../../pages/main-page/MainPage.module.css';
 import {FileType} from "../../types/file";
 
 const DeleteModal = ({

@@ -1,16 +1,22 @@
-import {useState, useRef, useCallback} from "react";
+import {useState, useRef, useCallback, useEffect} from "react";
 import {useDispatch} from "react-redux";
 import useClipboard from "./useClipboard";
 import {File, FileType} from "../../../types/file";
-import {addFile, addFolder, createRootFolder, deleteFile, openFile} from "../../../store/slices/fileTreeSlice";
+import {addFile, addFolder, createRootFolder} from "../../../store/slices/fileTreeSlice";
 
-export default function useFileModal(files: File[]) {
+export default function useFileTreeActions(files: File[]) {
     const dispatch = useDispatch();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalValue, setModalValue] = useState("");
     const [modalState, setModalState] = useState<{ reason: string, id: number | null }>({reason: "", id: null});
     const addFolderInputRef = useRef<HTMLInputElement>(null);
     const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean, file: File | null }>({open: false, file: null});
+
+    useEffect(() => {
+        if (isModalOpen && addFolderInputRef.current){
+            addFolderInputRef.current.focus();
+        }
+    }, [isModalOpen])
 
     const checkIfNameExists = useCallback((
         files: File[],
@@ -106,24 +112,14 @@ export default function useFileModal(files: File[]) {
         setModalState,
         addFolderInputRef,
         handleCreate,
-        handleFileClick: (id: number) => dispatch(openFile({id})),
-        handleOpenModal: openModal,
-        handleDeleteFile: (file: File) => setDeleteConfirm({open: true, file}),
-        handleRenameFile: (file: File) => {
+        onOpenModal: openModal,
+        onDeleteFile: (file: File) => setDeleteConfirm({open: true, file}),
+        onRenameFile: (file: File) => {
             setModalState({reason: 'rename', id: file.id});
             setModalValue(file.name);
             setIsModalOpen(true);
         },
-        handleCloseModal: () => {
-            setIsModalOpen(false);
-            setModalValue("");
-        },
         isPasteConflict: modalState.reason === 'resolvePasteConflict',
         deleteConfirm,
-        cancelDelete: () => setDeleteConfirm({open: false, file: null}),
-        confirmDelete: () => {
-            if (deleteConfirm.file) dispatch(deleteFile({id: deleteConfirm.file.id}));
-            setDeleteConfirm({open: false, file: null});
-        }
     }
 }

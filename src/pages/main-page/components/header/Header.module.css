@@ -20,6 +20,7 @@
 .header__content{
     display: flex;
     justify-content: space-between;
+    user-select: none;
 }
 
 .header__leftSide{
@@ -52,11 +53,6 @@
     margin-right: 20px;
 }
 
-.header__search img{
-    width: 11px;
-    height: 11px;
-    cursor: pointer;
-}
 
 .header__search-input{
     display: flex;
@@ -66,7 +62,7 @@
     margin-right: 4px;
 }
 
-.header__search-input img{
+.header__search-loop{
     width: 12px;
     height: 12px;
     position: absolute;

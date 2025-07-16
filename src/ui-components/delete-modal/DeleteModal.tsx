@@ -1,6 +1,7 @@
 import React from 'react';
 import Modal from "../../ui-components/modal/Modal";
-import styles from '../../pages/main-page/MainPage.module.css';
+import modalStyles from '../modal/ModalContent.module.css'
+import styles from './DeleteModal.module.css'
 import {FileType} from "../../types/file";
 
 const DeleteModal = ({
@@ -10,15 +11,15 @@ const DeleteModal = ({
                             }: any) => (
     <Modal isOpen={deleteConfirm.open} onClose={cancelDelete}>
         <div
-            className={styles['createFolder__overlay']}
+            className={modalStyles['modal__overlay']}
             style={deleteConfirm.open ? {padding: '7px 11px 7px'} : undefined}
         >
-            <div className={styles['createFolder__form']}>
-                <p className={styles['createFolder__form-deleteText']}>
+            <div className={modalStyles['modal__form']}>
+                <p className={modalStyles['modal__text']}>
                     {deleteConfirm.file?.type === FileType.Folder ? (
                         <>
                             Delete folder{" "}
-                            <span className={styles['createFolder__highlightName']}>
+                            <span className={styles['modal__text-highlighted']}>
                                 "{deleteConfirm.file.name}"
                             </span>{" "}
                             and all its contents?
@@ -26,24 +27,22 @@ const DeleteModal = ({
                     ) : (
                         <>
                             Delete file{" "}
-                            <span className={styles['createFolder__highlightName']}>
+                            <span className={styles['modal__text-highlighted']}>
                                 "{deleteConfirm.file?.name}"
                             </span>
                             ?
                         </>
                     )}
                 </p>
-                <div className={styles['createFolder__form-buttons']}>
+                <div className={modalStyles['modal__buttons']}>
                     <button
-                        className={styles['createFolder-button']}
-                        style={{background: '#D32F2F'}}
+                        className={styles['modal__buttons-delete']}
                         onClick={confirmDelete}
                     >
                         Delete
                     </button>
                     <button
-                        className={styles['createFolder-button']}
-                        style={{background: '#18A184'}}
+                        className={styles['modal__buttons-cancel']}
                         onClick={cancelDelete}
                     >
                         Cancel

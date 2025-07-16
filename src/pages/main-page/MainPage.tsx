@@ -1,20 +1,23 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Header from "./components/header/Header";
 import styles from './MainPage.module.css'
 import FileTree from "./components/file-tree/FileTree";
 import OpenedFile from "./components/opened-file/OpenedFile";
 import EmptyFile from "./components/empty-file/EmptyFile";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import findOpenedFile from "./utils/findOpenedFile";
-import useFileModal from "./utils/useFileModal";
+import useFileTreeActions from "./utils/useFileTreeActions";
 import EditModal from "../../ui-components/edit-modal/EditModal";
 import DeleteModal from "../../ui-components/delete-modal/DeleteModal";
+import {openFile} from "../../store/slices/fileTreeSlice";
+import useEditFileViewActions from "./utils/useEditFileViewActions";
 
 const MainPage = () => {
     const files = useSelector((state: RootState) => state.fileTree.files);
     const openedFile = useSelector((state: RootState) => findOpenedFile(state.fileTree.files));
-    const fileModal = useFileModal(files);
+    const fileTreeActions = useFileTreeActions(files);
+    const editFileViewActions = useEditFileViewActions()
 
     return (
         <div className={styles['main']}>
@@ -22,18 +25,16 @@ const MainPage = () => {
             <div className={styles['container']}>
                 <FileTree
                     files={files}
-                    copiedFile={fileModal.copiedFile}
-                    onFileClick={fileModal.handleFileClick}
-                    onOpenModal={fileModal.handleOpenModal}
-                    onCopyFile={fileModal.handleCopyFile}
-                    onPasteFile={fileModal.handlePasteFile}
-                    onDeleteFile={fileModal.handleDeleteFile}
-                    onRenameFile={fileModal.handleRenameFile}
+                    {...editFileViewActions}
+                    {...fileTreeActions}
                 />
-                {openedFile ? <OpenedFile file={openedFile}/> : <EmptyFile/>}
+                {openedFile ? <OpenedFile
+                    file={openedFile}
+                    {...editFileViewActions}
+                /> : <EmptyFile/>}
             </div>
-            <EditModal {...fileModal} copiedFile={fileModal.copiedFile} />
-            <DeleteModal {...fileModal} />
+            <EditModal {...fileTreeActions}/>
+            <DeleteModal {...fileTreeActions} />
         </div>
     );
 };

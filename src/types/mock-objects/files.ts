@@ -51,8 +51,8 @@
                                             id: 6,
                                             type: FileType.File,
                                             name: "document2.txt",
-                                            content: "Hello, this is your preview file 3 to see how your future notes will be look like. Let’s create some code to show how comfortably you can save your code notes in CodeWiki:\n" +
-                                                "[code*]\n" +
+                                            content: "Hello, this is your preview file 3 to see how your future notes will be look like. Let’s create some code to show how comfortably you can save your code notes in [```b```]CodeWiki[```/b```]:\n" +
+                                                "[```code```]\n" +
                                                 "import React from 'react';\n" +
                                                 "import {File, FileStatus, FileType} from \"../../../../../../types/file\";\n" +
                                                 "import OpenedImg from './images/file-list-opened.svg'\n" +
@@ -184,10 +184,11 @@
                                                 "};\n" +
                                                 "\n" +
                                                 "export default FileList;\n" +
-                                                "[/code*]\n" +
-                                                "[/divline*]\n" +
+                                                "[```/code```]\n" +
+                                                "\n" +
+                                                "[```line```]\n" +
                                                 "Now let’s watch, how your console notes will be saved in Instanotes:\n" +
-                                                "[terminal*]\n" +
+                                                "[```terminal```]\n" +
                                                 "PS C:\\Users\\matve> ping 192.168.1.1\n" +
                                                 "\n" +
                                                 "Обмен пакетами с 192.168.1.1 по с 32 байтами данных:\n" +
@@ -198,11 +199,17 @@
                                                 "    (100% потерь)\n" +
                                                 "Control-C\n" +
                                                 "PS C:\\Users\\matve>\n" +
-                                                "[/terminal*]\n" +
+                                                "[```/terminal```]\n" +
                                                 "Points:\n" +
-                                                "[point*]Point 1[/point*]\n" +
-                                                "[point*]Point 2[/point*]\n" +
-                                                "[point*]Point 3[/point*]\n",
+                                                "[```point```]\n" +
+                                                "Point 1\n" +
+                                                "[```/point```]\n" +
+                                                "[```point```]\n" +
+                                                "Point 2\n" +
+                                                "[```/point```]\n" +
+                                                "[```point```]\n" +
+                                                "Point 3\n" +
+                                                "[```/point```]\n",
                                             status: FileStatus.Closed,
                                             likes: 0,
                                             author: "frank",

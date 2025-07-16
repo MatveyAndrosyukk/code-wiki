@@ -38,6 +38,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    user-select: none;
 }
 
 .fileTree__buttons-create:hover{
@@ -47,17 +48,18 @@
 .fileTree__buttons-lock{
     width: 30px;
     height: 30px;
-    background-color: #191A1A;
+    background-color: #202222;
     border: 1px solid #8D9191;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    user-select: none;
 }
 
 .fileTree__buttons-lock:hover{
-    background-color: #202222;
+    background-color: #191A1A;
 }
 
 .fileTree__buttons-lock img{

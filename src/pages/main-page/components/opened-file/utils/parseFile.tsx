@@ -1,53 +1,83 @@
 import styles from '../OpenedFile.module.css'
-import {ReactNode} from "react";
+import React, {ReactNode} from "react";
 import CodeBlock from "../components/code-block/CodeBlock";
 import TerminalBlock from "../components/terminal-block/TerminalBlock";
 
 // Рекурсивный парсер для inline тегов
-function parseInline(text: string): ReactNode[] {
-    // Регулярное выражение для поиска [tag*]...[/tag*]
-    const regex = /\[(underline|bold|italic)\*](.+?)\[\/\1\*]/g;
+function parseInline(text: string): React.ReactNode[] {
+    const parts: React.ReactNode[] = [];
 
-    const parts: ReactNode[] = [];
+    // Регулярки для ваших тегов
+    const tagRegex = /\[```l to="([^"]+)"```](.+?)\[```\/l```]/g;
+    const simpleTagsRegex = /\[```([ubi])```]([\s\S]+?)\[```\/\1```]/g;
+
     let lastIndex = 0;
-    let match;
 
-    while ((match = regex.exec(text)) !== null) {
-        const [fullMatch, tag, content] = match;
+    // Функция для поиска ближайшего следующего тега (либо link, либо простой)
+    function findNextTag(text: string, startPos: number) {
+        tagRegex.lastIndex = startPos;
+        const linkMatch = tagRegex.exec(text);
+        simpleTagsRegex.lastIndex = startPos;
+        const simpleMatch = simpleTagsRegex.exec(text);
+
+        // Выбираем, какой матч встречается раньше
+        if (linkMatch && simpleMatch) {
+            return linkMatch.index < simpleMatch.index ? {type: 'link', match: linkMatch} : {type: 'simple', match: simpleMatch};
+        }
+        if (linkMatch) return {type: 'link', match: linkMatch};
+        if (simpleMatch) return {type: 'simple', match: simpleMatch};
+        return null;
+    }
+
+    let nextTag = findNextTag(text, 0);
+
+    while (nextTag) {
+        const {type, match} = nextTag;
         const index = match.index;
 
-        // Добавляем текст до тега
         if (index > lastIndex) {
             parts.push(text.slice(lastIndex, index));
         }
 
-        // Рекурсивно парсим содержимое тега (вдруг вложенные теги)
-        const children = parseInline(content);
+        if (type === 'link') {
+            const href = match[1]; // ИСПРАВЛЕНО: раньше было match[2]
+            const innerContent = match[2]; // ИСПРАВЛЕНО: раньше было match[3]
+            const children = parseInline(innerContent);
+            parts.push(
+                <a key={index} className={styles['openedFile__content-link']} href={href} target="_blank" rel="noopener noreferrer">
+                    {children}
+                </a>
+            );
+            lastIndex = index + match[0].length;
+        } else if (type === 'simple') {
+            const tag = match[1];
+            const innerContent = match[2];
+            const children = parseInline(innerContent);
 
-        // Оборачиваем в span с нужным классом
-        let className = '';
-        switch (tag) {
-            case 'underline':
-                className = styles['openedFile__content-underline'];
-                break;
-            case 'bold':
-                className = styles['openedFile__content-bold'];
-                break;
-            case 'italic':
-                className = styles['openedFile__content-italic'];
-                break;
+            let className = '';
+            switch (tag) {
+                case 'u':
+                    className = styles['openedFile__content-underline'];
+                    break;
+                case 'b':
+                    className = styles['openedFile__content-bold'];
+                    break;
+                case 'i':
+                    className = styles['openedFile__content-italic'];
+                    break;
+            }
+
+            parts.push(
+                <span key={index} className={className}>
+                    {children}
+                </span>
+            );
+            lastIndex = index + match[0].length;
         }
 
-        parts.push(
-            <span key={index} className={className}>
-        {children}
-      </span>
-        );
-
-        lastIndex = index + fullMatch.length;
+        nextTag = findNextTag(text, lastIndex);
     }
 
-    // Добавляем остаток текста после последнего тега
     if (lastIndex < text.length) {
         parts.push(text.slice(lastIndex));
     }
@@ -67,11 +97,11 @@ export function parseFile(file: string): ReactNode[] {
         const line = lines[i].trim();
 
         // [code*] ... [/code*]
-        if (line.startsWith('[code*]')) {
+        if (line.startsWith('[```code```]')) {
             // Собираем строки до [/code*]
             let codeLines: string[] = [];
             i++; // пропускаем [code*]
-            while (i < n && !lines[i].startsWith('[/code*]')) {
+            while (i < n && !lines[i].startsWith('[```/code```]')) {
                 codeLines.push(lines[i]);
                 i++;
             }
@@ -87,18 +117,15 @@ export function parseFile(file: string): ReactNode[] {
         }
 
         // [terminal*] ... [/terminal*]
-        if (line.startsWith('[terminal*]')) {
+        if (line.startsWith('[```terminal```]')) {
             let terminalLines: string[] = [];
             i++;
-            while (i < n && !lines[i].startsWith('[/terminal*]')) {
+            while (i < n && !lines[i].startsWith('[```/terminal```]')) {
                 terminalLines.push(lines[i]);
                 i++;
             }
             i++;
 
-            // Передаём терминальные команды в TerminalBlock
-            // Здесь предполагается, что у вас есть парсер для команд
-            // Для примера передаём пустой массив или можно передать terminalLines
             elements.push(
                 <div key={`terminal-${i}`} className={styles['openedFile__content-terminal']}>
                     <TerminalBlock commands={terminalLines.join('\n')}/>
@@ -108,7 +135,7 @@ export function parseFile(file: string): ReactNode[] {
         }
 
         // [/divline*] — рисуем линию
-        if (line === '[/divline*]') {
+        if (line === '[```line```]') {
             elements.push(
                 <div key={`line-${i}`} className={styles['openedFile__content-line']}/>
             );
@@ -117,14 +144,19 @@ export function parseFile(file: string): ReactNode[] {
         }
 
         // [point*] ... [/point*]
-        if (line.startsWith('[point*]') && line.endsWith('[/point*]')) {
-            const content = line.slice(8, -9).trim();
+        if (line.startsWith('[```point```]')) {
+            let pointLines: string[] = [];
+            i++;
+            while (i < n && !lines[i].startsWith('[```/point```]')) {
+                pointLines.push(lines[i]);
+                i++;
+            }
+            i++;
             elements.push(
                 <div key={`point-${i}`} className={styles['openedFile__content-point']}>
-                    {content}
+                    {pointLines.join('\n')}
                 </div>
             );
-            i++;
             continue;
         }
 

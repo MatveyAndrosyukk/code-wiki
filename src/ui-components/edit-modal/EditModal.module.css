@@ -1,0 +1,11 @@
+.modal__input {
+    width: 222px;
+    height: 27px;
+    border: 1px solid #8D9191;
+    border-radius: 22px;
+    background-color: #191A1A;
+    padding-left: 11px;
+    color: #8D9191;
+    font-size: 13px;
+    font-weight: 500;
+}

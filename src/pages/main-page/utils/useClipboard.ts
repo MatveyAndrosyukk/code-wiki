@@ -31,8 +31,8 @@ export default function useClipboard(
 
     return {
         copiedFile,
-        handleCopyFile,
-        handlePasteFile,
+        onCopyFile: handleCopyFile,
+        onPasteFile: handlePasteFile,
         doPaste,
     }
 }

@@ -1,0 +1,71 @@
+.SearchInput {
+    position: relative;
+    width: 100%; /* или 100% */
+    box-sizing: border-box;
+}
+
+.SearchInput__input {
+    width: 100%;
+    box-sizing: border-box;
+    height: 27px;
+    border: 1px solid #2B2C2D;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 14px;
+}
+
+.SearchInput__list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 300px; /* примерно 10 пунктов по 30px */
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid #2B2C2D;
+    border-radius: 0 0 10px 10px;
+    background-color: #191A1A;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.SearchInput__item {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 9px 10px 9px 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    color: #8D9191;
+    font-size: 13px;
+}
+
+.SearchInput__item:last-child {
+    border-bottom: none;
+}
+
+.SearchInput__item:hover {
+    background-color: #242525;
+}
+
+.SearchInput__icon {
+    width: 14px;
+    height: 13px;
+    margin-right: 8px;
+    flex-shrink: 0;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.SearchInput__text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    white-space: nowrap;
+}
+
+/* Плавный градиент справа для текста */

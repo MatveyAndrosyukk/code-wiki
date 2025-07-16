@@ -1,0 +1,11 @@
+.modal__text-highlighted {
+    font-weight: 900;
+}
+
+.modal__buttons-delete {
+    background: #FF6B68
+}
+
+.modal__buttons-cancel {
+    background: #8D9191
+}

@@ -4,8 +4,19 @@ import headerLogo from './images/header-logo.svg'
 import headerSearch from './images/header-search.svg'
 import headerSwap from './images/header-swap.svg'
 import headerUser from './images/header-user.svg'
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../../../store";
+import {openPathToNode} from "../../../../store/slices/fileTreeSlice";
+import SearchInput from "./components/search-input/SearchInput";
 
 const Header:FC = () => {
+    const files = useSelector((state: RootState) => state.fileTree.files)
+    const dispatch = useDispatch();
+
+    const handleSelect = (id: number) => {
+        dispatch(openPathToNode({ id }));
+    };
+
     return (
         <div className={styles['header']}>
             <div className={styles['container']}>
@@ -21,8 +32,8 @@ const Header:FC = () => {
                         </div>
                         <div className={styles['header__search']}>
                             <div className={styles['header__search-input']}>
-                                <input type="text" placeholder='Search for files...'/>
-                                <img src={headerSearch} alt="Search"/>
+                                <SearchInput files={files} onSelect={handleSelect} />
+                                <img className={styles['header__search-loop']} src={headerSearch} alt="Search"/>
                             </div>
                             <img src={headerSwap} alt="Swap"/>
                         </div>

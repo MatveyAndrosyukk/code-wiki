@@ -1,0 +1,34 @@
+import {File, FileType} from "../../../../../../../types/file";
+
+export interface SearchResult {
+    id: number;
+    type: FileType;
+    name: string;
+    fullPath: string;
+}
+
+export default function searchFiles(
+    nodes: File[],
+    query: string,
+    path: string = ''
+): SearchResult[] {
+    if (!query) return [];
+    const lowerQuery = query.toLowerCase();
+    let results: SearchResult[] = [];
+
+    for (const node of nodes) {
+        const currentPath = path ? `${path}/${node.name}` : node.name;
+        if (node.name.toLowerCase().startsWith(lowerQuery)) {
+            results.push({
+                id: node.id,
+                type: node.type,
+                name: node.name,
+                fullPath: currentPath,
+            });
+        }
+        if (node.children && node.children.length > 0) {
+            results = results.concat(searchFiles(node.children, query, currentPath));
+        }
+    }
+    return results;
+}

@@ -66,6 +66,63 @@ function deleteById(nodes: File[], id: number): File[] {
         }));
 }
 
+// Функция для поиска пути к узлу по id
+function findPathToNode(nodes: File[], targetId: number, path: number[] = []): number[] | null {
+    for (const node of nodes) {
+        const currentPath = [...path, node.id];
+        if (node.id === targetId) {
+            return currentPath;
+        }
+        if (node.children && node.children.length > 0) {
+            const result = findPathToNode(node.children, targetId, currentPath);
+            if (result) return result;
+        }
+    }
+    return null;
+}
+
+// Функция для поиска узла по id, возвращает File или null
+function findNode(nodes: File[], targetId: number): File | null {
+    for (const node of nodes) {
+        if (node.id === targetId) return node;
+        if (node.children && node.children.length > 0) {
+            const found = findNode(node.children, targetId);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+// Открыть папки по пути, не закрывая другие папки
+function openFoldersOnPathPreserveOthers(nodes: File[], pathIds: number[]): File[] {
+    return nodes.map(node => {
+        const newNode = { ...node };
+        if (newNode.type === FileType.Folder) {
+            if (pathIds.includes(newNode.id)) {
+                newNode.status = FileStatus.Opened;
+            }
+            if (newNode.children && newNode.children.length > 0) {
+                newNode.children = openFoldersOnPathPreserveOthers(newNode.children, pathIds);
+            }
+        }
+        return newNode;
+    });
+}
+
+// Закрыть все файлы, кроме файла с id = openedFileId (если передан)
+function closeAllFilesExcept(nodes: File[], openedFileId: number | null): File[] {
+    return nodes.map(node => {
+        const newNode = { ...node };
+        if (newNode.type === FileType.File) {
+            newNode.status = newNode.id === openedFileId ? FileStatus.Opened : FileStatus.Closed;
+        }
+        if (newNode.children && newNode.children.length > 0) {
+            newNode.children = closeAllFilesExcept(newNode.children, openedFileId);
+        }
+        return newNode;
+    });
+}
+
 // Тип состояния.
 interface FileTreeState {
     files: File[];
@@ -134,7 +191,8 @@ const fileTreeSlice = createSlice({
             findAndUpdate(state.files, action.payload.targetFolderId, (node) => {
                 if (node.type === FileType.Folder) {
                     const newFile = deepCloneWithNewIds(action.payload.file);
-                    node.children = [...(node.children || []), newFile];
+                    const  pastedFile = {...newFile, status: FileStatus.Closed};
+                    node.children = [...(node.children || []), pastedFile];
                 }
             });
         },
@@ -177,10 +235,56 @@ const fileTreeSlice = createSlice({
         deleteFile(state, action: PayloadAction<{ id: number }>) {
             state.files = deleteById(state.files, action.payload.id);
         },
+        openPathToNode(state, action: PayloadAction<{ id: number }>) {
+            const targetId = action.payload.id;
+
+            // Найти путь к узлу
+            const path = findPathToNode(state.files, targetId);
+            if (!path) return;
+
+            // Найти сам узел
+            const targetNode = findNode(state.files, targetId);
+            if (!targetNode) return;
+
+            if (targetNode.type === FileType.File) {
+                // Для файла: закрыть все файлы кроме этого, открыть папки по пути
+                state.files = closeAllFilesExcept(state.files, targetId);
+                state.files = openFoldersOnPathPreserveOthers(state.files, path);
+            } else if (targetNode.type === FileType.Folder) {
+                // Для папки: открыть папки по пути, не трогая остальные папки и файлы
+                state.files = openFoldersOnPathPreserveOthers(state.files, path);
+            }
+        },
+        updateFileContent(state, action: PayloadAction<{ id: number; content: string }>) {
+            const { id, content } = action.payload;
+            function update(nodes: File[]) {
+                for (const node of nodes) {
+                    if (node.id === id && node.type === FileType.File) {
+                        node.content = content;
+                        return true;
+                    }
+                    if (node.children && node.children.length > 0) {
+                        if (update(node.children)) return true;
+                    }
+                }
+                return false;
+            }
+            update(state.files);
+        }
     },
 
 });
 
-export const {openFile, toggleFolder, createRootFolder, pasteFile, addFolder, addFile, deleteFile} = fileTreeSlice.actions;
+export const {
+    openFile,
+    toggleFolder,
+    createRootFolder,
+    pasteFile,
+    addFolder,
+    addFile,
+    deleteFile,
+    openPathToNode,
+    updateFileContent,
+} = fileTreeSlice.actions;
 export default fileTreeSlice.reducer;
 

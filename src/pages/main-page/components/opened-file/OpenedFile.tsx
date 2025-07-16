@@ -1,25 +1,61 @@
-import React, {FC} from 'react';
-import styles from './OpenedFile.module.css'
-import LikeBtn from './images/opened-file-like.svg'
-import DownloadBtn from './images/opened-file-download.svg'
+import React from 'react';
+import styles from './OpenedFile.module.css';
+import LikeBtn from './images/opened-file-like.svg';
+import DownloadBtn from './images/opened-file-download.svg';
 import {File} from "../../../../types/file";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import {parseFile} from "./utils/parseFile";
 import findFilePath from "./utils/findFilePath";
+import EditFileView from "./components/edit-file-view/EditFileView";
+import {updateFileContent} from "../../../../store/slices/fileTreeSlice"; // создайте такой action
 
 interface OpenedFileProps {
     file: File;
+    isEditing: boolean;
+    setIsEditing: (value: boolean) => void;
+    dirty: boolean;
+    setDirty: (value: boolean) => void;
+    onTryToSwitchFile: (targetFileId: number) => void;
+    tryToSwitch: boolean;
+    onConfirmSwitch: () => void;
+    onRejectSwitch: () => void;
 }
 
-const OpenedFile: FC<OpenedFileProps> = ({file}) => {
+const OpenedFile: React.FC<OpenedFileProps> = (
+    {
+        file,
+        isEditing,
+        setIsEditing,
+        dirty,
+        setDirty,
+        onTryToSwitchFile,
+        tryToSwitch,
+        onConfirmSwitch,
+        onRejectSwitch,
+    }
+) => {
     const files = useSelector((state: RootState) => state.fileTree.files);
-    // Возвращает массив file.name от корневой папки до файла.
-    const filePath = findFilePath(files, file.id)?.join('/')
-    // Функция парсит content файла и собирает блоки в массив.
+    const dispatch = useDispatch();
+    const filePath = findFilePath(files, file.id)?.join('/');
     const contentElements = parseFile(file.content);
+
+    // Сохраняет изменения в режиме "Edit"
+    const handleSave = (newContent: string) => {
+        dispatch(updateFileContent({id: file.id, content: newContent}));
+        setIsEditing(false);
+        setDirty(false);
+    };
+
+    // Отменяет изменения в режиме "Edit"
+    const handleCancel = () => {
+        setIsEditing(false);
+        setDirty(false);
+    };
+
+    // В FileTree при клике на файл вызывайте handleTryToSwitchFile вместо обычного onFileClick, если редактирование активно
+
     return (
-        // Часть каждого файла по дефолту.
         <div className={styles['openedFile']}>
             <div className={styles['openedFile__header']}>
                 <div className={styles['openedFile__leftSide']}>
@@ -48,7 +84,11 @@ const OpenedFile: FC<OpenedFileProps> = ({file}) => {
                     <div className={styles['openedFile__rightSide-like']}>
                         Like
                     </div>
-                    <div className={styles['openedFile__rightSide-edit']}>
+                    <div
+                        className={styles['openedFile__rightSide-edit']}
+                        onClick={() => setIsEditing(true)}
+                        style={{cursor: 'pointer'}}
+                    >
                         Edit
                     </div>
                     <div className={styles['openedFile__rightSide-delete']}>
@@ -56,10 +96,24 @@ const OpenedFile: FC<OpenedFileProps> = ({file}) => {
                     </div>
                 </div>
             </div>
-            {/*Контент, который спарсили функцией parseFile().*/}
-            <div className={styles['openedFile__content']}>
-                {contentElements}
-            </div>
+            {isEditing ?
+                <EditFileView
+                    file={file}
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                    onTryToSwitchFile={onTryToSwitchFile}
+                    isTryToSwitch={tryToSwitch}
+                    isDirty={dirty}
+                    setIsDirty={setDirty}
+                    onConfirmSwitch={onConfirmSwitch}
+                    onRejectSwitch={onRejectSwitch}
+                    parseFile={parseFile}
+                />
+                :
+                <div className={styles['openedFile__content']}>
+                    {contentElements}
+                </div>
+            }
         </div>
     );
 };

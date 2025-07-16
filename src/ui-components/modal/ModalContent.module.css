@@ -1,0 +1,45 @@
+.modal__overlay {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    width: 100%;
+    height: 100%;
+    padding: 17px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.modal__form {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.modal__text {
+    color: #E8E8E6;
+    font-size: 14px;
+    margin-bottom: 12px;
+    font-family: "Lato", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    text-align: center;
+}
+
+.modal__buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.modal__buttons button {
+    padding: 4px 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}

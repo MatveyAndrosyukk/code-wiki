@@ -7,7 +7,7 @@ interface ContextMenuProps {
     y: number; // Координаты X куда нажали пкм.
     file: File; // Файл, на который нажали пкм.
     copiedFile: File | null; // Скопированный файл для логики отрисовки Paste.
-    onClose: () => void; // Закрывает контекстное меню.
+    onCloseContextMenu: () => void; // Закрывает контекстное меню.
     onOpenModal: (args: { reason: string, id: number | null }) => void; // Открывает модальное окно с опр. причиной.
     onCopyFile: (file: File) => void; // Копирует файл.
     onPasteFile: (id: number) => void; // Вставляет файл.
@@ -21,7 +21,7 @@ const ContextMenu: FC<ContextMenuProps> = (
         y,
         file,
         copiedFile,
-        onClose,
+        onCloseContextMenu,
         onCopyFile,
         onPasteFile,
         onDeleteFile,
@@ -33,10 +33,10 @@ const ContextMenu: FC<ContextMenuProps> = (
     // на экране.
     // Убирает слушаель, когда контекстное меню закрывается.
     useEffect(() => {
-        const handleClickOutside = () => onClose();
+        const handleClickOutside = () => onCloseContextMenu();
         window.addEventListener('click', handleClickOutside);
         return () => window.removeEventListener('click', handleClickOutside);
-    }, [onClose]);
+    }, [onCloseContextMenu]);
 
     return (
         <div>

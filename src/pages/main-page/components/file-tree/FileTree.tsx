@@ -7,7 +7,7 @@ import {File} from "../../../../types/file";
 interface FileTreeProps {
     files: File[]; // Все файлы.
     copiedFile: File | null; // Скопированный файл для логики отрисовки Paste.
-    onFileClick: (id: number) => void; // Открывает файл и закрывает остальные.
+    onTryToSwitchFile: (id: number) => void; // Открывает файл и закрывает остальные.
     onOpenModal: (args: {reason: string, id: number | null}) => void; // Открывает модальное окно с опр. причиной.
     onCopyFile: (file: File) => void; // Копирует файл.
     onPasteFile: (id: number) => void; // Вставляет файл.
@@ -19,7 +19,7 @@ const FileTree: FC<FileTreeProps> = (
     {
         files,
         copiedFile,
-        onFileClick,
+        onTryToSwitchFile,
         onOpenModal,
         onCopyFile,
         onPasteFile,
@@ -39,14 +39,16 @@ const FileTree: FC<FileTreeProps> = (
                 </div>
                 <div className={styles['fileTree__files']}>
                     <FileList
-                        files={files}
-                        copiedFile={copiedFile}
-                        onFileClick={onFileClick}
-                        onCopyFile={onCopyFile}
-                        onPasteFile={onPasteFile}
-                        onOpenModal={onOpenModal}
-                        onDeleteFile={onDeleteFile}
-                        onRenameFile={onRenameFile}
+                        {...{
+                            files,
+                            copiedFile,
+                            onTryToSwitchFile,
+                            onCopyFile,
+                            onPasteFile,
+                            onOpenModal,
+                            onDeleteFile,
+                            onRenameFile
+                        }}
                     />
                 </div>
             </div>

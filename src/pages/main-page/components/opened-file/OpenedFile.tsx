@@ -5,19 +5,17 @@ import DownloadBtn from './images/opened-file-download.svg';
 import {File} from "../../../../types/file";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../../store";
-import {parseFile} from "./utils/parseFile";
-import findFilePath from "./utils/findFilePath";
+import {parseFileTextToHTML} from "./utils/parseFile";
+import findPathToFile from "./utils/findFilePath"; // создайте такой action
 import EditFileView from "./components/edit-file-view/EditFileView";
-import {updateFileContent} from "../../../../store/slices/fileTreeSlice"; // создайте такой action
+import {updateFileContent} from "../../../../store/slices/fileTreeSlice";
 
 interface OpenedFileProps {
     file: File;
     isEditing: boolean;
     setIsEditing: (value: boolean) => void;
-    dirty: boolean;
-    setDirty: (value: boolean) => void;
-    onTryToSwitchFile: (targetFileId: number) => void;
-    tryToSwitch: boolean;
+    setIsFileContentChanged: (value: boolean) => void;
+    isTryToSwitchWhileEditing: boolean;
     onConfirmSwitch: () => void;
     onRejectSwitch: () => void;
 }
@@ -27,87 +25,80 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         file,
         isEditing,
         setIsEditing,
-        dirty,
-        setDirty,
-        onTryToSwitchFile,
-        tryToSwitch,
+        setIsFileContentChanged,
+        isTryToSwitchWhileEditing,
         onConfirmSwitch,
         onRejectSwitch,
     }
 ) => {
     const files = useSelector((state: RootState) => state.fileTree.files);
     const dispatch = useDispatch();
-    const filePath = findFilePath(files, file.id)?.join('/');
-    const contentElements = parseFile(file.content);
+    const pathToFile = findPathToFile(files, file.id)?.join('/');
+    const contentElements = parseFileTextToHTML(file.content);
 
-    // Сохраняет изменения в режиме "Edit"
-    const handleSave = (newContent: string) => {
+    const handleSaveEditedFileChanges = (newContent: string) => {
         dispatch(updateFileContent({id: file.id, content: newContent}));
         setIsEditing(false);
-        setDirty(false);
+        setIsFileContentChanged(false);
     };
 
-    // Отменяет изменения в режиме "Edit"
-    const handleCancel = () => {
+    const handleCancelEditedFileChanges = () => {
         setIsEditing(false);
-        setDirty(false);
+        setIsFileContentChanged(false);
     };
-
-    // В FileTree при клике на файл вызывайте handleTryToSwitchFile вместо обычного onFileClick, если редактирование активно
 
     return (
         <div className={styles['openedFile']}>
             <div className={styles['openedFile__header']}>
                 <div className={styles['openedFile__leftSide']}>
-                    <div className={styles['openedFile__leftSide-likes']}>
-                        <div className={styles['openedFile__leftSide-likes-amount']}>
+                    <div className={styles['openedFile__likes']}>
+                        <div className={styles['openedFile__likes-amount']}>
                             {file.likes}
                         </div>
                         <img src={LikeBtn} alt="Like"/>
                     </div>
-                    <div className={styles['openedFile__leftSide-title']}>
-                        <div className={styles['openedFile__leftSide-title-email']}>
+                    <div className={styles['openedFile__title']}>
+                        <div className={styles['openedFile__title-email']}>
                             {file.author}
                         </div>
                         <span>|</span>
                         <div
-                            className={styles['openedFile__leftSide-title-path']}
-                            title={filePath}>
-                            {filePath}
+                            className={styles['openedFile__title-path']}
+                            title={pathToFile}>
+                            {pathToFile}
                         </div>
                     </div>
                 </div>
                 <div className={styles['openedFile__rightSide']}>
-                    <div className={styles['openedFile__rightSide-download']}>
+                    <div className={styles['openedFile__download']}>
                         <img src={DownloadBtn} alt="Download"/>
                     </div>
-                    <div className={styles['openedFile__rightSide-like']}>
+                    <div className={styles['openedFile__like']}>
                         Like
                     </div>
                     <div
-                        className={styles['openedFile__rightSide-edit']}
+                        className={styles['openedFile__edit']}
                         onClick={() => setIsEditing(true)}
                         style={{cursor: 'pointer'}}
                     >
                         Edit
                     </div>
-                    <div className={styles['openedFile__rightSide-delete']}>
+                    <div className={styles['openedFile__delete']}>
                         Delete
                     </div>
                 </div>
             </div>
             {isEditing ?
                 <EditFileView
+
                     file={file}
-                    onSave={handleSave}
-                    onCancel={handleCancel}
-                    onTryToSwitchFile={onTryToSwitchFile}
-                    isTryToSwitch={tryToSwitch}
-                    isDirty={dirty}
-                    setIsDirty={setDirty}
+                    onSaveEditedFileChanges={handleSaveEditedFileChanges}
+                    onCancelEditedFileChange={handleCancelEditedFileChanges}
+                    isTryToSwitchWhileEditing={isTryToSwitchWhileEditing}
+                    setIsFileContentChanged={setIsFileContentChanged}
                     onConfirmSwitch={onConfirmSwitch}
                     onRejectSwitch={onRejectSwitch}
-                    parseFile={parseFile}
+                    parseFileTextToHTML={parseFileTextToHTML}
                 />
                 :
                 <div className={styles['openedFile__content']}>

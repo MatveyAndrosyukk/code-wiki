@@ -1,26 +1,33 @@
-import React from 'react';
+import React, {FC} from 'react';
 import Modal from "../../ui-components/modal/Modal";
 import modalStyles from '../modal/ModalContent.module.css'
 import styles from './DeleteModal.module.css'
-import {FileType} from "../../types/file";
+import {File, FileType} from "../../types/file";
 
-const DeleteModal = ({
-                                deleteConfirm,
-                                cancelDelete,
-                                confirmDelete
-                            }: any) => (
-    <Modal isOpen={deleteConfirm.open} onClose={cancelDelete}>
+interface DeleteModalProps {
+    deleteModalState: { open: boolean, file: File | null };
+    onCancelDeleteFile: () => void;
+    onDeleteFile: () => void;
+}
+
+const DeleteModal:FC<DeleteModalProps> = (
+    {
+        deleteModalState,
+        onCancelDeleteFile,
+        onDeleteFile
+    }: any) => (
+    <Modal isOpen={deleteModalState.open} onClose={onCancelDeleteFile}>
         <div
             className={modalStyles['modal__overlay']}
-            style={deleteConfirm.open ? {padding: '7px 11px 7px'} : undefined}
+            style={deleteModalState.open ? {padding: '7px 11px 7px'} : undefined}
         >
             <div className={modalStyles['modal__form']}>
                 <p className={modalStyles['modal__text']}>
-                    {deleteConfirm.file?.type === FileType.Folder ? (
+                    {deleteModalState.file?.type === FileType.Folder ? (
                         <>
                             Delete folder{" "}
                             <span className={styles['modal__text-highlighted']}>
-                                "{deleteConfirm.file.name}"
+                                "{deleteModalState.file.name}"
                             </span>{" "}
                             and all its contents?
                         </>
@@ -28,7 +35,7 @@ const DeleteModal = ({
                         <>
                             Delete file{" "}
                             <span className={styles['modal__text-highlighted']}>
-                                "{deleteConfirm.file?.name}"
+                                "{deleteModalState.file?.name}"
                             </span>
                             ?
                         </>
@@ -37,13 +44,13 @@ const DeleteModal = ({
                 <div className={modalStyles['modal__buttons']}>
                     <button
                         className={styles['modal__buttons-delete']}
-                        onClick={confirmDelete}
+                        onClick={onDeleteFile}
                     >
                         Delete
                     </button>
                     <button
                         className={styles['modal__buttons-cancel']}
-                        onClick={cancelDelete}
+                        onClick={onCancelDeleteFile}
                     >
                         Cancel
                     </button>

@@ -1,9 +1,10 @@
 import React from 'react';
 import styles from './EmplyFile.module.css'
+import openedFileStyles from '../opened-file/OpenedFile.module.css'
 
 const EmptyFile = () => {
     return (
-        <div className={styles['emptyFile']}>
+        <div className={openedFileStyles['openedFile']}>
             <div className={styles['emptyFile__content']}>
                 <div className={styles['emptyFile__bookWrapper']}>
                     <svg className={styles['book-svg']} width="200" height="200" viewBox="0 0 22 22" fill="none"

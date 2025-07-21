@@ -1,34 +1,51 @@
-import React from 'react';
+import React, {FC} from 'react';
 import Modal from "../../ui-components/modal/Modal";
 import styles from './EditModal.module.css'
 import modalStyles from '../modal/ModalContent.module.css'
-import {FileType} from "../../types/file";
+import {File, FileType} from "../../types/file";
 
-const EditModal = ({
-                       isModalOpen,
-                       handleCloseModal,
-                       isPasteConflict,
-                       modalState,
-                       modalValue,
-                       setModalValue,
-                       addFolderInputRef,
-                       handleCreate,
-                       copiedFile
-                   }: any) => (
+interface EditModalProps {
+    isModalOpen: boolean;
+    onCloseModal: () => void;
+    isPasteConflictReason: boolean;
+    modalOpenState: { reason: string, id: number | null };
+    modalValue: string;
+    setModalValue: (value: string) => void;
+    modalInputRef: any;
+    onModalConfirmByReason: (
+        title: string,
+        id: number | null,
+        actionType: 'addRoot' | 'addFolder' | 'addFile' | 'resolvePasteConflict'
+    ) => void;
+    copiedFile: File | null;
+}
+
+const EditModal: FC<EditModalProps> = (
+    {
+        isModalOpen,
+        onCloseModal,
+        isPasteConflictReason,
+        modalOpenState,
+        modalValue,
+        setModalValue,
+        modalInputRef,
+        onModalConfirmByReason,
+        copiedFile
+    }) => (
     <Modal
         isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        isPasteConflict={isPasteConflict}
+        onClose={onCloseModal}
+        isPasteConflictReason={isPasteConflictReason}
     >
         <div
             className={modalStyles['modal__overlay']}
-            style={isPasteConflict
+            style={isPasteConflictReason
                 ? {padding: '7px 17px 12px 17px'}
                 : undefined
             }
         >
             <div className={modalStyles['modal__form']}>
-                {modalState.reason === 'resolvePasteConflict' && (
+                {isPasteConflictReason && (
                     <p className={modalStyles['modal__text']}>
                         {copiedFile?.type === FileType.Folder
                             ? "Folder with this name exists. Enter another name:"
@@ -36,7 +53,7 @@ const EditModal = ({
                     </p>
                 )}
                 <input
-                    ref={addFolderInputRef}
+                    ref={modalInputRef}
                     type='text'
                     className={styles['modal__input']}
                     placeholder={"Enter the title"}
@@ -44,10 +61,10 @@ const EditModal = ({
                     onChange={(e) => setModalValue(e.target.value)}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
-                            handleCreate(
+                            onModalConfirmByReason(
                                 modalValue,
-                                modalState.id,
-                                modalState.reason as 'addRoot' | 'addFolder' | 'addFile' | 'resolvePasteConflict'
+                                modalOpenState.id,
+                                modalOpenState.reason as 'addRoot' | 'addFolder' | 'addFile' | 'resolvePasteConflict'
                             );
                         }
                     }}

@@ -6,48 +6,48 @@ export default function useEditFileViewActions() {
     const dispatch = useDispatch();
 
     const [isEditing, setIsEditing] = useState(false);
-    const [dirty, setDirty] = useState(false);
-    const [tryToSwitch, setTryToSwitch] = useState(false);
-    const [pendingFileId, setPendingFileId] = useState<number | null>(null);
+    const [isFileContentChanged, setIsFileContentChanged] = useState(false);
+    const [isTryToSwitchWhileEditing, setIsTryToSwitchWhileEditing] = useState(false);
+    const [switchedFileId, setSwitchedFileId] = useState<number | null>(null);
 
-    const handleTryToSwitchFile = (targetFileId: number) => {
-        if (isEditing && dirty) {
-            setTryToSwitch(true);
-            setPendingFileId(targetFileId);
+    const handleTryToOpenFile = (targetFileId: number) => {
+        if (isEditing && isFileContentChanged) {
+            setIsTryToSwitchWhileEditing(true);
+            setSwitchedFileId(targetFileId);
         } else {
             setIsEditing(false);
-            setDirty(false);
-            setTryToSwitch(false);
-            setPendingFileId(null);
+            setIsFileContentChanged(false);
+            setIsTryToSwitchWhileEditing(false);
+            setSwitchedFileId(null);
             dispatch(openFile({id: targetFileId}))
         }
     };
 
     const handleConfirmSwitch = () => {
-        if (pendingFileId !== null) {
-            dispatch(openFile({id: pendingFileId}))
+        if (switchedFileId !== null) {
+            dispatch(openFile({id: switchedFileId}))
             setIsEditing(false);
-            setDirty(false);
-            setTryToSwitch(false);
-            setPendingFileId(null);
+            setIsFileContentChanged(false);
+            setIsTryToSwitchWhileEditing(false);
+            setSwitchedFileId(null);
         }
     };
 
     const handleRejectSwitch = () => {
-        setTryToSwitch(false);
-        setPendingFileId(null);
+        setIsTryToSwitchWhileEditing(false);
+        setSwitchedFileId(null);
     };
 
     return {
         isEditing,
         setIsEditing,
-        dirty,
-        setDirty,
-        tryToSwitch,
-        setTryToSwitch,
-        pendingFileId,
-        setPendingFileId,
-        onTryToSwitchFile: handleTryToSwitchFile,
+        isFileContentChanged,
+        setIsFileContentChanged,
+        isTryToSwitchWhileEditing,
+        setIsTryToSwitchWhileEditing,
+        switchedFileId,
+        setSwitchedFileId,
+        onTryToOpenFile: handleTryToOpenFile,
         onRejectSwitch: handleRejectSwitch,
         onConfirmSwitch: handleConfirmSwitch
     }

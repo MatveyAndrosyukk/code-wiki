@@ -12,16 +12,16 @@ interface FileListViewProps {
     nodes: File[];
     level?: number;
     ancestors?: boolean[];
-    onTryToSwitchFile: (id: number) => void;
+    onTryToOpenFile: (id: number) => void;
     onFolderClick: (id: number) => void;
-    contextMenuActions: any; // типизируйте по возможности, если у вас есть типы!
+    contextMenuActions: any;
 }
 
 const FileListView: React.FC<FileListViewProps> = ({
                                                        nodes,
                                                        level = 0,
                                                        ancestors = [],
-                                                       onTryToSwitchFile,
+                                                       onTryToOpenFile,
                                                        onFolderClick,
                                                        contextMenuActions,
                                                    }) => {
@@ -70,7 +70,7 @@ const FileListView: React.FC<FileListViewProps> = ({
                                     className={styles['fileList__node-file']}
                                     onContextMenu={(e) => contextMenuActions.onOpenContextMenu(e, node)}
                                     style={{fontWeight: node.status === FileStatus.Opened ? 'bold' : 'normal'}}
-                                    onClick={() => onTryToSwitchFile(node.id)}
+                                    onClick={() => onTryToOpenFile(node.id)}
                                 >
                                     <img src={FileImg} alt="File" /> {node.name}
                                 </div>
@@ -84,7 +84,7 @@ const FileListView: React.FC<FileListViewProps> = ({
                                 nodes={node.children}
                                 level={level + 1}
                                 ancestors={[...ancestors, !isLast]}
-                                onTryToSwitchFile={onTryToSwitchFile}
+                                onTryToOpenFile={onTryToOpenFile}
                                 onFolderClick={onFolderClick}
                                 contextMenuActions={contextMenuActions}
                             />}

@@ -41,32 +41,32 @@
     cursor: default;
 }
 
-.openedFile__leftSide-likes {
+.openedFile__likes {
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 11px;
 }
 
-.openedFile__leftSide-likes-amount {
+.openedFile__likes-amount {
     margin-right: 4px;
 }
 
-.openedFile__leftSide-likes img {
+.openedFile__likes img {
     user-select: none;
 }
 
-.openedFile__leftSide-title {
+.openedFile__title {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.openedFile__leftSide-title-email {
+.openedFile__title-email {
     margin-right: 4px;
 }
 
-.openedFile__leftSide-title-path {
+.openedFile__title-path {
     margin-left: 4px;
     white-space: nowrap;
     overflow: hidden;
@@ -75,7 +75,7 @@
     position: relative;
 }
 
-.openedFile__leftSide-title-path::after {
+.openedFile__title-path::after {
     content: '';
     position: absolute;
     top: 0;
@@ -94,40 +94,40 @@
 
 }
 
-.openedFile__rightSide-download {
+.openedFile__download {
     cursor: pointer;
 }
 
-.openedFile__rightSide-like {
+.openedFile__like {
     margin-left: 9px;
     cursor: pointer;
 }
 
-.openedFile__rightSide-like:hover {
+.openedFile__like:hover {
     color: #81A2BE;
 }
 
-.openedFile__rightSide-delete {
+.openedFile__delete {
     margin-left: 9px;
     cursor: pointer;
 }
 
-.openedFile__rightSide-delete:hover {
+.openedFile__delete:hover {
     color: #FF6B68;
 }
 
-.openedFile__rightSide-edit {
+.openedFile__edit {
     margin-left: 9px;
     cursor: pointer;
 }
 
-.openedFile__rightSide-edit:hover {
+.openedFile__edit:hover {
     color: #81A2BE;
 }
 
 .openedFile__content {
-    flex: 1 1 auto;       /* занимает оставшееся пространство */
-    overflow-y: auto;     /* вертикальная прокрутка при переполнении */
+    flex: 1 1 auto;
+    overflow-y: auto;
     padding: 0 9px 0 9px;
 }
 

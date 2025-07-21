@@ -5,17 +5,17 @@ interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
     children: React.ReactNode;
-    isPasteConflict?: boolean;
+    isPasteConflictReason?: boolean;
 }
 
-const Modal:FC<ModalProps> = ({isOpen, onClose, children, isPasteConflict}) => {
+const Modal:FC<ModalProps> = ({isOpen, onClose, children, isPasteConflictReason}) => {
     if (!isOpen) return null;
     return (
         <div className={styles['modal__overlay']} onClick={onClose}>
             <div
                 className={styles['modal__content']}
                 onClick={e => e.stopPropagation()}
-                style={isPasteConflict ? { top: '1px' } : { top: '4px' }}
+                style={isPasteConflictReason ? { top: '1px' } : { top: '4px' }}
             >
                 {children}
             </div>

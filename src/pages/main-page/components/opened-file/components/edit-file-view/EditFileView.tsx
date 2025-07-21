@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import styles from './EditFileView.module.css';
 import {File} from "../../../../../../types/file";
-import Modal from "../../../../../../ui-components/modal/Modal";
 import BoldImage from './images/edit-file-view__bold.svg'
 import ItalicImage from './images/edit-file-view__italic.svg'
 import UnderlinedImage from './images/edit-file-view__underlined.svg'
@@ -14,46 +13,42 @@ import SwitchWhileEditModal from "../../../../../../ui-components/switch-while-e
 
 interface EditFileViewProps {
     file: File;
-    onSave: (newContent: string) => void;
-    onCancel: () => void;
-    onTryToSwitchFile: (targetFileId: number) => void;
-    isTryToSwitch: boolean;
-    isDirty: boolean;
-    setIsDirty: (value: boolean) => void;
+    onSaveEditedFileChanges: (newContent: string) => void;
+    onCancelEditedFileChange: () => void;
+    isTryToSwitchWhileEditing: boolean;
+    setIsFileContentChanged: (value: boolean) => void;
     onConfirmSwitch: () => void;
     onRejectSwitch: () => void;
-    parseFile: (content: string) => React.ReactNode[];
+    parseFileTextToHTML: (content: string) => React.ReactNode[];
 }
 
 const EditFileView: React.FC<EditFileViewProps> = (
     {
         file,
-        onSave,
-        onCancel,
-        isTryToSwitch,
-        isDirty,
-        setIsDirty,
+        onSaveEditedFileChanges,
+        onCancelEditedFileChange,
+        isTryToSwitchWhileEditing,
+        setIsFileContentChanged,
         onConfirmSwitch,
         onRejectSwitch,
-        parseFile,
+        parseFileTextToHTML,
     }
 ) => {
-    const [content, setContent] = useState(file.content);
+    const [textareaContent, setTextareaContent] = useState(file.content);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
-        setContent(file.content);
-        setIsDirty(false);
-    }, [file.content, file.id, setIsDirty]);
+        setTextareaContent(file.content);
+        setIsFileContentChanged(false);
+    }, [file.content, file.id, setIsFileContentChanged]);
 
-    // Фокус на textarea при открытии
     useEffect(() => {
         textareaRef.current?.focus();
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setContent(e.target.value);
-        setIsDirty(e.target.value !== file.content);
+        setTextareaContent(e.target.value);
+        setIsFileContentChanged(e.target.value !== file.content);
     };
 
     const wrapSelection = (tagStart: string, tagEnd: string) => {
@@ -70,14 +65,12 @@ const EditFileView: React.FC<EditFileViewProps> = (
         const after = value.substring(selectionEnd);
 
         const newText = before + tagStart + selected + tagEnd + after;
-        setContent(newText);
-        setIsDirty(true);
+        setTextareaContent(newText);
+        setIsFileContentChanged(true);
 
-        // Восстановим выделение, выделив вставленный текст
         const cursorStart = selectionStart + tagStart.length;
         const cursorEnd = cursorStart + selected.length;
 
-        // Обновим textarea и выделение после обновления состояния
         setTimeout(() => {
             if (textarea) {
                 textarea.focus();
@@ -100,8 +93,8 @@ const EditFileView: React.FC<EditFileViewProps> = (
         const after = value.substring(selectionEnd);
 
         const newText = before + tag + after;
-        setContent(newText);
-        setIsDirty(true);
+        setTextareaContent(newText);
+        setIsFileContentChanged(true);
 
         const cursorStart = selectionStart;
         const cursorEnd = cursorStart + tag.length;
@@ -116,8 +109,6 @@ const EditFileView: React.FC<EditFileViewProps> = (
 
     }
 
-    // Пример кнопок сверху:
-    // Вы можете добавить свои кнопки вместо этих
     return (
         <div className={styles['editFileView']}>
             <div className={styles['editFileView__header']}>
@@ -142,7 +133,6 @@ const EditFileView: React.FC<EditFileViewProps> = (
                     }}>
                         <img src={PointImage} alt='Point' style={{width: '4px', height: '4px'}}/>
                     </div>
-                    {/*Ссылка*/}
                     <div onClick={() => {
                         wrapSelection('[```l to="https://example.com"```]', '[```/l```]')
                     }}>
@@ -158,7 +148,6 @@ const EditFileView: React.FC<EditFileViewProps> = (
                     }}>
                         <img src={TerminalImage} alt='Terminal' style={{width: '14.25px', height: '12.67px'}}/>
                     </div>
-                    {/*Линия*/}
                     <div onClick={() => {
                         pasteTag('[```line```]')
                     }}>
@@ -168,11 +157,11 @@ const EditFileView: React.FC<EditFileViewProps> = (
                 <div className={styles['editFileView__header-buttons']}>
                     <button
                         className={styles['editFileView__header-save']}
-                        onClick={() => onSave(content)}
-                        disabled={!isDirty}>Save
+                        onClick={() => onSaveEditedFileChanges(textareaContent)}
+                        disabled={!setIsFileContentChanged}>Save
                     </button>
                     <button
-                        onClick={onCancel}
+                        onClick={onCancelEditedFileChange}
                         className={styles['editFileView__header-cancel']}>Cancel
                     </button>
                 </div>
@@ -181,17 +170,17 @@ const EditFileView: React.FC<EditFileViewProps> = (
                 <textarea
                     ref={textareaRef}
                     className={styles['editFileView__textarea']}
-                    value={content}
+                    value={textareaContent}
                     onChange={handleChange}
                 />
                 <div className={styles['editFileView__preview']}>
                     <div className={styles['editFileView__preview-title']}>Preview</div>
-                    <div className={styles['editFileView__preview-content']}>{parseFile(content)}</div>
+                    <div className={styles['editFileView__preview-content']}>{parseFileTextToHTML(textareaContent)}</div>
                 </div>
             </div>
-            {/* Модалка при попытке переключиться на другой файл с несохранёнными изменениями */}
+
             <SwitchWhileEditModal
-                isTryToSwitch={isTryToSwitch}
+                isTryToSwitchWhileEditing={isTryToSwitchWhileEditing}
                 onRejectSwitch={onRejectSwitch}
                 onConfirmSwitch={onConfirmSwitch}
             />

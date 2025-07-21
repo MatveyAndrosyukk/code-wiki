@@ -8,33 +8,31 @@ import useContextMenuActions from "./utils/useContextMenuActions";
 import FileListView from "./components/FileListView";
 
 interface FileListProps {
-    files: File[]; // Все файлы.
-    copiedFile: File | null; // Скопированный файл для логики отрисовки Paste.
-    onTryToSwitchFile: (id: number) => void; // Открывает файл и закрывает остальные.
-    onOpenModal: (args: {reason: string, id: number | null}) => void; // Открывает модальное окно с опр. причиной.
-    onCopyFile: (file: File) => void; // Копирует файл.
-    onPasteFile: (id: number) => void; // Вставляет файл.
-    onDeleteFile: (file: File) => void;
-    onRenameFile: (file: File) => void;
+    files: File[];
+    copiedFile: File | null;
+    onTryToOpenFile: (id: number) => void;
+    onOpenModalByReason: (args: {reason: string, id: number | null}) => void;
+    onCopyFile: (file: File) => void;
+    onPasteFile: (id: number) => void;
+    onOpenDeleteModal: (file: File) => void;
+    onOpenRenameModal: (file: File) => void;
 }
 
 const FileList: React.FC<FileListProps> = (
     {
         files,
         copiedFile,
-        onTryToSwitchFile,
+        onTryToOpenFile,
         onCopyFile,
         onPasteFile,
-        onOpenModal,
-        onDeleteFile,
-        onRenameFile,
+        onOpenModalByReason,
+        onOpenDeleteModal,
+        onOpenRenameModal,
     }
 ) => {
     const contextMenuActions = useContextMenuActions()
     const dispatch = useDispatch();
 
-
-    // Открывает / закрывает папку (также ее children).
     const onFolderClick = (id: number) => {
         dispatch(toggleFolder({id}))
     };
@@ -42,23 +40,23 @@ const FileList: React.FC<FileListProps> = (
     return <div className={styles['fileList']}>
         <FileListView
             nodes={files}
-            onTryToSwitchFile={onTryToSwitchFile}
+            onTryToOpenFile={onTryToOpenFile}
             onFolderClick={onFolderClick}
             contextMenuActions={contextMenuActions}
         />
-        {contextMenuActions.contextMenu.visible && contextMenuActions.contextMenu.file && (
+        {contextMenuActions.contextMenuState.visible && contextMenuActions.contextMenuState.file && (
             <ContextMenu
-                x={contextMenuActions.contextMenu.x}
-                y={contextMenuActions.contextMenu.y}
-                file={contextMenuActions.contextMenu.file}
+                clickX={contextMenuActions.contextMenuState.clickX}
+                clickY={contextMenuActions.contextMenuState.clickY}
+                file={contextMenuActions.contextMenuState.file}
                 onCloseContextMenu={contextMenuActions.onCloseContextMenu}
                 {...{
                     copiedFile,
                     onCopyFile,
                     onPasteFile,
-                    onOpenModal,
-                    onRenameFile,
-                    onDeleteFile
+                    onOpenModalByReason,
+                    onOpenRenameModal,
+                    onOpenDeleteModal
                 }}
             />
         )}

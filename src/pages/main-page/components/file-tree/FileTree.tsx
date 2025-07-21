@@ -7,33 +7,36 @@ import {File} from "../../../../types/file";
 interface FileTreeProps {
     files: File[]; // Все файлы.
     copiedFile: File | null; // Скопированный файл для логики отрисовки Paste.
-    onTryToSwitchFile: (id: number) => void; // Открывает файл и закрывает остальные.
-    onOpenModal: (args: {reason: string, id: number | null}) => void; // Открывает модальное окно с опр. причиной.
+    onTryToOpenFile: (id: number) => void; // Открывает файл и закрывает остальные.
+    onOpenModalByReason: (args: { reason: string, id: number | null }) => void; // Открывает модальное окно с опр. причиной.
     onCopyFile: (file: File) => void; // Копирует файл.
     onPasteFile: (id: number) => void; // Вставляет файл.
-    onRenameFile: (file: File) => void;
-    onDeleteFile: (file: File) => void;
+    onOpenRenameModal: (file: File) => void;
+    onOpenDeleteModal: (file: File) => void;
 }
 
 const FileTree: FC<FileTreeProps> = (
     {
         files,
         copiedFile,
-        onTryToSwitchFile,
-        onOpenModal,
+        onTryToOpenFile,
+        onOpenModalByReason,
         onCopyFile,
         onPasteFile,
-        onRenameFile,
-        onDeleteFile,
+        onOpenRenameModal,
+        onOpenDeleteModal,
     }) => {
     return (
         <div className={styles['fileTree']}>
             <div className={styles['fileTree__content']}>
                 <div className={styles['fileTree__buttons']}>
-                    <div className={styles['fileTree__buttons-create']} onClick={() => onOpenModal({reason: "addRoot",id: null})}>
+                    <div
+                        className={styles['fileTree__buttons-create']}
+                        onClick={() => onOpenModalByReason({reason: "addRoot", id: null})}
+                    >
                         Create a root folder
                     </div>
-                    <div className={styles['fileTree__buttons-lock']}>
+                    <div className={styles['fileTree__buttons-block']}>
                         <img src={fileTreeLock} alt="Lock"/>
                     </div>
                 </div>
@@ -42,12 +45,12 @@ const FileTree: FC<FileTreeProps> = (
                         {...{
                             files,
                             copiedFile,
-                            onTryToSwitchFile,
+                            onTryToOpenFile,
                             onCopyFile,
                             onPasteFile,
-                            onOpenModal,
-                            onDeleteFile,
-                            onRenameFile
+                            onOpenModalByReason,
+                            onOpenDeleteModal,
+                            onOpenRenameModal
                         }}
                     />
                 </div>

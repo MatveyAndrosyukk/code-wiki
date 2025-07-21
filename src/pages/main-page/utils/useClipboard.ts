@@ -12,10 +12,12 @@ export default function useClipboard(
     const [copiedFile, setCopiedFile] = useState<File | null>(null);
     const dispatch = useDispatch();
 
+    // Copy selected file from context menu.
     const handleCopyFile = useCallback((file: File) => {
         setCopiedFile(file);
     }, []);
 
+    // Paste selected file from context menu.
     const handlePasteFile = useCallback((id: number) => {
         if (!copiedFile) return;
         if (checkIfNameExists(files, id, copiedFile.name)) {
@@ -25,14 +27,9 @@ export default function useClipboard(
         }
     }, [copiedFile, dispatch, files, checkIfNameExists, openModal]);
 
-    const doPaste = useCallback((id: number, file: File) => {
-        dispatch(pasteFile({targetFolderId: id, file}));
-    }, [dispatch]);
-
     return {
         copiedFile,
         onCopyFile: handleCopyFile,
         onPasteFile: handlePasteFile,
-        doPaste,
     }
 }

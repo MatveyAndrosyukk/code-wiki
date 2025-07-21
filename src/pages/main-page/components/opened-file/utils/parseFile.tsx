@@ -85,7 +85,7 @@ function parseInline(text: string): React.ReactNode[] {
     return parts;
 }
 
-export function parseFile(file: string): ReactNode[] {
+export function parseFileTextToHTML(file: string): ReactNode[] {
     const lines = file.split('\n');
 
     const elements: ReactNode[] = [];

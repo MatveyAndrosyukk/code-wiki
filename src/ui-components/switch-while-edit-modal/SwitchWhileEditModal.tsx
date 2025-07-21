@@ -4,20 +4,20 @@ import styles from './SwitchWhileEditModal.module.css'
 import Modal from "../modal/Modal";
 
 interface SwitchWhileEditModalProps {
-    isTryToSwitch: boolean;
+    isTryToSwitchWhileEditing: boolean;
     onRejectSwitch: () => void;
     onConfirmSwitch: () => void;
 }
 
 const SwitchWhileEditModal: FC<SwitchWhileEditModalProps> = (
     {
-        isTryToSwitch,
+        isTryToSwitchWhileEditing,
         onRejectSwitch,
         onConfirmSwitch,
     }
 ) => {
     return (
-        <Modal isOpen={isTryToSwitch} onClose={onRejectSwitch}>
+        <Modal isOpen={isTryToSwitchWhileEditing} onClose={onRejectSwitch}>
             <div className={modalStyles['modal__overlay']}>
                 <div className={modalStyles['modal__form']}>
                     <p className={modalStyles['modal__text']}>

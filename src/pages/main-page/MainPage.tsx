@@ -1,16 +1,15 @@
-import React, {useState} from 'react';
+import React from 'react';
 import Header from "./components/header/Header";
 import styles from './MainPage.module.css'
 import FileTree from "./components/file-tree/FileTree";
 import OpenedFile from "./components/opened-file/OpenedFile";
 import EmptyFile from "./components/empty-file/EmptyFile";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {RootState} from "../../store";
 import findOpenedFile from "./utils/findOpenedFile";
 import useFileTreeActions from "./utils/useFileTreeActions";
 import EditModal from "../../ui-components/edit-modal/EditModal";
 import DeleteModal from "../../ui-components/delete-modal/DeleteModal";
-import {openFile} from "../../store/slices/fileTreeSlice";
 import useEditFileViewActions from "./utils/useEditFileViewActions";
 
 const MainPage = () => {
@@ -34,7 +33,9 @@ const MainPage = () => {
                 /> : <EmptyFile/>}
             </div>
             <EditModal {...fileTreeActions}/>
-            <DeleteModal {...fileTreeActions} />
+            <DeleteModal
+                {...fileTreeActions}
+            />
         </div>
     );
 };

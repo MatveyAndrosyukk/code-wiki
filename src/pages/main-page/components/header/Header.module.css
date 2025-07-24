@@ -70,6 +70,10 @@
     left: 7px;
 }
 
+.header__search-swap{
+    cursor: pointer;
+}
+
 .header__search-input input{
     width: 222px;
     height: 27px;

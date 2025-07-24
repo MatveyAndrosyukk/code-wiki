@@ -18,6 +18,7 @@ interface OpenedFileProps {
     isTryToSwitchWhileEditing: boolean;
     onConfirmSwitch: () => void;
     onRejectSwitch: () => void;
+    onOpenDeleteModal: (file: File) => void;
 }
 
 const OpenedFile: React.FC<OpenedFileProps> = (
@@ -29,6 +30,8 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         isTryToSwitchWhileEditing,
         onConfirmSwitch,
         onRejectSwitch,
+        onOpenDeleteModal
+
     }
 ) => {
     const files = useSelector((state: RootState) => state.fileTree.files);
@@ -83,7 +86,9 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                     >
                         Edit
                     </div>
-                    <div className={styles['openedFile__delete']}>
+                    <div
+                        onClick={() => onOpenDeleteModal(file)}
+                        className={styles['openedFile__delete']}>
                         Delete
                     </div>
                 </div>

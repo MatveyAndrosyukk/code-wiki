@@ -18,9 +18,15 @@ const SwitchWhileEditModal: FC<SwitchWhileEditModalProps> = (
 ) => {
     return (
         <Modal isOpen={isTryToSwitchWhileEditing} onClose={onRejectSwitch}>
-            <div className={modalStyles['modal__overlay']}>
+            <div
+                className={modalStyles['modal__overlay']}
+                style={{padding: 8}}
+            >
                 <div className={modalStyles['modal__form']}>
-                    <p className={modalStyles['modal__text']}>
+                    <p
+                        className={modalStyles['modal__text']}
+                        style={{marginBottom: 6}}
+                    >
                         Are you sure that you want to open another file?
                         <br/>
                         You will lose all your unsaved changes.
@@ -30,13 +36,13 @@ const SwitchWhileEditModal: FC<SwitchWhileEditModalProps> = (
                             className={styles['modal__buttons-confirm']}
                             onClick={onConfirmSwitch}
                         >
-                            Open file
+                            Open
                         </button>
                         <button
                             className={styles['modal__buttons-reject']}
                             onClick={onRejectSwitch}
                         >
-                            Stay
+                            Cancel
                         </button>
                     </div>
                 </div>

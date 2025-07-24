@@ -5,9 +5,10 @@ export interface SearchResult {
     type: FileType;
     name: string;
     fullPath: string;
+    content: string;
 }
 
-export default function searchFiles(
+export default function searchFilesByName(
     nodes: File[],
     query: string,
     path: string = ''
@@ -24,10 +25,11 @@ export default function searchFiles(
                 type: node.type,
                 name: node.name,
                 fullPath: currentPath,
+                content: node.content,
             });
         }
         if (node.children && node.children.length > 0) {
-            results = results.concat(searchFiles(node.children, query, currentPath));
+            results = results.concat(searchFilesByName(node.children, query, currentPath));
         }
     }
     return results;

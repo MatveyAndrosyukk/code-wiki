@@ -270,7 +270,23 @@ const fileTreeSlice = createSlice({
                 return false;
             }
             update(state.files);
-        }
+        },
+        renameFile(state, action: PayloadAction<{ id: number; newName: string }>) {
+            const { id, newName } = action.payload;
+            function updateName(nodes: File[]): boolean {
+                for (const node of nodes) {
+                    if (node.id === id) {
+                        node.name = newName;
+                        return true; // нашли и обновили
+                    }
+                    if (node.children && node.children.length > 0) {
+                        if (updateName(node.children)) return true;
+                    }
+                }
+                return false;
+            }
+            updateName(state.files);
+        },
     },
 
 });
@@ -285,6 +301,7 @@ export const {
     deleteFile,
     openPathToNode,
     updateFileContent,
+    renameFile,
 } = fileTreeSlice.actions;
 export default fileTreeSlice.reducer;
 

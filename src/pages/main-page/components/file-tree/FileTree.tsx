@@ -3,15 +3,15 @@ import styles from './FileTree.module.css'
 import fileTreeLock from './images/fileTree-lock.svg'
 import FileList from "./components/file-list/FileList";
 import {File} from "../../../../types/file";
+import {ActionType} from "../../utils/useFileTreeActions";
 
 interface FileTreeProps {
-    files: File[]; // Все файлы.
-    copiedFile: File | null; // Скопированный файл для логики отрисовки Paste.
-    onTryToOpenFile: (id: number) => void; // Открывает файл и закрывает остальные.
-    onOpenModalByReason: (args: { reason: string, id: number | null }) => void; // Открывает модальное окно с опр. причиной.
-    onCopyFile: (file: File) => void; // Копирует файл.
-    onPasteFile: (id: number) => void; // Вставляет файл.
-    onOpenRenameModal: (file: File) => void;
+    files: File[];
+    copiedFile: File | null;
+    onTryToOpenFile: (id: number) => void;
+    onOpenModalByReason: (args: { reason: ActionType, id: number | null }) => void;
+    onCopyFile: (file: File) => void;
+    onPasteFile: (id: number) => void;
     onOpenDeleteModal: (file: File) => void;
 }
 
@@ -23,7 +23,6 @@ const FileTree: FC<FileTreeProps> = (
         onOpenModalByReason,
         onCopyFile,
         onPasteFile,
-        onOpenRenameModal,
         onOpenDeleteModal,
     }) => {
     return (
@@ -32,7 +31,7 @@ const FileTree: FC<FileTreeProps> = (
                 <div className={styles['fileTree__buttons']}>
                     <div
                         className={styles['fileTree__buttons-create']}
-                        onClick={() => onOpenModalByReason({reason: "addRoot", id: null})}
+                        onClick={() => onOpenModalByReason({reason: ActionType.AddRootFolder, id: null})}
                     >
                         Create a root folder
                     </div>
@@ -50,7 +49,6 @@ const FileTree: FC<FileTreeProps> = (
                             onPasteFile,
                             onOpenModalByReason,
                             onOpenDeleteModal,
-                            onOpenRenameModal
                         }}
                     />
                 </div>

@@ -29,6 +29,7 @@ const MainPage = () => {
                 />
                 {openedFile ? <OpenedFile
                     file={openedFile}
+                    {...fileTreeActions}
                     {...editFileViewActions}
                 /> : <EmptyFile/>}
             </div>

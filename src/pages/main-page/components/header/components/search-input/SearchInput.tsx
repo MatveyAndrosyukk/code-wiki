@@ -1,16 +1,25 @@
-import React, {useState, useRef, useEffect} from 'react';
-import searchFiles, {SearchResult} from "./utils/searchFiles";
+import React, {useEffect, useRef, useState} from 'react';
+import searchFilesByName, {SearchResult} from "./utils/searchFilesByName";
 import styles from './SearchInput.module.css'
 import FileImage from './images/search-input-file.svg'
 import FolderImage from './images/search-input-folder.svg'
-import {File, FileType} from "../../../../../../types/file"; // ваш импорт типов
+import {File, FileType} from "../../../../../../types/file";
+import {SearchType} from "../../../../../../types/searchType";
+import searchFilesByContent from "./utils/searchFilesByContent";
 
 interface SearchProps {
     files: File[];
     onSelect: (id: number) => void;
+    searchType: SearchType;
 }
 
-const SearchInput: React.FC<SearchProps> = ({files, onSelect}) => {
+const SearchInput: React.FC<SearchProps> = (
+    {
+        files,
+        onSelect,
+        searchType,
+    }
+) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<SearchResult[]>([]);
     const [isFocused, setIsFocused] = useState(false);
@@ -21,11 +30,15 @@ const SearchInput: React.FC<SearchProps> = ({files, onSelect}) => {
             setResults([]);
             return;
         }
-        const found = searchFiles(files, query.trim()).slice(0, 10);
+        let found;
+        if (searchType === SearchType.InFileNames) {
+            found = searchFilesByName(files, query.trim());
+        } else {
+            found = searchFilesByContent(files, query.trim());
+        }
         setResults(found);
-    }, [query, files]);
+    }, [query, files, searchType]);
 
-    // Закрыть список при клике вне компонента
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (
@@ -44,7 +57,7 @@ const SearchInput: React.FC<SearchProps> = ({files, onSelect}) => {
         <div className={styles["SearchInput"]} ref={containerRef}>
             <input
                 type="text"
-                placeholder="Search for files..."
+                placeholder={searchType === SearchType.InFileNames ? "Search for files..." : "Search for file content..."}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setIsFocused(true)}
@@ -52,7 +65,7 @@ const SearchInput: React.FC<SearchProps> = ({files, onSelect}) => {
             />
             {(isFocused && results.length > 0) && (
                 <ul className={styles["SearchInput__list"]}>
-                    {results.map(({id, type, fullPath}) => (
+                    {results.map(({id, type, fullPath, content}) => (
                         <li
                             key={id}
                             title={fullPath}
@@ -61,14 +74,15 @@ const SearchInput: React.FC<SearchProps> = ({files, onSelect}) => {
                             }}
                             className={styles["SearchInput__item"]}
                         >
-                            {/* Иконка файла или папки */}
                             <img className={styles["SearchInput__icon"]}
                                  src={type === FileType.Folder ? FolderImage : FileImage}
                                  alt='FileImage'/>
 
-                            <span className={styles["SearchInput__text"]}>
-            {fullPath}
-          </span>
+                            <span className={styles["SearchInput__text"]}
+                                  title={searchType === SearchType.InFileContents ? fullPath : undefined}
+                            >
+                                {searchType === SearchType.InFileNames ? fullPath : content}
+                            </span>
                         </li>
                     ))}
                 </ul>

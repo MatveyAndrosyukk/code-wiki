@@ -1,12 +1,13 @@
-import {useState, useCallback} from "react";
+import {useCallback, useState} from "react";
 import {useDispatch} from "react-redux";
 import {pasteFile} from "../../../store/slices/fileTreeSlice";
 import {File} from "../../../types/file";
+import {ActionType} from "./useFileTreeActions";
 
 
 export default function useClipboard(
     files: File[],
-    openModal: ({reason, id}: { reason: string, id: number | null }) => void,
+    openModal: ({reason, id}: { reason: ActionType, id: number | null }) => void,
     checkIfNameExists: (files: File[], folderId: number, name: string) => boolean
 ) {
     const [copiedFile, setCopiedFile] = useState<File | null>(null);
@@ -21,7 +22,7 @@ export default function useClipboard(
     const handlePasteFile = useCallback((id: number) => {
         if (!copiedFile) return;
         if (checkIfNameExists(files, id, copiedFile.name)) {
-            openModal({reason: 'resolvePasteConflict', id});
+            openModal({reason: ActionType.ResolveNameConflictPaste, id});
         } else {
             dispatch(pasteFile({targetFolderId: id, file: copiedFile}));
         }

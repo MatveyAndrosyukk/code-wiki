@@ -6,16 +6,16 @@ import {toggleFolder} from "../../../../../../store/slices/fileTreeSlice";
 import ContextMenu from "../../../../../../ui-components/context-menu/ContextMenu";
 import useContextMenuActions from "./utils/useContextMenuActions";
 import FileListView from "./components/FileListView";
+import {ActionType} from "../../../../utils/useFileTreeActions";
 
 interface FileListProps {
     files: File[];
     copiedFile: File | null;
     onTryToOpenFile: (id: number) => void;
-    onOpenModalByReason: (args: {reason: string, id: number | null}) => void;
+    onOpenModalByReason: (args: {reason: ActionType, id: number | null}) => void;
     onCopyFile: (file: File) => void;
     onPasteFile: (id: number) => void;
     onOpenDeleteModal: (file: File) => void;
-    onOpenRenameModal: (file: File) => void;
 }
 
 const FileList: React.FC<FileListProps> = (
@@ -27,7 +27,6 @@ const FileList: React.FC<FileListProps> = (
         onPasteFile,
         onOpenModalByReason,
         onOpenDeleteModal,
-        onOpenRenameModal,
     }
 ) => {
     const contextMenuActions = useContextMenuActions()
@@ -55,7 +54,6 @@ const FileList: React.FC<FileListProps> = (
                     onCopyFile,
                     onPasteFile,
                     onOpenModalByReason,
-                    onOpenRenameModal,
                     onOpenDeleteModal
                 }}
             />

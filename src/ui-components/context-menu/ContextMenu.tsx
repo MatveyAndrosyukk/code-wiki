@@ -1,6 +1,7 @@
 import React, {FC, useEffect} from 'react';
 import styles from './ContextMenu.module.css'
 import {File, FileType} from "../../types/file";
+import {ActionType} from "../../pages/main-page/utils/useFileTreeActions";
 
 interface ContextMenuProps {
     clickX: number;
@@ -8,10 +9,9 @@ interface ContextMenuProps {
     file: File;
     copiedFile: File | null;
     onCloseContextMenu: () => void;
-    onOpenModalByReason: (args: { reason: string, id: number | null }) => void;
+    onOpenModalByReason: (args: { reason: ActionType, id: number | null }) => void;
     onCopyFile: (file: File) => void;
     onPasteFile: (id: number) => void;
-    onOpenRenameModal: (file: File) => void;
     onOpenDeleteModal: (file: File) => void;
 }
 
@@ -25,7 +25,6 @@ const ContextMenu: FC<ContextMenuProps> = (
         onCopyFile,
         onPasteFile,
         onOpenDeleteModal,
-        onOpenRenameModal,
         onOpenModalByReason
     }) => {
 
@@ -42,12 +41,12 @@ const ContextMenu: FC<ContextMenuProps> = (
                     file.type === FileType.Folder && (
                         <>
                             {copiedFile && <li onClick={() => onPasteFile(file.id)}>Paste</li>}
-                            <li onClick={() => onOpenModalByReason({reason: 'addFile', id: file.id})}>Add File</li>
-                            <li onClick={() => onOpenModalByReason({reason: 'addFolder', id: file.id})}>Add Folder</li>
+                            <li onClick={() => onOpenModalByReason({reason: ActionType.AddFile, id: file.id})}>Add File</li>
+                            <li onClick={() => onOpenModalByReason({reason: ActionType.AddFolder, id: file.id})}>Add Folder</li>
                         </>
                     )
                 }
-                <li onClick={() => onOpenRenameModal(file)}>Rename</li>
+                <li onClick={() => onOpenModalByReason({reason: ActionType.RenameFile, id: file.id})}>Rename</li>
                 <li onClick={() => onCopyFile(file)}>Copy</li>
                 <li className={styles['contextMenu__item-delete']} onClick={() => onOpenDeleteModal(file)}>Delete</li>
             </ul>

@@ -3,49 +3,50 @@ import Modal from "../../ui-components/modal/Modal";
 import styles from './EditModal.module.css'
 import modalStyles from '../modal/ModalContent.module.css'
 import {File, FileType} from "../../types/file";
+import {ActionType} from "../../pages/main-page/utils/useFileTreeActions";
 
 interface EditModalProps {
     isModalOpen: boolean;
     onCloseModal: () => void;
-    isPasteConflictReason: boolean;
-    modalOpenState: { reason: string, id: number | null };
+    modalOpenState: { reason: ActionType | null, id: number | null };
     modalValue: string;
     setModalValue: (value: string) => void;
     modalInputRef: any;
     onModalConfirmByReason: (
         title: string,
         id: number | null,
-        actionType: 'addRoot' | 'addFolder' | 'addFile' | 'resolvePasteConflict'
+        actionType: ActionType
     ) => void;
     copiedFile: File | null;
+    isNameConflictReason: () => boolean;
 }
 
 const EditModal: FC<EditModalProps> = (
     {
         isModalOpen,
         onCloseModal,
-        isPasteConflictReason,
         modalOpenState,
         modalValue,
         setModalValue,
         modalInputRef,
         onModalConfirmByReason,
-        copiedFile
+        copiedFile,
+        isNameConflictReason,
     }) => (
     <Modal
         isOpen={isModalOpen}
         onClose={onCloseModal}
-        isPasteConflictReason={isPasteConflictReason}
+        isNameConflictReason={isNameConflictReason()}
     >
         <div
             className={modalStyles['modal__overlay']}
-            style={isPasteConflictReason
+            style={isNameConflictReason()
                 ? {padding: '7px 17px 12px 17px'}
                 : undefined
             }
         >
             <div className={modalStyles['modal__form']}>
-                {isPasteConflictReason && (
+                {isNameConflictReason() && (
                     <p className={modalStyles['modal__text']}>
                         {copiedFile?.type === FileType.Folder
                             ? "Folder with this name exists. Enter another name:"
@@ -64,7 +65,7 @@ const EditModal: FC<EditModalProps> = (
                             onModalConfirmByReason(
                                 modalValue,
                                 modalOpenState.id,
-                                modalOpenState.reason as 'addRoot' | 'addFolder' | 'addFile' | 'resolvePasteConflict'
+                                modalOpenState.reason as ActionType
                             );
                         }
                     }}

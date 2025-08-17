@@ -6,9 +6,10 @@ import FolderImage from './images/search-input-folder.svg'
 import {File, FileType} from "../../../../../../types/file";
 import {SearchType} from "../../../../../../types/searchType";
 import searchFilesByContent from "./utils/searchFilesByContent";
+import {CreateFilePayload} from "../../../../../../store/thunks/createFileOnServer";
 
 interface SearchProps {
-    files: File[];
+    files: CreateFilePayload[];
     onSelect: (id: number) => void;
     searchType: SearchType;
 }

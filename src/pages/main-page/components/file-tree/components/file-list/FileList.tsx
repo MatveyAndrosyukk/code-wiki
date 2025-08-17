@@ -4,18 +4,19 @@ import styles from './FileList.module.css'
 import {useDispatch} from "react-redux";
 import {toggleFolder} from "../../../../../../store/slices/fileTreeSlice";
 import ContextMenu from "../../../../../../ui-components/context-menu/ContextMenu";
-import useContextMenuActions from "./utils/useContextMenuActions";
+import useContextMenuActions from "../../../../../../utils/useContextMenuActions";
 import FileListView from "./components/FileListView";
-import {ActionType} from "../../../../utils/useFileTreeActions";
+import {ActionType} from "../../../../../../utils/useFileTreeActions";
+import {CreateFilePayload} from "../../../../../../store/thunks/createFileOnServer";
 
 interface FileListProps {
-    files: File[];
-    copiedFile: File | null;
-    onTryToOpenFile: (id: number) => void;
+    files: CreateFilePayload[];
+    copiedFile: CreateFilePayload | null;
+    onTryToOpenFile: (id: number | null) => void;
     onOpenModalByReason: (args: {reason: ActionType, id: number | null}) => void;
-    onCopyFile: (file: File) => void;
-    onPasteFile: (id: number) => void;
-    onOpenDeleteModal: (file: File) => void;
+    onCopyFile: (file: CreateFilePayload) => void;
+    onPasteFile: (id: number | null) => void;
+    onOpenDeleteModal: (file: CreateFilePayload) => void;
 }
 
 const FileList: React.FC<FileListProps> = (
@@ -32,7 +33,7 @@ const FileList: React.FC<FileListProps> = (
     const contextMenuActions = useContextMenuActions()
     const dispatch = useDispatch();
 
-    const onFolderClick = (id: number) => {
+    const onFolderClick = (id: number | null) => {
         dispatch(toggleFolder({id}))
     };
 

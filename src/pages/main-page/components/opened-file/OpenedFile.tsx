@@ -9,16 +9,17 @@ import {parseFileTextToHTML} from "./utils/parseFile";
 import findPathToFile from "./utils/findFilePath"; // создайте такой action
 import EditFileView from "./components/edit-file-view/EditFileView";
 import {updateFileContent} from "../../../../store/slices/fileTreeSlice";
+import {CreateFilePayload} from "../../../../store/thunks/createFileOnServer";
 
 interface OpenedFileProps {
-    file: File;
+    file: CreateFilePayload;
     isEditing: boolean;
     setIsEditing: (value: boolean) => void;
     setIsFileContentChanged: (value: boolean) => void;
     isTryToSwitchWhileEditing: boolean;
     onConfirmSwitch: () => void;
     onRejectSwitch: () => void;
-    onOpenDeleteModal: (file: File) => void;
+    onOpenDeleteModal: (file: CreateFilePayload) => void;
 }
 
 const OpenedFile: React.FC<OpenedFileProps> = (

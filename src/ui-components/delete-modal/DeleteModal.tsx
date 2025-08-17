@@ -3,9 +3,10 @@ import Modal from "../../ui-components/modal/Modal";
 import modalStyles from '../modal/ModalContent.module.css'
 import styles from './DeleteModal.module.css'
 import {File, FileType} from "../../types/file";
+import {CreateFilePayload} from "../../store/thunks/createFileOnServer";
 
 interface DeleteModalProps {
-    deleteModalState: { open: boolean, file: File | null };
+    deleteModalState: { open: boolean, file: CreateFilePayload | null };
     onCancelDeleteFile: () => void;
     onDeleteFile: () => void;
 }

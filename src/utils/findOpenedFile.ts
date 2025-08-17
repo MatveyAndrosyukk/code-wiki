@@ -1,7 +1,7 @@
-import {File, FileStatus, FileType} from "../../../types/file";
+import {FileStatus, FileType} from "../types/file";
+import {CreateFilePayload} from "../store/thunks/createFileOnServer";
 
-// Searches for opened file from all files.
-export default function findOpenedFile(nodes: File[]): File | null {
+export default function findOpenedFile(nodes: CreateFilePayload[]): CreateFilePayload | null {
     for (const node of nodes) {
         if (node.type === FileType.File && node.status === FileStatus.Opened) {
             return node;

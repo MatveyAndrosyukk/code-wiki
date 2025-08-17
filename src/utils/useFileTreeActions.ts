@@ -1,15 +1,12 @@
-import {useState, useRef, useCallback, useEffect} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {useDispatch} from "react-redux";
 import useClipboard from "./useClipboard";
-import {File, FileType} from "../../../types/file";
-import {
-    addFile,
-    addFolder,
-    createRootFolder,
-    deleteFile,
-    pasteFile,
-    renameFile
-} from "../../../store/slices/fileTreeSlice";
+import {File, FileType} from "../types/file";
+import {addFile, addFolder, createRootFolder, deleteFile, pasteFile} from "../store/slices/fileTreeSlice";
+import {createFileOnServer, CreateFilePayload} from "../store/thunks/createFileOnServer";
+import {AppDispatch} from "../store";
+import {renameFileOnServer} from "../store/thunks/renameFileOnServer";
+import {deleteFileOnServer} from "../store/thunks/deleteFileOnServer";
 
 export enum ActionType {
     RenameFile = "RenameFile",
@@ -23,8 +20,8 @@ export enum ActionType {
     AddFile = "AddFile"
 }
 
-export default function useFileTreeActions(files: File[]) {
-    const dispatch = useDispatch();
+export default function FuseFileTreeActions(files: CreateFilePayload[]) {
+    const dispatch = useDispatch<AppDispatch>();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalValue, setModalValue] = useState("");
     const [modalOpenState, setModalOpenState] = useState<{
@@ -32,7 +29,7 @@ export default function useFileTreeActions(files: File[]) {
         id: number | null
     }>({reason: null, id: null});
     const modalInputRef = useRef<HTMLInputElement>(null);
-    const [deleteModalState, setDeleteModalState] = useState<{ open: boolean, file: File | null }>({
+    const [deleteModalState, setDeleteModalState] = useState<{ open: boolean, file: CreateFilePayload | null }>({
         open: false,
         file: null
     });
@@ -43,12 +40,23 @@ export default function useFileTreeActions(files: File[]) {
         }
     }, [isModalOpen])
 
+    function findNodeById(nodes: CreateFilePayload[], id: number | null): CreateFilePayload | null {
+        for (const node of nodes) {
+            if (node.id === id && node.type === FileType.Folder) return node;
+            if (node.type === FileType.Folder && node.children) {
+                const found = findNodeById(node.children, id);
+                if (found) return found;
+            }
+        }
+        return null;
+    }
+
     const checkIfNameExistsInFolder = useCallback((
-        files: File[],
-        folderId: number,
+        files: CreateFilePayload[],
+        folderId: number | null,
         name: string
     ): boolean => {
-        function findFolderById(nodes: File[]): File | null {
+        function findFolderById(nodes: CreateFilePayload[]): CreateFilePayload | null {
             for (const node of nodes) {
                 if (node.id === folderId && node.type === FileType.Folder) return node;
                 if (node.type === FileType.Folder && node.children) {
@@ -68,8 +76,15 @@ export default function useFileTreeActions(files: File[]) {
 
     const openModalByReasonHandler = useCallback(({reason, id}: { reason: ActionType, id: number | null }) => {
         setModalOpenState({reason, id})
+        
+        const node = findNodeById(files, id)
+        
+        if (reason === ActionType.RenameFile) {
+            setModalValue(node?.name as string)
+        }
+        
         setIsModalOpen(true);
-    }, [])
+    }, [files, findNodeById])
 
     const clipboard = useClipboard(files, openModalByReasonHandler, checkIfNameExistsInFolder);
 
@@ -109,19 +124,66 @@ export default function useFileTreeActions(files: File[]) {
                     openModalByReasonHandler({reason: ActionType.ResolveNameConflictRoot, id: null});
                     return;
                 }
-                dispatch(createRootFolder({title: trimmedTitle}));
+
+                const createdRootFolder = {
+                    id: null,
+                    status: null,
+                    likes: null,
+                    children: null,
+                    author: localStorage.getItem('email'),
+                    type: 'Folder',
+                    name: trimmedTitle,
+                    content: '',
+                    parent: null
+                }
+
+                dispatch(createFileOnServer(createdRootFolder));
                 break;
+                // еще не сделал
             case ActionType.RenameFile:
                 if (handleNameConflictInFolder(ActionType.ResolveNameConflictRename)) return;
-                dispatch(renameFile({id: id!, newName: trimmedTitle}));
+
+                const renameFileDto = {
+                    id: id as number,
+                    name: trimmedTitle,
+                }
+
+                dispatch(renameFileOnServer(renameFileDto))
+
                 break;
             case ActionType.AddFolder:
                 if (handleNameConflictInFolder(ActionType.ResolveNameConflictAddFolder)) return;
-                dispatch(addFolder({parentId: id!, title: trimmedTitle}));
+
+                const createdFolder = {
+                    id: null,
+                    status: null,
+                    likes: null,
+                    children: null,
+                    author: localStorage.getItem('email'),
+                    type: 'Folder',
+                    name: trimmedTitle,
+                    content: '',
+                    parent: id
+                }
+
+                dispatch(createFileOnServer(createdFolder));
                 break;
             case ActionType.AddFile:
                 if (handleNameConflictInFolder(ActionType.ResolveNameConflictAddFile)) return;
-                dispatch(addFile({parentId: id!, title: trimmedTitle}));
+
+                const createdFile = {
+                    id: null,
+                    status: null,
+                    likes: null,
+                    children: null,
+                    author: localStorage.getItem('email'),
+                    type: 'File',
+                    name: trimmedTitle,
+                    content: '',
+                    parent: id
+                }
+
+                dispatch(createFileOnServer(createdFile));
                 break;
             case ActionType.ResolveNameConflictRoot:
                 if (isNameExistsInRoot()) return;
@@ -158,7 +220,7 @@ export default function useFileTreeActions(files: File[]) {
         setModalValue(file.name);
     }
 
-    const openDeleteModalHandler = (file: File) => {
+    const openDeleteModalHandler = (file: CreateFilePayload) => {
         setDeleteModalState({open: true, file})
     }
 
@@ -170,7 +232,7 @@ export default function useFileTreeActions(files: File[]) {
 
     const deleteFileHandler = () => {
         if (!deleteModalState.file) return;
-        dispatch(deleteFile({id: deleteModalState.file.id}));
+        dispatch(deleteFileOnServer(deleteModalState.file.id as number));
         setDeleteModalState({open: false, file: null})
     }
 

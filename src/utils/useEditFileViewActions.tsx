@@ -1,6 +1,6 @@
 import {useDispatch} from "react-redux";
 import {useState} from "react";
-import {openFile} from "../../../store/slices/fileTreeSlice";
+import {openFile} from "../store/slices/fileTreeSlice";
 
 export default function useEditFileViewActions() {
     const dispatch = useDispatch();
@@ -10,7 +10,7 @@ export default function useEditFileViewActions() {
     const [isTryToSwitchWhileEditing, setIsTryToSwitchWhileEditing] = useState(false);
     const [switchedFileId, setSwitchedFileId] = useState<number | null>(null);
 
-    const handleTryToOpenFile = (targetFileId: number) => {
+    const handleTryToOpenFile = (targetFileId: number | null) => {
         if (isEditing && isFileContentChanged) {
             setIsTryToSwitchWhileEditing(true);
             setSwitchedFileId(targetFileId);

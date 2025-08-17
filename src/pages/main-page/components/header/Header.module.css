@@ -101,16 +101,32 @@
     justify-content: center;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.5s ease
+    transition: background-color 0.5s ease;
+    font-weight: 600;
+    font-size: 11px;
+    color: #CC032D;
 }
 
 .header__logout:hover{
     background-color: #fbada6;
 }
 
-.header__logout a{
+.header__login{
+    background-color: #81A2FA;
+    width: 57px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.5s ease;
     font-weight: 600;
     font-size: 11px;
-    color: #CC032D;
+    color: #E8E8E6;
+}
+
+.header__login:hover{
+    background-color: #8eafff;
 }
 

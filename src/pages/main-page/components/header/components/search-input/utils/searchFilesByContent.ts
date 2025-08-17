@@ -1,8 +1,9 @@
 import {File} from "../../../../../../../types/file";
 import {SearchResult} from "./searchFilesByName";
+import {CreateFilePayload} from "../../../../../../../store/thunks/createFileOnServer";
 
 export default function searchFilesByContent(
-    nodes: File[],
+    nodes: CreateFilePayload[],
     query: string,
     path: string = ''
 ): SearchResult[] {
@@ -22,7 +23,7 @@ export default function searchFilesByContent(
                 name: node.name,
                 content: node.content.substring(idx),
                 fullPath: currentPath,
-            });
+            } as SearchResult);
         }
         if (node.children && node.children.length > 0) {
             results = results.concat(searchFilesByContent(node.children, query, currentPath));

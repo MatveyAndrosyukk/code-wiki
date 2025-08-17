@@ -10,9 +10,10 @@ import PointImage from './images/edit-file-view__point.svg'
 import LineImage from './images/edit-file-view__line.svg'
 import LinkImage from './images/edit-file-view__link.svg'
 import SwitchWhileEditModal from "../../../../../../ui-components/switch-while-edit-modal/SwitchWhileEditModal";
+import {CreateFilePayload} from "../../../../../../store/thunks/createFileOnServer";
 
 interface EditFileViewProps {
-    file: File;
+    file: CreateFilePayload;
     onSaveEditedFileChanges: (newContent: string) => void;
     onCancelEditedFileChange: () => void;
     isTryToSwitchWhileEditing: boolean;

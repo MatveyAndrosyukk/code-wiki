@@ -3,7 +3,8 @@ import Modal from "../../ui-components/modal/Modal";
 import styles from './EditModal.module.css'
 import modalStyles from '../modal/ModalContent.module.css'
 import {File, FileType} from "../../types/file";
-import {ActionType} from "../../pages/main-page/utils/useFileTreeActions";
+import {ActionType} from "../../utils/useFileTreeActions";
+import {CreateFilePayload} from "../../store/thunks/createFileOnServer";
 
 interface EditModalProps {
     isModalOpen: boolean;
@@ -17,7 +18,7 @@ interface EditModalProps {
         id: number | null,
         actionType: ActionType
     ) => void;
-    copiedFile: File | null;
+    copiedFile: CreateFilePayload | null;
     isNameConflictReason: () => boolean;
 }
 

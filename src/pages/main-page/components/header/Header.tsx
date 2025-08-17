@@ -1,32 +1,27 @@
-import React, {FC, useState} from 'react';
+import React, {FC} from 'react';
 import styles from './Header.module.css'
 import headerLogo from './images/header-logo.svg'
 import headerSearch from './images/header-search.svg'
 import headerSwap from './images/header-swap.svg'
 import headerUser from './images/header-user.svg'
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../../../../store";
-import {openPathToNode} from "../../../../store/slices/fileTreeSlice";
 import SearchInput from "./components/search-input/SearchInput";
-import {SearchType} from "../../../../types/searchType";
+import LoginModal from "../../../../ui-components/logim-modal/LoginModal";
+import {File} from "../../../../types/file";
+import {CreateFilePayload} from "../../../../store/thunks/createFileOnServer";
 
-const Header:FC = () => {
-    const files = useSelector((state: RootState) => state.fileTree.files)
-    const dispatch = useDispatch();
-    const [searchType, setSearchType] = useState<SearchType>(SearchType.InFileNames);
+interface HeaderProps {
+    loginState: any;
+    fileSearch: any;
+    files: CreateFilePayload[];
+}
 
-    const selectHandler = (id: number) => {
-        dispatch(openPathToNode({ id }));
-    };
-
-    const setSearchTypeHandler = () => {
-        if (searchType === SearchType.InFileNames){
-            setSearchType(SearchType.InFileContents);
-        } else {
-            setSearchType(SearchType.InFileNames);
-        }
+const Header:FC<HeaderProps> = (
+    {
+        loginState,
+        fileSearch,
+        files,
     }
-
+) => {
     return (
         <div className={styles['header']}>
             <div className={styles['container']}>
@@ -44,24 +39,46 @@ const Header:FC = () => {
                             <div className={styles['header__search-input']}>
                                 <SearchInput
                                     files={files}
-                                    onSelect={selectHandler}
-                                    searchType={searchType}
+                                    onSelect={fileSearch.selectHandler}
+                                    searchType={fileSearch.searchType}
                                 />
                                 <img className={styles['header__search-loop']} src={headerSearch} alt="Search"/>
                             </div>
                             <img
                                 className={styles['header__search-swap']}
-                                onClick={setSearchTypeHandler}
+                                onClick={fileSearch.onChangeSearchType}
                                 src={headerSwap}
                                 alt="Swap"
                             />
                         </div>
-                        <div className={styles['header__logout']}>
-                            <a href="/">Logout</a>
-                        </div>
+                        {loginState.isLoggedIn ? (
+                            <div
+                                className={`${styles.header__logout}`}
+                                onClick={() => loginState.onLogout()}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                Logout
+                            </div>
+                        ) : (
+                            <div
+                                className={`${styles.header__login}`}
+                                onClick={() => loginState.openLoginModal()}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                Login
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
+            <LoginModal
+                isModalOpen={loginState.isLoginModalOpen}
+                onCloseModal={loginState.closeLoginModal}
+                modalValue={loginState.loginModalValue}
+                setModalValue={loginState.setLoginModalValue}
+                modalInputRef={loginState.loginModalInputRef}
+                onLogin={loginState.onLogin}
+            />
         </div>
     );
 };

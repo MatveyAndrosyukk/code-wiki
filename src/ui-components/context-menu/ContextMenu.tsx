@@ -1,18 +1,19 @@
 import React, {FC, useEffect} from 'react';
 import styles from './ContextMenu.module.css'
 import {File, FileType} from "../../types/file";
-import {ActionType} from "../../pages/main-page/utils/useFileTreeActions";
+import {ActionType} from "../../utils/useFileTreeActions";
+import {CreateFilePayload} from "../../store/thunks/createFileOnServer";
 
 interface ContextMenuProps {
     clickX: number;
     clickY: number;
-    file: File;
-    copiedFile: File | null;
+    file: CreateFilePayload;
+    copiedFile: CreateFilePayload | null;
     onCloseContextMenu: () => void;
     onOpenModalByReason: (args: { reason: ActionType, id: number | null }) => void;
-    onCopyFile: (file: File) => void;
-    onPasteFile: (id: number) => void;
-    onOpenDeleteModal: (file: File) => void;
+    onCopyFile: (file: CreateFilePayload) => void;
+    onPasteFile: (id: number | null) => void;
+    onOpenDeleteModal: (file: CreateFilePayload) => void;
 }
 
 const ContextMenu: FC<ContextMenuProps> = (

@@ -17,4 +17,5 @@ export interface File {
     content: string;
     status: FileStatus;
     children: File[];
+    parent: File | null;
 }

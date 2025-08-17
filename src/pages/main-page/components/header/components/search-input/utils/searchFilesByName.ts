@@ -1,4 +1,5 @@
 import {File, FileType} from "../../../../../../../types/file";
+import {CreateFilePayload} from "../../../../../../../store/thunks/createFileOnServer";
 
 export interface SearchResult {
     id: number;
@@ -9,7 +10,7 @@ export interface SearchResult {
 }
 
 export default function searchFilesByName(
-    nodes: File[],
+    nodes: CreateFilePayload[],
     query: string,
     path: string = ''
 ): SearchResult[] {
@@ -26,7 +27,7 @@ export default function searchFilesByName(
                 name: node.name,
                 fullPath: currentPath,
                 content: node.content,
-            });
+            } as SearchResult);
         }
         if (node.children && node.children.length > 0) {
             results = results.concat(searchFilesByName(node.children, query, currentPath));

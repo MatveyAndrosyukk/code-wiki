@@ -1,5 +1,6 @@
 import React from "react";
-import {File} from "../../../../../../../types/file";
+import {File} from "../types/file";
+import {CreateFilePayload} from "../store/thunks/createFileOnServer";
 
 export default function useContextMenuActions(){
 
@@ -7,7 +8,7 @@ export default function useContextMenuActions(){
         visible: boolean,
         clickX: number,
         clickY: number,
-        file: File | null;
+        file: CreateFilePayload | null;
     }>({visible: false, clickX: 0, clickY: 0, file: null});
 
     const openContextMenuHandler = (event: React.MouseEvent, file: File) => {

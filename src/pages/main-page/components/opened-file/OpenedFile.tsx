@@ -2,14 +2,13 @@ import React from 'react';
 import styles from './OpenedFile.module.css';
 import LikeBtn from './images/opened-file-like.svg';
 import DownloadBtn from './images/opened-file-download.svg';
-import {File} from "../../../../types/file";
 import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../../../../store";
+import {AppDispatch, RootState} from "../../../../store";
 import {parseFileTextToHTML} from "./utils/parseFile";
 import findPathToFile from "./utils/findFilePath"; // создайте такой action
 import EditFileView from "./components/edit-file-view/EditFileView";
-import {updateFileContent} from "../../../../store/slices/fileTreeSlice";
 import {CreateFilePayload} from "../../../../store/thunks/createFileOnServer";
+import {changeFileContentOnServer} from "../../../../store/thunks/changeFileContentOnServer";
 
 interface OpenedFileProps {
     file: CreateFilePayload;
@@ -36,12 +35,12 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     }
 ) => {
     const files = useSelector((state: RootState) => state.fileTree.files);
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const pathToFile = findPathToFile(files, file.id)?.join('/');
     const contentElements = parseFileTextToHTML(file.content);
 
     const handleSaveEditedFileChanges = (newContent: string) => {
-        dispatch(updateFileContent({id: file.id, content: newContent}));
+        dispatch(changeFileContentOnServer({id: file.id as number, content: newContent}))
         setIsEditing(false);
         setIsFileContentChanged(false);
     };
@@ -63,7 +62,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                     </div>
                     <div className={styles['openedFile__title']}>
                         <div className={styles['openedFile__title-email']}>
-                            {file.author}
+                            {localStorage.getItem('email')}
                         </div>
                         <span>|</span>
                         <div

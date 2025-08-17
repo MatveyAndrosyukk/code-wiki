@@ -11,10 +11,10 @@ export interface CreateFilePayload {
     status: string | null;
     likes: number | null;
     children: CreateFilePayload[] | null;
-    parent: number | null | CreateFilePayload;
+    parent: number | { id: number } | null;
 }
 
-export const createFileOnServer = createAsyncThunk<File, CreateFilePayload>(
+export const createFileOnServer = createAsyncThunk<CreateFilePayload, CreateFilePayload>(
     'fileTree/createFileOnServer',
     async (body, thunkApi) => {
         const token = localStorage.getItem('token');

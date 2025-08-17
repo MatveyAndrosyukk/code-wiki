@@ -1,8 +1,9 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {File} from "../../types/file";
 import API_BASE_URL from "../../config/api-config";
+import {CreateFilePayload} from "./createFileOnServer";
 
-export const fetchFiles = createAsyncThunk<File[], string>(
+export const fetchFiles = createAsyncThunk<CreateFilePayload[], string>(
     'fileTree/fetchFiles',
     async (email, thunkApi) => {
         const token = localStorage.getItem('token');

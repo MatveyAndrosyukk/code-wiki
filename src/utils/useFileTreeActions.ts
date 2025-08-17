@@ -5,7 +5,7 @@ import {File, FileType} from "../types/file";
 import {addFile, addFolder, createRootFolder, deleteFile, pasteFile} from "../store/slices/fileTreeSlice";
 import {createFileOnServer, CreateFilePayload} from "../store/thunks/createFileOnServer";
 import {AppDispatch} from "../store";
-import {renameFileOnServer} from "../store/thunks/renameFileOnServer";
+import {changeFileNameOnServer} from "../store/thunks/changeFileNameOnServer";
 import {deleteFileOnServer} from "../store/thunks/deleteFileOnServer";
 
 export enum ActionType {
@@ -148,7 +148,7 @@ export default function FuseFileTreeActions(files: CreateFilePayload[]) {
                     name: trimmedTitle,
                 }
 
-                dispatch(renameFileOnServer(renameFileDto))
+                dispatch(changeFileNameOnServer(renameFileDto))
 
                 break;
             case ActionType.AddFolder:
@@ -191,7 +191,7 @@ export default function FuseFileTreeActions(files: CreateFilePayload[]) {
                 break;
             case ActionType.ResolveNameConflictPaste:
                 if (handleNameConflictInFolder(ActionType.ResolveNameConflictPaste)) return;
-                const newFile = {...clipboard.copiedFile, name: trimmedTitle} as File;
+                const newFile = {...clipboard.copiedFile, name: trimmedTitle} as CreateFilePayload;
                 dispatch(pasteFile({targetFolderId: id!, file: newFile}));
                 break;
             case ActionType.ResolveNameConflictAddFile:
@@ -204,7 +204,7 @@ export default function FuseFileTreeActions(files: CreateFilePayload[]) {
                 break;
             case ActionType.ResolveNameConflictRename:
                 if (handleNameConflictInFolder(ActionType.ResolveNameConflictRename)) return;
-                const renamedFile = {...clipboard.copiedFile, name: trimmedTitle} as File;
+                const renamedFile = {...clipboard.copiedFile, name: trimmedTitle} as CreateFilePayload;
                 dispatch(pasteFile({targetFolderId: id!, file: renamedFile}));
                 break;
             default:

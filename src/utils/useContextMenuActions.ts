@@ -11,7 +11,7 @@ export default function useContextMenuActions(){
         file: CreateFilePayload | null;
     }>({visible: false, clickX: 0, clickY: 0, file: null});
 
-    const openContextMenuHandler = (event: React.MouseEvent, file: File) => {
+    const openContextMenuHandler = (event: React.MouseEvent, file: CreateFilePayload) => {
         event.preventDefault();
         setContextMenuState({
             visible: true,

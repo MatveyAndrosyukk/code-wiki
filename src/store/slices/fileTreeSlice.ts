@@ -2,8 +2,9 @@ import {File, FileStatus, FileType} from "../../types/file";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {fetchFiles} from "../thunks/fetchFiles";
 import {createFileOnServer, CreateFilePayload} from "../thunks/createFileOnServer";
-import {renameFileOnServer} from "../thunks/renameFileOnServer";
+import {changeFileNameOnServer} from "../thunks/changeFileNameOnServer";
 import {deleteFileOnServer} from "../thunks/deleteFileOnServer";
+import {changeFileContentOnServer} from "../thunks/changeFileContentOnServer";
 
 // Из всех файлов находит нужный по id и применяет переданную функцию updater.
 function findAndUpdate(
@@ -214,7 +215,7 @@ const fileTreeSlice = createSlice({
                         content: "",
                         likes: 0,
                         children: [],
-                        parent: node
+                        parent: node.id
                     };
                     node.children = [...(node.children || []), newFolder];
                 }
@@ -233,7 +234,7 @@ const fileTreeSlice = createSlice({
                         content: "",
                         likes: 0,
                         children: [],
-                        parent: node
+                        parent: node.id
                     };
                     node.children = [...(node.children || []), newFolder];
                 }
@@ -260,44 +261,8 @@ const fileTreeSlice = createSlice({
                 state.files = openFoldersOnPathPreserveOthers(state.files, path);
             }
         },
-        updateFileContent(state, action: PayloadAction<{ id: number | null; content: string }>) {
-            const {id, content} = action.payload;
-
-            function update(nodes: CreateFilePayload[]) {
-                for (const node of nodes) {
-                    if (node.id === id && node.type === FileType.File) {
-                        node.content = content;
-                        return true;
-                    }
-                    if (node.children && node.children.length > 0) {
-                        if (update(node.children)) return true;
-                    }
-                }
-                return false;
-            }
-
-            update(state.files);
-        },
         resetFiles(state) {
             state.files = []
-        },
-        renameFile(state, action: PayloadAction<{ id: number; newName: string }>) {
-            const {id, newName} = action.payload;
-
-            function updateName(nodes: CreateFilePayload[]): boolean {
-                for (const node of nodes) {
-                    if (node.id === id) {
-                        node.name = newName;
-                        return true; // нашли и обновили
-                    }
-                    if (node.children && node.children.length > 0) {
-                        if (updateName(node.children)) return true;
-                    }
-                }
-                return false;
-            }
-
-            updateName(state.files);
         },
     },
     extraReducers: (builder) => {
@@ -310,28 +275,47 @@ const fileTreeSlice = createSlice({
             })
             .addCase(createFileOnServer.fulfilled, (state, action) => {
                 const newFile = action.payload;
-                if (newFile.parent == null){
-                    state.files.push(newFile)
+                const parentId =
+                    newFile.parent === null
+                        ? null
+                        : typeof newFile.parent === 'number'
+                            ? newFile.parent
+                            : newFile.parent.id;
+
+                if (parentId === null) {
+                    state.files.push(newFile);
                 } else {
-                    findAndUpdate(state.files, newFile.parent.id, (node) => {
+                    findAndUpdate(state.files, parentId, (node) => {
                         if (node.type === FileType.Folder) {
                             node.children = node.children ? [...node.children, newFile] : [newFile];
                         }
-                        if (node.type === FileType.Folder && node.status === FileStatus.Closed) {
+                        if (node.status === FileStatus.Closed) {
                             node.status = FileStatus.Opened;
                         }
-                    })
+                    });
                 }
-            })
-            .addCase(renameFileOnServer.fulfilled, (state, action) => {
-                const newFile = action.payload;
-                findAndUpdate(state.files, newFile.id, (node) => {
-                    node.name = newFile.name;
-                })
             })
             .addCase(deleteFileOnServer.fulfilled, (state, action) => {
                 const deletedFileId = action.payload;
                 state.files = deleteById(state.files, deletedFileId);
+            })
+            .addCase(changeFileContentOnServer.fulfilled, (state, action) => {
+                const changedFile = action.payload;
+
+                function update(nodes: CreateFilePayload[]) {
+                    for (const node of nodes) {
+                        if (node.id === changedFile.id && node.type === FileType.File) {
+                            node.content = changedFile.content;
+                            return true;
+                        }
+                        if (node.children && node.children.length > 0) {
+                            if (update(node.children)) return true;
+                        }
+                    }
+                    return false;
+                }
+
+                update(state.files);
             })
     }
 
@@ -346,8 +330,6 @@ export const {
     addFile,
     deleteFile,
     openPathToNode,
-    updateFileContent,
-    renameFile,
     resetFiles,
 } = fileTreeSlice.actions;
 export default fileTreeSlice.reducer;

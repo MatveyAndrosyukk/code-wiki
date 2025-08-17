@@ -1,14 +1,14 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {File} from "../../types/file";
 import API_BASE_URL from "../../config/api-config";
+import {CreateFilePayload} from "./createFileOnServer";
 
-interface RenameFilePayload {
+interface ChangeFileNamePayload {
     id: number;
     name: string;
 }
 
-export const renameFileOnServer = createAsyncThunk<File, RenameFilePayload>(
-    'fileTree/renameFileOnServer',
+export const changeFileNameOnServer = createAsyncThunk<CreateFilePayload, ChangeFileNamePayload>(
+    'fileTree/changeFileNameOnServer',
     async (body, thunkApi) => {
         const token = localStorage.getItem('token');
 

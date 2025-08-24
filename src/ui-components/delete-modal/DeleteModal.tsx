@@ -2,7 +2,7 @@ import React, {FC} from 'react';
 import Modal from "../../ui-components/modal/Modal";
 import modalStyles from '../modal/ModalContent.module.css'
 import styles from './DeleteModal.module.css'
-import {File, FileType} from "../../types/file";
+import {FileType} from "../../types/file";
 import {CreateFilePayload} from "../../store/thunks/createFileOnServer";
 
 interface DeleteModalProps {
@@ -11,7 +11,7 @@ interface DeleteModalProps {
     onDeleteFile: () => void;
 }
 
-const DeleteModal:FC<DeleteModalProps> = (
+const DeleteModal: FC<DeleteModalProps> = (
     {
         deleteModalState,
         onCancelDeleteFile,
@@ -20,10 +20,9 @@ const DeleteModal:FC<DeleteModalProps> = (
     <Modal isOpen={deleteModalState.open} onClose={onCancelDeleteFile}>
         <div
             className={modalStyles['modal__overlay']}
-            style={deleteModalState.open ? {padding: '7px 11px 7px'} : undefined}
         >
             <div className={modalStyles['modal__form']}>
-                <p className={modalStyles['modal__text']}>
+                <p className={`${modalStyles['modal__text']} ${styles['modal__text']}`}>
                     {deleteModalState.file?.type === FileType.Folder ? (
                         <>
                             Delete folder{" "}

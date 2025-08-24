@@ -1,15 +1,13 @@
 import {useCallback, useState} from "react";
 import {useDispatch} from "react-redux";
-import {pasteFile} from "../store/slices/fileTreeSlice";
-import {File} from "../types/file";
 import {ActionType} from "./useFileTreeActions";
-import {AppDispatch} from "../store";
-import {createFileOnServer, CreateFilePayload} from "../store/thunks/createFileOnServer";
+import {AppDispatch} from "../../store";
+import {createFileOnServer, CreateFilePayload} from "../../store/thunks/createFileOnServer";
 
 
-export default function useClipboard(
+export default function useCopyPasteFile(
     files: CreateFilePayload[],
-    openModal: ({reason, id}: { reason: ActionType, id: number | null }) => void,
+    openModal: ({reason, id, title}: { reason: ActionType, id: number | null, title: string }) => void,
     checkIfNameExists: (files: CreateFilePayload[], folderId: number | null, name: string) => boolean
 ) {
     const [copiedFile, setCopiedFile] = useState<CreateFilePayload | null>(null);
@@ -22,7 +20,7 @@ export default function useClipboard(
     const handlePasteFile = useCallback((id: number | null) => {
         if (!copiedFile) return;
         if (checkIfNameExists(files, id, copiedFile.name)) {
-            openModal({reason: ActionType.ResolveNameConflictPaste, id});
+            openModal({reason: ActionType.ResolveNameConflictPaste, id, title: "Paste file"});
         } else {
             const copiedFileToSave = {
                 id: null,

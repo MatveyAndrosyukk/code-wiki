@@ -1,19 +1,16 @@
-import styles from '../OpenedFile.module.css'
+import styles from '../pages/main-page/components/opened-file/OpenedFile.module.css'
 import React, {ReactNode} from "react";
-import CodeBlock from "../components/code-block/CodeBlock";
-import TerminalBlock from "../components/terminal-block/TerminalBlock";
+import CodeBlock from "../pages/main-page/components/opened-file/components/code-block/CodeBlock";
+import TerminalBlock from "../pages/main-page/components/opened-file/components/terminal-block/TerminalBlock";
 
-// Рекурсивный парсер для inline тегов
 function parseInline(text: string): React.ReactNode[] {
     const parts: React.ReactNode[] = [];
 
-    // Регулярки для ваших тегов
     const tagRegex = /\[```l to="([^"]+)"```](.+?)\[```\/l```]/g;
     const simpleTagsRegex = /\[```([ubi])```]([\s\S]+?)\[```\/\1```]/g;
 
     let lastIndex = 0;
 
-    // Функция для поиска ближайшего следующего тега (либо link, либо простой)
     function findNextTag(text: string, startPos: number) {
         tagRegex.lastIndex = startPos;
         const linkMatch = tagRegex.exec(text);
@@ -40,8 +37,8 @@ function parseInline(text: string): React.ReactNode[] {
         }
 
         if (type === 'link') {
-            const href = match[1]; // ИСПРАВЛЕНО: раньше было match[2]
-            const innerContent = match[2]; // ИСПРАВЛЕНО: раньше было match[3]
+            const href = match[1];
+            const innerContent = match[2];
             const children = parseInline(innerContent);
             parts.push(
                 <a key={index} className={styles['openedFile__content-link']} href={href} target="_blank" rel="noopener noreferrer">
@@ -98,14 +95,13 @@ export function parseFileTextToHTML(file: string): ReactNode[] {
 
         // [code*] ... [/code*]
         if (line.startsWith('[```code```]')) {
-            // Собираем строки до [/code*]
             let codeLines: string[] = [];
-            i++; // пропускаем [code*]
+            i++;
             while (i < n && !lines[i].startsWith('[```/code```]')) {
                 codeLines.push(lines[i]);
                 i++;
             }
-            i++; // пропускаем [/code*]
+            i++;
 
             const codeText = codeLines.join('\n');
             elements.push(
@@ -160,7 +156,7 @@ export function parseFileTextToHTML(file: string): ReactNode[] {
             continue;
         }
 
-        // Обычный текст с возможными inline тегами
+        //Simple text with inline tags
         if (line.length > 0) {
             elements.push(
                 <div key={`text-${i}`} className={styles['openedFile__content-text']}>
@@ -171,7 +167,6 @@ export function parseFileTextToHTML(file: string): ReactNode[] {
             continue;
         }
 
-        // Пустая строка — рендерим пустой div для отступа
         elements.push(<div key={`empty-${i}`} style={{height: 8}}/>);
         i++;
     }

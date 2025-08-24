@@ -1,6 +1,5 @@
 import React from "react";
-import {File} from "../types/file";
-import {CreateFilePayload} from "../store/thunks/createFileOnServer";
+import {CreateFilePayload} from "../../store/thunks/createFileOnServer";
 
 export default function useContextMenuActions(){
 

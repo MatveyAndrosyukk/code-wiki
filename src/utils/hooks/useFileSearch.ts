@@ -1,6 +1,6 @@
 import {useState} from "react";
-import {SearchType} from "../types/searchType";
-import {openPathToNode} from "../store/slices/fileTreeSlice";
+import {SearchType} from "../../types/searchType";
+import {openPathToNode} from "../../store/slices/fileTreeSlice";
 import {useDispatch} from "react-redux";
 
 export default function useFileSearch(){

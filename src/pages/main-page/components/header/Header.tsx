@@ -5,23 +5,29 @@ import headerSearch from './images/header-search.svg'
 import headerSwap from './images/header-swap.svg'
 import headerUser from './images/header-user.svg'
 import SearchInput from "./components/search-input/SearchInput";
-import LoginModal from "../../../../ui-components/logim-modal/LoginModal";
-import {File} from "../../../../types/file";
+import LoginModal from "../../../../ui-components/login-modal/LoginModal";
 import {CreateFilePayload} from "../../../../store/thunks/createFileOnServer";
+import UserModal from '../../../../ui-components/user-modal/UserModal';
+import {User} from "../../../../store/slices/userSlice";
+import useUserModalActions from "../../../../utils/hooks/useUserModalActions";
 
 interface HeaderProps {
     loginState: any;
     fileSearch: any;
     files: CreateFilePayload[];
+    user: User | null;
 }
 
-const Header:FC<HeaderProps> = (
+const Header: FC<HeaderProps> = (
     {
         loginState,
         fileSearch,
         files,
+        user,
     }
 ) => {
+    const userModalActions = useUserModalActions(user, loginState);
+
     return (
         <div className={styles['header']}>
             <div className={styles['container']}>
@@ -33,7 +39,11 @@ const Header:FC<HeaderProps> = (
                     </div>
                     <div className={styles['header__rightSide']}>
                         <div className={styles['header__user']}>
-                            <img src={headerUser} alt="User"/>
+                            <img
+                                src={headerUser}
+                                onClick={userModalActions.onOpenModal}
+                                alt="User"
+                            />
                         </div>
                         <div className={styles['header__search']}>
                             <div className={styles['header__search-input']}>
@@ -55,7 +65,7 @@ const Header:FC<HeaderProps> = (
                             <div
                                 className={`${styles.header__logout}`}
                                 onClick={() => loginState.onLogout()}
-                                style={{ cursor: 'pointer' }}
+                                style={{cursor: 'pointer'}}
                             >
                                 Logout
                             </div>
@@ -63,7 +73,7 @@ const Header:FC<HeaderProps> = (
                             <div
                                 className={`${styles.header__login}`}
                                 onClick={() => loginState.openLoginModal()}
-                                style={{ cursor: 'pointer' }}
+                                style={{cursor: 'pointer'}}
                             >
                                 Login
                             </div>
@@ -78,6 +88,10 @@ const Header:FC<HeaderProps> = (
                 setModalValue={loginState.setLoginModalValue}
                 modalInputRef={loginState.loginModalInputRef}
                 onLogin={loginState.onLogin}
+            />
+            <UserModal
+                user={user}
+                userModalActions={userModalActions}
             />
         </div>
     );

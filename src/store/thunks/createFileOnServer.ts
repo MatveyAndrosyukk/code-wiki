@@ -1,5 +1,4 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {File} from "../../types/file";
 import API_BASE_URL from "../../config/api-config";
 
 export interface CreateFilePayload {

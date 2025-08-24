@@ -1,14 +1,15 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import styles from './OpenedFile.module.css';
 import LikeBtn from './images/opened-file-like.svg';
-import DownloadBtn from './images/opened-file-download.svg';
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../../../store";
-import {parseFileTextToHTML} from "./utils/parseFile";
-import findPathToFile from "./utils/findFilePath"; // создайте такой action
+import {parseFileTextToHTML} from "../../../../utils/parseFile";
+import findPathToFile from "../../../../utils/findFilePath"; // создайте такой action
 import EditFileView from "./components/edit-file-view/EditFileView";
 import {CreateFilePayload} from "../../../../store/thunks/createFileOnServer";
 import {changeFileContentOnServer} from "../../../../store/thunks/changeFileContentOnServer";
+import {ChangeFileLikesPayload} from "../../../../store/thunks/changeFileLikesOnServer";
+import {isFileLikedByUser} from "../../../../api/isFileLikedByUser";
 
 interface OpenedFileProps {
     file: CreateFilePayload;
@@ -19,6 +20,8 @@ interface OpenedFileProps {
     onConfirmSwitch: () => void;
     onRejectSwitch: () => void;
     onOpenDeleteModal: (file: CreateFilePayload) => void;
+    onLikeFile: (dto: ChangeFileLikesPayload) => Promise<any>
+    openLoginModal: () => void;
 }
 
 const OpenedFile: React.FC<OpenedFileProps> = (
@@ -30,14 +33,35 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         isTryToSwitchWhileEditing,
         onConfirmSwitch,
         onRejectSwitch,
-        onOpenDeleteModal
-
+        onOpenDeleteModal,
+        onLikeFile,
+        openLoginModal,
     }
 ) => {
     const files = useSelector((state: RootState) => state.fileTree.files);
     const dispatch = useDispatch<AppDispatch>();
     const pathToFile = findPathToFile(files, file.id)?.join('/');
     const contentElements = parseFileTextToHTML(file.content);
+    const [isLiked, setIsLiked] = React.useState(false);
+
+    useEffect(() => {
+        async function checkLike(): Promise<boolean> {
+            const dto = {
+                id: file.id as number,
+                email: localStorage.getItem('email') || '',
+            };
+            try {
+                return await isFileLikedByUser(dto);
+            } catch (error) {
+                console.error('Failed to check like status', error);
+                return false;
+            }
+        }
+
+        checkLike().then(isLikedValue => {
+            setIsLiked(isLikedValue);
+        });
+    }, [file.id]);
 
     const handleSaveEditedFileChanges = (newContent: string) => {
         dispatch(changeFileContentOnServer({id: file.id as number, content: newContent}))
@@ -49,6 +73,24 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         setIsEditing(false);
         setIsFileContentChanged(false);
     };
+
+    const handleLikeFile = async () => {
+        const email = localStorage.getItem("email");
+        if (!email) {
+            openLoginModal();
+            return;
+        }
+        const dto = {
+            id: file.id as number,
+            email: email,
+        }
+        try {
+            await onLikeFile(dto);
+            setIsLiked(prev => !prev);
+        } catch (error) {
+            console.error("Failed to like file", error);
+        }
+    }
 
     return (
         <div className={styles['openedFile']}>
@@ -73,10 +115,14 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                     </div>
                 </div>
                 <div className={styles['openedFile__rightSide']}>
-                    <div className={styles['openedFile__download']}>
-                        <img src={DownloadBtn} alt="Download"/>
-                    </div>
-                    <div className={styles['openedFile__like']}>
+                    {/*<div className={styles['openedFile__download']}>*/}
+                    {/*    <img src={DownloadBtn} alt="Download"/>*/}
+                    {/*</div>*/}
+                    <div
+                        onClick={() => handleLikeFile()}
+                        className={styles['openedFile__like']}
+                        style={{color: isLiked ? '#81A2BE' : '#8D9191'}}
+                    >
                         Like
                     </div>
                     <div

@@ -1,7 +1,7 @@
 import React, {FC, useEffect} from 'react';
 import styles from './ContextMenu.module.css'
-import {File, FileType} from "../../types/file";
-import {ActionType} from "../../utils/useFileTreeActions";
+import {FileType} from "../../types/file";
+import {ActionType} from "../../utils/hooks/useFileTreeActions";
 import {CreateFilePayload} from "../../store/thunks/createFileOnServer";
 
 interface ContextMenuProps {
@@ -10,7 +10,7 @@ interface ContextMenuProps {
     file: CreateFilePayload;
     copiedFile: CreateFilePayload | null;
     onCloseContextMenu: () => void;
-    onOpenModalByReason: (args: { reason: ActionType, id: number | null }) => void;
+    onOpenModalByReason: (args: { reason: ActionType, id: number | null, title: string}) => void;
     onCopyFile: (file: CreateFilePayload) => void;
     onPasteFile: (id: number | null) => void;
     onOpenDeleteModal: (file: CreateFilePayload) => void;
@@ -42,12 +42,29 @@ const ContextMenu: FC<ContextMenuProps> = (
                     file.type === FileType.Folder && (
                         <>
                             {copiedFile && <li onClick={() => onPasteFile(file.id)}>Paste</li>}
-                            <li onClick={() => onOpenModalByReason({reason: ActionType.AddFile, id: file.id})}>Add File</li>
-                            <li onClick={() => onOpenModalByReason({reason: ActionType.AddFolder, id: file.id})}>Add Folder</li>
+                            <li onClick={() => onOpenModalByReason({
+                                reason: ActionType.AddFile,
+                                id: file.id,
+                                title: "Add File"
+                            })}>
+                                Add File
+                            </li>
+                            <li onClick={() => onOpenModalByReason({
+                                reason: ActionType.AddFolder,
+                                id: file.id,
+                                title: 'Add Folder'
+                            })}>Add Folder
+                            </li>
                         </>
                     )
                 }
-                <li onClick={() => onOpenModalByReason({reason: ActionType.RenameFile, id: file.id})}>Rename</li>
+                <li onClick={() => onOpenModalByReason({
+                    reason: ActionType.RenameFile,
+                    id: file.id,
+                    title: "Rename file"
+                })}
+                >Rename
+                </li>
                 <li onClick={() => onCopyFile(file)}>Copy</li>
                 <li className={styles['contextMenu__item-delete']} onClick={() => onOpenDeleteModal(file)}>Delete</li>
             </ul>

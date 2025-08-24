@@ -1,11 +1,17 @@
+.modal__text {
+    margin-bottom: 13px;
+}
+
 .modal__text-highlighted {
-    font-weight: 900;
+    font-weight: 600;
 }
 
 .modal__buttons-delete {
-    background: #E53935
+    background-color: #FFB4AD;
+    color: #CC032D;
 }
 
 .modal__buttons-cancel {
-    background: #888C8C
+    background: #888C8C;
+    color: #E8E8E6;
 }

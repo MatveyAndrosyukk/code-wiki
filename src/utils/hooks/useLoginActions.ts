@@ -1,11 +1,11 @@
 import {useRef, useState} from "react";
-import {login} from "../api/auth";
+import {login} from "../../api/auth";
 import {jwtDecode} from "jwt-decode";
 import {useDispatch} from "react-redux";
-import {AppDispatch} from "../store";
-import {resetFiles} from "../store/slices/fileTreeSlice";
+import {AppDispatch} from "../../store";
+import {resetFiles} from "../../store/slices/fileTreeSlice";
 
-export default function useLoginState() {
+export default function useLoginActions() {
     const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('token'));
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [loginModalValue, setLoginModalValue] = useState({

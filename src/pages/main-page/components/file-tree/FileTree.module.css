@@ -1,6 +1,5 @@
-.fileTree{
+.fileTree {
     width: 340px;
-    overflow: auto;
     min-height: 290px;
     border-radius: 14px;
     background-color: #202222;
@@ -14,18 +13,21 @@
     font-style: normal;
     scrollbar-width: thin;
     scrollbar-color: #8D9191 #191A1A;
+    overflow: auto;
+    position: relative;
 }
 
-.fileTree__content{
-
+.fileTree__content {
 }
 
-.fileTree__buttons{
+.fileTree__buttons {
     display: flex;
     justify-content: space-between;
+    position: fixed;
+    width: 320px;
 }
 
-.fileTree__buttons-create{
+.fileTree__buttons-create {
     width: 146px;
     height: 28px;
     background-color: #191A1A;
@@ -41,11 +43,11 @@
     user-select: none;
 }
 
-.fileTree__buttons-create:hover{
+.fileTree__buttons-create:hover {
     background-color: #202222;
 }
 
-.fileTree__buttons-block{
+.fileTree__buttons-block {
     width: 30px;
     height: 30px;
     background-color: #202222;
@@ -58,20 +60,22 @@
     user-select: none;
 }
 
-.fileTree__buttons-lock:hover{
+.fileTree__buttons-lock:hover {
     background-color: #191A1A;
 }
 
-.fileTree__buttons-lock img{
+.fileTree__buttons-lock img {
     width: 12px;
     height: 12px;
 }
 
-.fileTree__files{
- margin-top: 6px;
+.fileTree__files {
+    margin-top: 6px;
+    position: absolute;
+    top: 40px;
 }
 
-.add_folder_modal{
+.add_folder_modal {
     width: 350px;
     height: 200px;
     background-color: #191A1A;

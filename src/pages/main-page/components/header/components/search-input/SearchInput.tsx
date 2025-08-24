@@ -1,11 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
-import searchFilesByName, {SearchResult} from "./utils/searchFilesByName";
+import searchFilesByName, {SearchResult} from "../../../../../../utils/searchFilesByName";
 import styles from './SearchInput.module.css'
 import FileImage from './images/search-input-file.svg'
 import FolderImage from './images/search-input-folder.svg'
-import {File, FileType} from "../../../../../../types/file";
+import {FileType} from "../../../../../../types/file";
 import {SearchType} from "../../../../../../types/searchType";
-import searchFilesByContent from "./utils/searchFilesByContent";
+import searchFilesByContent from "../../../../../../utils/searchFilesByContent";
 import {CreateFilePayload} from "../../../../../../store/thunks/createFileOnServer";
 
 interface SearchProps {

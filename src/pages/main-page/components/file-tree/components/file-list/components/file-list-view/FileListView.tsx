@@ -1,13 +1,13 @@
 import React from 'react';
-import {FileStatus, FileType} from "../../../../../../../types/file";
-import OpenedImg from '../images/file-list-opened.svg'
-import ClosedImg from '../images/file-list-closed.svg'
-import FileImg from '../images/file-list-file.svg'
-import Line from '../images/file-list-line.svg'
-import ChildLine from '../images/file-list-child-line.svg'
-import LastChildLine from '../images/file-list-last-child-line.svg'
-import styles from '../FileList.module.css';
-import {CreateFilePayload} from "../../../../../../../store/thunks/createFileOnServer";
+import {FileStatus, FileType} from "../../../../../../../../types/file";
+import OpenedImg from '../../images/file-list-opened.svg'
+import ClosedImg from '../../images/file-list-closed.svg'
+import FileImg from '../../images/file-list-file.svg'
+import Line from '../../images/file-list-line.svg'
+import ChildLine from '../../images/file-list-child-line.svg'
+import LastChildLine from '../../images/file-list-last-child-line.svg'
+import styles from '../../FileList.module.css';
+import {CreateFilePayload} from "../../../../../../../../store/thunks/createFileOnServer";
 
 interface FileListViewProps {
     nodes: CreateFilePayload[];

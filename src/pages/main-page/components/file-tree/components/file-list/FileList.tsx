@@ -1,19 +1,18 @@
 import React from 'react';
-import {File} from "../../../../../../types/file";
 import styles from './FileList.module.css'
 import {useDispatch} from "react-redux";
 import {toggleFolder} from "../../../../../../store/slices/fileTreeSlice";
 import ContextMenu from "../../../../../../ui-components/context-menu/ContextMenu";
-import useContextMenuActions from "../../../../../../utils/useContextMenuActions";
-import FileListView from "./components/FileListView";
-import {ActionType} from "../../../../../../utils/useFileTreeActions";
+import useContextMenuActions from "../../../../../../utils/hooks/useContextMenuActions";
+import FileListView from "./components/file-list-view/FileListView";
+import {ActionType} from "../../../../../../utils/hooks/useFileTreeActions";
 import {CreateFilePayload} from "../../../../../../store/thunks/createFileOnServer";
 
 interface FileListProps {
     files: CreateFilePayload[];
     copiedFile: CreateFilePayload | null;
     onTryToOpenFile: (id: number | null) => void;
-    onOpenModalByReason: (args: {reason: ActionType, id: number | null}) => void;
+    onOpenModalByReason: (args: {reason: ActionType, id: number | null, title: string}) => void;
     onCopyFile: (file: CreateFilePayload) => void;
     onPasteFile: (id: number | null) => void;
     onOpenDeleteModal: (file: CreateFilePayload) => void;

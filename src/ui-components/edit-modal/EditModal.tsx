@@ -1,15 +1,15 @@
-import React, {FC} from 'react';
+import React, {FC, useEffect} from 'react';
 import Modal from "../../ui-components/modal/Modal";
 import styles from './EditModal.module.css'
 import modalStyles from '../modal/ModalContent.module.css'
-import {File, FileType} from "../../types/file";
-import {ActionType} from "../../utils/useFileTreeActions";
+import {FileType} from "../../types/file";
+import {ActionType} from "../../utils/hooks/useFileTreeActions";
 import {CreateFilePayload} from "../../store/thunks/createFileOnServer";
 
 interface EditModalProps {
     isModalOpen: boolean;
     onCloseModal: () => void;
-    modalOpenState: { reason: ActionType | null, id: number | null };
+    modalOpenState: { reason: ActionType | null, id: number | null, title: string | null };
     modalValue: string;
     setModalValue: (value: string) => void;
     modalInputRef: any;
@@ -33,27 +33,55 @@ const EditModal: FC<EditModalProps> = (
         onModalConfirmByReason,
         copiedFile,
         isNameConflictReason,
-    }) => (
-    <Modal
+    }) => {
+    const [lengthError, setLengthError] = React.useState('');
+
+    useEffect(() => {
+        if (modalValue.length >= 20) {
+            setLengthError('Name is too long');
+        } else {
+            setLengthError('')
+        }
+    }, [modalValue]);
+
+    return <Modal
         isOpen={isModalOpen}
         onClose={onCloseModal}
-        isNameConflictReason={isNameConflictReason()}
     >
         <div
             className={modalStyles['modal__overlay']}
-            style={isNameConflictReason()
-                ? {padding: '7px 17px 12px 17px'}
-                : undefined
-            }
         >
             <div className={modalStyles['modal__form']}>
-                {isNameConflictReason() && (
-                    <p className={modalStyles['modal__text']}>
-                        {copiedFile?.type === FileType.Folder
-                            ? "Folder with this name exists. Enter another name:"
-                            : "File with this name exists. Enter another name:"}
-                    </p>
-                )}
+                <div className={`${styles['modal__title']} ${modalStyles['modal__title']}`}>
+                    {modalOpenState.title}
+                </div>
+                {isNameConflictReason() ?
+                    lengthError ? (
+                        <p className={`${modalStyles['modal__error']} ${styles['modal__error']}`}>
+                            {lengthError}
+                        </p>
+                    ) : (
+                        <p className={`${modalStyles['modal__error']} ${styles['modal__error']}`}>
+                            {copiedFile?.type === FileType.Folder
+                                ? "Folder with this name exists:"
+                                : "File with this name exists:"}
+                        </p>
+                    ) :
+                    (
+                        lengthError ? (
+                            <p className={`${modalStyles['modal__error']} ${styles['modal__error']}`}>
+                                {lengthError}
+                            </p>
+                        ) : (
+                            <p className={`${modalStyles['modal__error']} ${styles['modal__error']} ${modalStyles['modal__hidden']}`}>
+                                {copiedFile?.type === FileType.Folder
+                                    ? "Folder with this name exists:"
+                                    : "File with this name exists:"}
+                            </p>
+                        )
+
+                    )
+                }
                 <input
                     ref={modalInputRef}
                     type='text'
@@ -63,6 +91,7 @@ const EditModal: FC<EditModalProps> = (
                     onChange={(e) => setModalValue(e.target.value)}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
+                            if (lengthError) return
                             onModalConfirmByReason(
                                 modalValue,
                                 modalOpenState.id,
@@ -74,6 +103,6 @@ const EditModal: FC<EditModalProps> = (
             </div>
         </div>
     </Modal>
-);
+};
 
 export default EditModal;

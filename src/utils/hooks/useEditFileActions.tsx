@@ -1,8 +1,8 @@
 import {useDispatch} from "react-redux";
 import {useState} from "react";
-import {openFile} from "../store/slices/fileTreeSlice";
+import {openFile} from "../../store/slices/fileTreeSlice";
 
-export default function useEditFileViewActions() {
+export default function useEditFileActions() {
     const dispatch = useDispatch();
 
     const [isEditing, setIsEditing] = useState(false);

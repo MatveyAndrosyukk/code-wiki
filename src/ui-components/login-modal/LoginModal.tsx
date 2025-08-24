@@ -30,7 +30,7 @@ const LoginModal: FC<LoginModalProps> = (
         try {
             onLogin()
             setLoading(false);
-        }catch (error){
+        } catch (error) {
             setError('Authorization failed, try again');
             setLoading(false);
         }
@@ -47,7 +47,6 @@ const LoginModal: FC<LoginModalProps> = (
         <Modal
             isOpen={isModalOpen}
             onClose={handleCloseModal}
-            isCentered={true}
         >
             <div className={`${modalStyles.modal__overlay} ${styles.modal__overlay}`}>
                 <div className={`${modalStyles.modal__form} ${styles.modal__form}`}>
@@ -62,7 +61,6 @@ const LoginModal: FC<LoginModalProps> = (
                         onChange={(e) => setModalValue({...modalValue, login: e.currentTarget.value})}
                     />
                     <input
-                        ref={modalInputRef}
                         type='password'
                         className={styles['modal__input']}
                         placeholder={"Enter your password"}

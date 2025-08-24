@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
 import styles from './EditFileView.module.css';
-import {File} from "../../../../../../types/file";
 import BoldImage from './images/edit-file-view__bold.svg'
 import ItalicImage from './images/edit-file-view__italic.svg'
 import UnderlinedImage from './images/edit-file-view__underlined.svg'
@@ -176,7 +175,8 @@ const EditFileView: React.FC<EditFileViewProps> = (
                 />
                 <div className={styles['editFileView__preview']}>
                     <div className={styles['editFileView__preview-title']}>Preview</div>
-                    <div className={styles['editFileView__preview-content']}>{parseFileTextToHTML(textareaContent)}</div>
+                    <div
+                        className={styles['editFileView__preview-content']}>{parseFileTextToHTML(textareaContent)}</div>
                 </div>
             </div>
 

@@ -2,15 +2,14 @@ import React, {FC} from 'react';
 import styles from './FileTree.module.css'
 import fileTreeLock from './images/fileTree-lock.svg'
 import FileList from "./components/file-list/FileList";
-import {File} from "../../../../types/file";
-import {ActionType} from "../../../../utils/useFileTreeActions";
+import {ActionType} from "../../../../utils/hooks/useFileTreeActions";
 import {CreateFilePayload} from "../../../../store/thunks/createFileOnServer";
 
 interface FileTreeProps {
     files: CreateFilePayload[];
     copiedFile: CreateFilePayload | null;
     onTryToOpenFile: (id: number | null) => void;
-    onOpenModalByReason: (args: { reason: ActionType, id: number | null }) => void;
+    onOpenModalByReason: (args: { reason: ActionType, id: number | null, title: string}) => void;
     onCopyFile: (file: CreateFilePayload) => void;
     onPasteFile: (id: number | null) => void;
     onOpenDeleteModal: (file: CreateFilePayload) => void;
@@ -32,7 +31,11 @@ const FileTree: FC<FileTreeProps> = (
     }) => {
 
     const handleCreateRootFolder = () => {
-        isLoggedIn ? onOpenModalByReason({reason: ActionType.AddRootFolder, id: null}) : setIsLoginModalOpen(true);
+        isLoggedIn ? onOpenModalByReason({
+            reason: ActionType.AddRootFolder,
+            id: null,
+            title: "Add root folder"
+        }) : setIsLoginModalOpen(true);
     }
 
     return (

@@ -1,149 +1,33 @@
-import {File, FileStatus, FileType} from "../../types/file";
+import {FileStatus, FileType} from "../../types/file";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {fetchFiles} from "../thunks/fetchFiles";
 import {createFileOnServer, CreateFilePayload} from "../thunks/createFileOnServer";
-import {changeFileNameOnServer} from "../thunks/changeFileNameOnServer";
 import {deleteFileOnServer} from "../thunks/deleteFileOnServer";
 import {changeFileContentOnServer} from "../thunks/changeFileContentOnServer";
+import {changeFileLikesOnServer} from "../thunks/changeFileLikesOnServer";
+import {
+    closeAllChildren,
+    closeAllFiles,
+    closeAllFilesExcept,
+    deleteById,
+    findAndUpdate,
+    findPathToNode,
+    openFoldersOnPathPreserveOthers
+} from "../utils/fileTreeActionUtils";
+import {findNodeById} from "../../utils/modalUtils";
 
-// Из всех файлов находит нужный по id и применяет переданную функцию updater.
-function findAndUpdate(
-    nodes: CreateFilePayload[],
-    id: number | null,
-    updater: (node: CreateFilePayload, idx: number, arr: CreateFilePayload[]) => boolean | void
-): boolean {
-    for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
-        if (node.id === id) {
-            updater(node, i, nodes);
-            return true;
-        }
-        if (node.children && node.children.length > 0) {
-            if (findAndUpdate(node.children, id, updater)) return true;
-        }
-    }
-    return false;
-}
-
-// У скопированного файла изменяется все id по вложенности.
-function deepCloneWithNewIds(file: CreateFilePayload): CreateFilePayload {
-    const newId = Date.now() + Math.floor(Math.random() * 1000000);
-    return {
-        ...file,
-        id: newId,
-        children: file.children
-            ? file.children.map(child => deepCloneWithNewIds(child))
-            : [],
-    };
-}
-
-// Рекурсивно закрывает все файлы.
-function closeAllFiles(nodes: CreateFilePayload[]): CreateFilePayload[] {
-    return nodes.map(node => {
-        const newNode = {...node};
-        if (newNode.type === FileType.File) {
-            newNode.status = FileStatus.Closed;
-        }
-        if (newNode.children) {
-            newNode.children = closeAllFiles(newNode.children);
-        }
-        return newNode;
-    });
-}
-
-// Закрывает всех children у нажатой папки.
-function closeAllChildren(nodes: CreateFilePayload[]): CreateFilePayload[] {
-    return nodes.map(node => ({
-        ...node,
-        status: node.type === FileType.Folder ? FileStatus.Closed : node.status,
-        children: node.children ? closeAllChildren(node.children) : [],
-    }));
-}
-
-// Удаляет файл/папку по id.
-function deleteById(nodes: CreateFilePayload[], id: number | null): CreateFilePayload[] {
-    return nodes
-        .filter(node => node.id !== id)
-        .map(node => ({
-            ...node,
-            children: node.children ? deleteById(node.children, id) : [],
-        }));
-}
-
-// Функция для поиска пути к узлу по id
-function findPathToNode(nodes: CreateFilePayload[], targetId: number, path: number[] | null = []): number[] | null {
-    for (const node of nodes) {
-        // @ts-ignore
-        const currentPath = [...path, node.id];
-        if (node.id === targetId) {
-            return currentPath;
-        }
-        if (node.children && node.children.length > 0) {
-            const result = findPathToNode(node.children, targetId, currentPath);
-            if (result) return result;
-        }
-    }
-    return null;
-}
-
-// Функция для поиска узла по id, возвращает File или null
-function findNode(nodes: CreateFilePayload[], targetId: number): CreateFilePayload | null {
-    for (const node of nodes) {
-        if (node.id === targetId) return node;
-        if (node.children && node.children.length > 0) {
-            const found = findNode(node.children, targetId);
-            if (found) return found;
-        }
-    }
-    return null;
-}
-
-// Открыть папки по пути, не закрывая другие папки
-function openFoldersOnPathPreserveOthers(nodes: CreateFilePayload[], pathIds: number[]): CreateFilePayload[] {
-    return nodes.map(node => {
-        const newNode = {...node};
-        if (newNode.type === FileType.Folder) {
-            if (pathIds.includes(newNode.id as number)) {
-                newNode.status = FileStatus.Opened;
-            }
-            if (newNode.children && newNode.children.length > 0) {
-                newNode.children = openFoldersOnPathPreserveOthers(newNode.children, pathIds);
-            }
-        }
-        return newNode;
-    });
-}
-
-// Закрыть все файлы, кроме файла с id = openedFileId (если передан)
-function closeAllFilesExcept(nodes: CreateFilePayload[], openedFileId: number | null): CreateFilePayload[] {
-    return nodes.map(node => {
-        const newNode = {...node};
-        if (newNode.type === FileType.File) {
-            newNode.status = newNode.id === openedFileId ? FileStatus.Opened : FileStatus.Closed;
-        }
-        if (newNode.children && newNode.children.length > 0) {
-            newNode.children = closeAllFilesExcept(newNode.children, openedFileId);
-        }
-        return newNode;
-    });
-}
-
-// Тип состояния.
 interface FileTreeState {
     files: CreateFilePayload[];
 }
 
-// Состояние.
 const initialState: FileTreeState = {
     files: [],
 }
 
-// Редьюсеры для массива files.
 const fileTreeSlice = createSlice({
     name: 'fileTree',
     initialState,
     reducers: {
-        // Открывает выбранный файл и закрывает остальные.
         openFile(state, action: PayloadAction<{ id: number | null }>) {
             state.files = closeAllFiles(state.files);
 
@@ -153,7 +37,6 @@ const fileTreeSlice = createSlice({
                 }
             })
         },
-        // Изменяет status папок и их children при нажатии на Closed или Opened.
         toggleFolder(state, action: PayloadAction<{ id: number | null }>) {
             function toggle(nodes: CreateFilePayload[]): CreateFilePayload[] {
                 return nodes.map(node => {
@@ -177,87 +60,19 @@ const fileTreeSlice = createSlice({
 
             state.files = toggle(state.files);
         },
-        // Добавляет корневую папку с переданным названием.
-        createRootFolder(state, action: PayloadAction<{ title: string }>) {
-            const newFolder: CreateFilePayload = {
-                id: Date.now(), // или nanoid() если подключите
-                name: action.payload.title,
-                type: FileType.Folder,
-                status: FileStatus.Closed,
-                author: 'matvey',
-                content: "",
-                likes: 0,
-                children: [],
-                parent: null,
-            };
-            state.files.push(newFolder);
-        },
-        // Вставляет скопированный файл в переданную папку по id.
-        pasteFile(state, action: PayloadAction<{ targetFolderId: number | null; file: CreateFilePayload }>) {
-            findAndUpdate(state.files, action.payload.targetFolderId, (node) => {
-                if (node.type === FileType.Folder) {
-                    const newFile = deepCloneWithNewIds(action.payload.file);
-                    const pastedFile = {...newFile, status: FileStatus.Closed};
-                    node.children = [...(node.children || []), pastedFile];
-                }
-            });
-        },
-        //Создает папку в переданной по id папке.
-        addFolder(state, action: PayloadAction<{ parentId: number; title: string }>) {
-            findAndUpdate(state.files, action.payload.parentId, (node) => {
-                if (node.type === FileType.Folder) {
-                    const newFolder: CreateFilePayload = {
-                        id: Date.now(),
-                        name: action.payload.title,
-                        type: FileType.Folder,
-                        status: FileStatus.Closed,
-                        author: 'user',
-                        content: "",
-                        likes: 0,
-                        children: [],
-                        parent: node.id
-                    };
-                    node.children = [...(node.children || []), newFolder];
-                }
-            });
-        },
-        //Создает файл в переданной по id папке.
-        addFile(state, action: PayloadAction<{ parentId: number; title: string }>) {
-            findAndUpdate(state.files, action.payload.parentId, (node) => {
-                if (node.type === FileType.Folder) {
-                    const newFolder: CreateFilePayload = {
-                        id: Date.now(),
-                        name: action.payload.title,
-                        type: FileType.File,
-                        status: FileStatus.Closed,
-                        author: 'user',
-                        content: "",
-                        likes: 0,
-                        children: [],
-                        parent: node.id
-                    };
-                    node.children = [...(node.children || []), newFolder];
-                }
-            });
-        },
-        deleteFile(state, action: PayloadAction<{ id: number | null }>) {
-            state.files = deleteById(state.files, action.payload.id);
-        },
         openPathToNode(state, action: PayloadAction<{ id: number }>) {
             const targetId = action.payload.id;
 
             const path = findPathToNode(state.files, targetId);
             if (!path) return;
 
-            const targetNode = findNode(state.files, targetId);
+            const targetNode = findNodeById(state.files, targetId);
             if (!targetNode) return;
 
             if (targetNode.type === FileType.File) {
-                // Для файла: закрыть все файлы кроме этого, открыть папки по пути
                 state.files = closeAllFilesExcept(state.files, targetId);
                 state.files = openFoldersOnPathPreserveOthers(state.files, path);
             } else if (targetNode.type === FileType.Folder) {
-                // Для папки: открыть папки по пути, не трогая остальные папки и файлы
                 state.files = openFoldersOnPathPreserveOthers(state.files, path);
             }
         },
@@ -317,6 +132,13 @@ const fileTreeSlice = createSlice({
 
                 update(state.files);
             })
+            .addCase(changeFileLikesOnServer.fulfilled, (state, action) => {
+                const likedFile = action.payload;
+
+                findAndUpdate(state.files, likedFile.id, (node) => {
+                    node.likes = likedFile.likes
+                });
+            })
     }
 
 });
@@ -324,11 +146,6 @@ const fileTreeSlice = createSlice({
 export const {
     openFile,
     toggleFolder,
-    createRootFolder,
-    pasteFile,
-    addFolder,
-    addFile,
-    deleteFile,
     openPathToNode,
     resetFiles,
 } = fileTreeSlice.actions;

@@ -9,3 +9,11 @@
     font-size: 13px;
     font-weight: 500;
 }
+
+.modal__title {
+    margin-bottom: 7px;
+}
+
+.modal__error {
+    margin-bottom: 5px;
+}

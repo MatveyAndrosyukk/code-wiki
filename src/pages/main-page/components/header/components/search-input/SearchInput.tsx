@@ -27,6 +27,7 @@ const SearchInput: React.FC<SearchProps> = (
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        console.log('SearchInput files:', files);
         if (query.trim() === '') {
             setResults([]);
             return;
@@ -37,6 +38,7 @@ const SearchInput: React.FC<SearchProps> = (
         } else {
             found = searchFilesByContent(files, query.trim());
         }
+        console.log('SearchInput results:', found);
         setResults(found);
     }, [query, files, searchType]);
 

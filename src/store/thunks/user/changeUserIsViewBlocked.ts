@@ -2,22 +2,24 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {User} from "../../slices/userSlice";
 import API_BASE_URL from "../../../config/api-config";
 
-export const fetchUser = createAsyncThunk<User, string>(
-    'user/fetchUser',
+export const changeUserIsViewBlocked = createAsyncThunk<User, string>(
+    'user/changeUserIsViewBlocked',
     async (email) => {
         const token = localStorage.getItem('token');
 
         const response = await fetch(
-            `${API_BASE_URL}/users/findOne?email=${email}`,
+            `${API_BASE_URL}/users/isViewBlocked?email=${email}`,
             {
-                method: 'GET',
+                method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 }
             }
         );
         if (!response.ok) {
-            throw new Error('Failed to fetch user');
+            const errorData = await response.json();
+            throw new Error(errorData.message || JSON.stringify(errorData));
         }
         return await response.json();
     }

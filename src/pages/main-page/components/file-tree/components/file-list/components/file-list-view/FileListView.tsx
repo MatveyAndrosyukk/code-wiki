@@ -8,6 +8,7 @@ import ChildLine from '../../images/file-list-child-line.svg'
 import LastChildLine from '../../images/file-list-last-child-line.svg'
 import styles from '../../FileList.module.css';
 import {CreateFilePayload} from "../../../../../../../../store/thunks/createFileOnServer";
+import {User} from "../../../../../../../../store/slices/userSlice";
 
 interface FileListViewProps {
     nodes: CreateFilePayload[];
@@ -16,16 +17,43 @@ interface FileListViewProps {
     onTryToOpenFile: (id: number | null) => void;
     onFolderClick: (id: number | null) => void;
     contextMenuActions: any;
+    isLoggedIn: boolean;
+    emailParam: string | undefined;
+    user: User | null;
 }
 
-const FileListView: React.FC<FileListViewProps> = ({
-                                                       nodes,
-                                                       level = 0,
-                                                       ancestors = [],
-                                                       onTryToOpenFile,
-                                                       onFolderClick,
-                                                       contextMenuActions,
-                                                   }) => {
+const FileListView: React.FC<FileListViewProps> = (
+    {
+        nodes,
+        level = 0,
+        ancestors = [],
+        onTryToOpenFile,
+        onFolderClick,
+        contextMenuActions,
+        isLoggedIn,
+        emailParam,
+        user,
+    }) => {
+    const isUserCanEdit = () => {
+        if (!isLoggedIn && !emailParam) {
+            return true
+        }
+        const isUserEditor = user?.whoCanEdit.some(user => user.email === localStorage.getItem('email'));
+        const isUserEqualsLoggedIn = user?.email === localStorage.getItem('email');
+        return isUserEditor || isUserEqualsLoggedIn;
+
+    }
+
+    const openContextMenuHandler = (
+        e: React.MouseEvent<HTMLDivElement>,
+        node: CreateFilePayload
+    ) => {
+        if (isUserCanEdit()) {
+            contextMenuActions.onOpenContextMenu(e, node)
+        }
+        return
+    }
+
     return (
         <>
             {nodes.map((node, idx) => {
@@ -35,17 +63,17 @@ const FileListView: React.FC<FileListViewProps> = ({
             {ancestors.slice(1).map((hasSibling, i) =>
                 hasSibling ? (
                     <span key={i} className={styles['fileList__node-line']}>
-                  <img style={{width: 2}} src={Line} alt="line" />
+                  <img style={{width: 2}} src={Line} alt="line"/>
                 </span>
                 ) : (
-                    <span key={i} className={styles['fileList__node-space']} />
+                    <span key={i} className={styles['fileList__node-space']}/>
                 )
             )}
                         {level > 0 && (() => {
                             const lineSrc = isLast ? LastChildLine : ChildLine;
                             return (
                                 <span className={styles['fileList__node-line']}>
-                  <img style={{width: 10}} src={lineSrc} alt="line" />
+                  <img style={{width: 10}} src={lineSrc} alt="line"/>
                 </span>
                             )
                         })()}
@@ -59,11 +87,12 @@ const FileListView: React.FC<FileListViewProps> = ({
                             {node.type === FileType.Folder ? (
                                 <div
                                     className={styles['fileList__node-folder']}
-                                    onContextMenu={(e) => contextMenuActions.onOpenContextMenu(e, node)}
+                                    onContextMenu={(e) => openContextMenuHandler(e, node)}
                                     onClick={() => onFolderClick(node.id)}
                                     style={{display: 'flex', alignItems: 'center'}}
                                 >
-                                    <img src={node.status === FileStatus.Opened ? OpenedImg : ClosedImg} alt="File Status" />
+                                    <img src={node.status === FileStatus.Opened ? OpenedImg : ClosedImg}
+                                         alt="File Status"/>
                                     {node.name}
                                 </div>
                             ) : (
@@ -73,7 +102,7 @@ const FileListView: React.FC<FileListViewProps> = ({
                                     style={{fontWeight: node.status === FileStatus.Opened ? 'bold' : 'normal'}}
                                     onClick={() => onTryToOpenFile(node.id)}
                                 >
-                                    <img src={FileImg} alt="File" /> {node.name}
+                                    <img src={FileImg} alt="File"/> {node.name}
                                 </div>
                             )}
                         </div>
@@ -82,6 +111,9 @@ const FileListView: React.FC<FileListViewProps> = ({
                             node.status === FileStatus.Opened &&
                             node.children &&
                             <FileListView
+                                user={user}
+                                emailParam={emailParam}
+                                isLoggedIn={isLoggedIn}
                                 nodes={node.children}
                                 level={level + 1}
                                 ancestors={[...ancestors, !isLast]}

@@ -1,6 +1,6 @@
 import React, {FC, useEffect, useRef} from 'react';
 import hljs from 'highlight.js';
-import 'highlight.js/styles/custom-theme-5.css';
+import 'highlight.js/styles/custom-theme-9.css';
 
 interface CodeBlockProps {
     code: string;

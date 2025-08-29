@@ -34,24 +34,28 @@ export default function useLoginActions() {
     }
 
     const handleLogin = async () => {
-        const data = await login(loginModalValue.login, loginModalValue.password);
+        try {
+            const data = await login(loginModalValue.login, loginModalValue.password);
 
-        type JwtPayload = {
-            email: string;
-            roles: { id: number; value: string; description: string }[];
-            iat: number;
-            exp: number;
-        };
+            type JwtPayload = {
+                email: string;
+                roles: { id: number; value: string; description: string }[];
+                iat: number;
+                exp: number;
+            };
 
-        const decoded: JwtPayload = jwtDecode(data.token);
-        const roleValues = decoded.roles.map(role => role.value);
+            const decoded: JwtPayload = jwtDecode(data.token);
+            const roleValues = decoded.roles.map(role => role.value);
 
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('email', decoded.email)
-        localStorage.setItem('roles', JSON.stringify(roleValues));
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('email', decoded.email);
+            localStorage.setItem('roles', JSON.stringify(roleValues));
 
-        setIsLoggedIn(true);
-        closeLoginModal();
+            setIsLoggedIn(true);
+            closeLoginModal();
+        } catch (error) {
+            throw error;
+        }
     }
 
     return {

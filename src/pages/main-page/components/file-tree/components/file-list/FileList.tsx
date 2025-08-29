@@ -7,6 +7,7 @@ import useContextMenuActions from "../../../../../../utils/hooks/useContextMenuA
 import FileListView from "./components/file-list-view/FileListView";
 import {ActionType} from "../../../../../../utils/hooks/useFileTreeActions";
 import {CreateFilePayload} from "../../../../../../store/thunks/createFileOnServer";
+import {User} from "../../../../../../store/slices/userSlice";
 
 interface FileListProps {
     files: CreateFilePayload[];
@@ -16,6 +17,9 @@ interface FileListProps {
     onCopyFile: (file: CreateFilePayload) => void;
     onPasteFile: (id: number | null) => void;
     onOpenDeleteModal: (file: CreateFilePayload) => void;
+    isLoggedIn: boolean;
+    emailParam: string | undefined;
+    user: User | null;
 }
 
 const FileList: React.FC<FileListProps> = (
@@ -27,6 +31,9 @@ const FileList: React.FC<FileListProps> = (
         onPasteFile,
         onOpenModalByReason,
         onOpenDeleteModal,
+        isLoggedIn,
+        emailParam,
+        user,
     }
 ) => {
     const contextMenuActions = useContextMenuActions()
@@ -38,6 +45,9 @@ const FileList: React.FC<FileListProps> = (
 
     return <div className={styles['fileList']}>
         <FileListView
+            user={user}
+            emailParam={emailParam}
+            isLoggedIn={isLoggedIn}
             nodes={files}
             onTryToOpenFile={onTryToOpenFile}
             onFolderClick={onFolderClick}

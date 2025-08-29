@@ -28,7 +28,7 @@ const LoginModal: FC<LoginModalProps> = (
         setLoading(true);
         setError(null);
         try {
-            onLogin()
+            await onLogin()
             setLoading(false);
         } catch (error) {
             setError('Authorization failed, try again');

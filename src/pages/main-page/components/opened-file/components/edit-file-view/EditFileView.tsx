@@ -8,8 +8,10 @@ import CodeImage from './images/edit-file-view__code.svg'
 import PointImage from './images/edit-file-view__point.svg'
 import LineImage from './images/edit-file-view__line.svg'
 import LinkImage from './images/edit-file-view__link.svg'
+import ImgImage from './images/edit-file-view__image.svg'
 import SwitchWhileEditModal from "../../../../../../ui-components/switch-while-edit-modal/SwitchWhileEditModal";
 import {CreateFilePayload} from "../../../../../../store/thunks/createFileOnServer";
+import {uploadImage} from "../../../../../../api/uploadImage";
 
 interface EditFileViewProps {
     file: CreateFilePayload;
@@ -36,6 +38,31 @@ const EditFileView: React.FC<EditFileViewProps> = (
 ) => {
     const [textareaContent, setTextareaContent] = useState(file.content);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleSelectImage = async (file: File) => {
+        try {
+            const data = await uploadImage(file);
+            if (data && data.fileName) {
+                pasteTag(`[image/${data.fileName}]`);
+            }
+        } catch (error) {
+            console.error('Failed to upload image:', error);
+        }
+    }
+
+    const openFileDialog = () => {
+        fileInputRef.current?.click();
+    }
+
+    const changeFileHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files && files.length > 0){
+            const file = files[0];
+            handleSelectImage(file);
+            e.target.value = '';
+        }
+    }
 
     useEffect(() => {
         setTextareaContent(file.content);
@@ -153,6 +180,16 @@ const EditFileView: React.FC<EditFileViewProps> = (
                     }}>
                         <img src={LineImage} alt='Line' style={{width: '14.25px', height: '1.81px'}}/>
                     </div>
+                    <div onClick={openFileDialog}>
+                        <img src={ImgImage} alt="Load img"/>
+                    </div>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        ref={fileInputRef}
+                        onChange={changeFileHandler}
+                    />
                 </div>
                 <div className={styles['editFileView__header-buttons']}>
                     <button

@@ -9,7 +9,7 @@ export interface ChangeFileLikesPayload {
 
 export const changeFileLikesOnServer = createAsyncThunk<CreateFilePayload, ChangeFileLikesPayload>(
     'fileTree/changeFileLikesOnServer',
-    async (body, thunkApi) => {
+    async (body) => {
         const token = localStorage.getItem('token');
 
         const response = await fetch(`${API_BASE_URL}/files/like`, {

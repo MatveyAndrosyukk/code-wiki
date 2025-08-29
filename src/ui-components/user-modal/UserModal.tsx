@@ -3,6 +3,7 @@ import styles from './UserModal.module.css'
 import modalStyles from '../modal/ModalContent.module.css'
 import Modal from "../modal/Modal";
 import editNameSvg from './images/user-modal-edit.svg'
+import copyLinkSvg from './images/user-modal-copyLink.svg'
 import userSvg from './images/user-modal-user.svg'
 import {User} from "../../store/slices/userSlice";
 
@@ -38,6 +39,13 @@ const UserModal: FC<LoginModalProps> = (
         setModalValue,
     } = userModalActions
 
+    const handleCopyProfileLink = () => {
+        if (!user?.email) return;
+
+        const profileUrl = `${window.location.origin}/${user.email}`;
+        navigator.clipboard.writeText(profileUrl)
+    };
+
     if (!isModalOpen) return null;
 
     return (
@@ -47,61 +55,73 @@ const UserModal: FC<LoginModalProps> = (
         >
             <div className={`${modalStyles.modal__overlay} ${styles.modal__overlay}`}>
                 <div className={`${modalStyles.modal__form} ${styles.modal__form}`}>
-                    <div className={styles['modal__name']}>
-                        {isEditingName ? (
-                            <div>
-                                {isEditedNameLong ? (
-                                    <p className={styles['modal__name-symbolError']}>
-                                        Username should be less than 25 symbols
-                                    </p>
-                                ) : (
-                                    <p className={styles['modal__name-invisibleError']}>
-                                        Username should be less than 25 symbols
-                                    </p>
-                                )}
-                                <input
-                                    ref={nameInputRef}
-                                    className={styles['modal__name-changeNameInput']}
-                                    value={editedName}
-                                    onChange={(e) => setEditedName(e.target.value)}
-                                    onKeyDown={onKeyDown}
-                                    onBlur={onBlur}
-                                />
-                            </div>
-                        ) : (
-                            <div>
-                                <p className={styles['modal__name-invisibleError']}>
-                                    Username should be less than 25 symbols
-                                </p>
-                                <div className={styles['modal__username']}>
-                                    <div className={styles['modal__name-username']}>
-                                        {user?.name}
-                                    </div>
-                                    <img
-                                        src={editNameSvg}
-                                        alt="Edit"
-                                        title="Change name"
-                                        className={styles['modal__name-image']}
-                                        onClick={() => setIsEditingName(true)}
-                                    />
-                                </div>
-                            </div>
-                        )}
+                    <div className={styles['modal__head']}>
+                       <div className={`${styles['modal__head-name']}`}>
+                           <div className={styles['modal__name']}>
+                               {isEditingName ? (
+                                   <div>
+                                       {isEditedNameLong ? (
+                                           <p className={styles['modal__name-symbolError']}>
+                                               Username should be less than 25 symbols
+                                           </p>
+                                       ) : (
+                                           <p className={styles['modal__name-invisibleError']}>
+                                               Username should be less than 25 symbols
+                                           </p>
+                                       )}
+                                       <input
+                                           ref={nameInputRef}
+                                           className={styles['modal__name-changeNameInput']}
+                                           value={editedName}
+                                           onChange={(e) => setEditedName(e.target.value)}
+                                           onKeyDown={onKeyDown}
+                                           onBlur={onBlur}
+                                       />
+                                   </div>
+                               ) : (
+                                   <div>
+                                       <p className={styles['modal__name-invisibleError']}>
+                                           Username should be less than 25 symbols
+                                       </p>
+                                       <div className={styles['modal__username']}>
+                                           <div className={styles['modal__name-username']}>
+                                               {user?.name}
+                                           </div>
+                                           <img
+                                               src={editNameSvg}
+                                               alt="Edit"
+                                               title="Change name"
+                                               className={styles['modal__name-image']}
+                                               onClick={() => setIsEditingName(true)}
+                                           />
+                                       </div>
+                                   </div>
+                               )}
+                           </div>
+                           <div className={styles['modal__email']}>
+                               {user?.email}
+                           </div>
+                           {changeNameError ? (
+                               <p
+                                   className={`${styles['modal__name-symbolError']} ${styles['modal__email-error']}`}
+                               >
+                                   {changeNameError}
+                               </p>
+                           ) : (
+                               <p className={`${styles['modal__name-invisibleError']} ${styles['modal__email-error']}`}>
+                                   Username should be less than 25 symbols
+                               </p>
+                           )}
+                       </div>
+                        <div className={`${styles['modal__head-link']}`}>
+                            <img
+                                src={copyLinkSvg}
+                                alt='Copy link'
+                                title='Copy profile link'
+                                onClick={handleCopyProfileLink}
+                            />
+                        </div>
                     </div>
-                    <div className={styles['modal__email']}>
-                        {user?.email}
-                    </div>
-                    {changeNameError ? (
-                        <p
-                            className={`${styles['modal__name-symbolError']} ${styles['modal__email-error']}`}
-                        >
-                            {changeNameError}
-                        </p>
-                    ) : (
-                        <p className={`${styles['modal__name-invisibleError']} ${styles['modal__email-error']}`}>
-                            Username should be less than 25 symbols
-                        </p>
-                    )}
                     <p className={styles['modal__text']}>
                         Administer users who can edit your files:
                     </p>

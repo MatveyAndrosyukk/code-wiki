@@ -3,7 +3,7 @@ import {ActionType} from "./hooks/useFileTreeActions";
 
 export function findNodeById(nodes: CreateFilePayload[], id: number | null): CreateFilePayload | null {
     for (const node of nodes) {
-        if (node.id === id && node.type === 'Folder') return node;
+        if (node.id === id) return node;
         if (node.type === 'Folder' && node.children) {
             const found = findNodeById(node.children, id);
             if (found) return found;

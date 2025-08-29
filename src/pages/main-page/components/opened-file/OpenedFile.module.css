@@ -91,7 +91,12 @@
     align-items: center;
     justify-content: center;
     user-select: none;
+}
 
+.openedFile__editAndDelete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .openedFile__download {

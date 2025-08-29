@@ -14,7 +14,7 @@ export default function searchFilesByName(
     query: string,
     path: string = ''
 ): SearchResult[] {
-    if (!query) return [];
+    if (!query || nodes.length === 0) return [];
     const lowerQuery = query.toLowerCase();
     let results: SearchResult[] = [];
 

@@ -7,7 +7,7 @@
     font-optical-sizing: auto;
     font-style: normal;
     width: 500px;
-    padding: 0 0 15px 15px;
+    padding: 0 15px 15px 15px;
 }
 
 .modal__permission {
@@ -16,6 +16,24 @@
     align-items: center;
     align-self: flex-start;
     width: 100%;
+}
+
+.modal__head {
+    align-self: flex-start;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    user-select: none;
+}
+
+.modal__head-name {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal__head-link {
+    cursor: pointer;
 }
 
 .modal__name {
@@ -128,7 +146,6 @@
     color: #E8E8E6;
     font-weight: 600;
     font-size: 13px;
-    margin-right: 15px;
 }
 
 .modal__button:hover{
@@ -154,7 +171,6 @@
     width: 100%;
     scrollbar-width: thin;
     scrollbar-color: #8D9191 #202222;
-    padding-right: 15px;
 }
 
 .modal__user {

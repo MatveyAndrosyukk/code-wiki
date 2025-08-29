@@ -6,6 +6,8 @@
     justify-content: center;
 }
 
+
+
 .emptyFile__bookWrapper {
     display: flex;
     flex-direction: column;
@@ -16,7 +18,7 @@
 .book-svg {
     width: 200px;
     height: 200px;
-    perspective: 600px; /* Для 3D эффекта */
+    perspective: 600px;
 }
 
 .book-left, .book-right {

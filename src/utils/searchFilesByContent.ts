@@ -7,7 +7,7 @@ export default function searchFilesByContent(
     query: string,
     path: string = ''
 ): SearchResult[] {
-    if (!query) return [];
+    if (!query || nodes.length === 0) return [];
     const lowerQuery = query.toLowerCase();
     let results: SearchResult[] = [];
 

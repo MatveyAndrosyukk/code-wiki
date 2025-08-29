@@ -10,6 +10,7 @@ import {CreateFilePayload} from "../../../../store/thunks/createFileOnServer";
 import UserModal from '../../../../ui-components/user-modal/UserModal';
 import {User} from "../../../../store/slices/userSlice";
 import useUserModalActions from "../../../../utils/hooks/useUserModalActions";
+import {useNavigate} from "react-router-dom";
 
 interface HeaderProps {
     loginState: any;
@@ -26,14 +27,22 @@ const Header: FC<HeaderProps> = (
         user,
     }
 ) => {
+    const navigate = useNavigate();
     const userModalActions = useUserModalActions(user, loginState);
+
+    const handleLogoClick = () => {
+        navigate('/');
+    }
 
     return (
         <div className={styles['header']}>
             <div className={styles['container']}>
                 <div className={styles['header__content']}>
                     <div className={styles['header__leftSide']}>
-                        <div className={styles['header__logo']}>
+                        <div
+                            className={styles['header__logo']}
+                            onClick={handleLogoClick}
+                        >
                             <img src={headerLogo} alt="Logo"/>
                         </div>
                     </div>

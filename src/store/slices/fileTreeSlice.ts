@@ -28,6 +28,9 @@ const fileTreeSlice = createSlice({
     name: 'fileTree',
     initialState,
     reducers: {
+        clearFiles(state){
+            state.files = [];
+        },
         openFile(state, action: PayloadAction<{ id: number | null }>) {
             state.files = closeAllFiles(state.files);
 
@@ -148,6 +151,7 @@ export const {
     toggleFolder,
     openPathToNode,
     resetFiles,
+    clearFiles
 } = fileTreeSlice.actions;
 export default fileTreeSlice.reducer;
 

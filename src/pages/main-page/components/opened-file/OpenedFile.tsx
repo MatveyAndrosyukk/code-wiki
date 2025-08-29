@@ -10,6 +10,7 @@ import {CreateFilePayload} from "../../../../store/thunks/createFileOnServer";
 import {changeFileContentOnServer} from "../../../../store/thunks/changeFileContentOnServer";
 import {ChangeFileLikesPayload} from "../../../../store/thunks/changeFileLikesOnServer";
 import {isFileLikedByUser} from "../../../../api/isFileLikedByUser";
+import {User} from '../../../../store/slices/userSlice';
 
 interface OpenedFileProps {
     file: CreateFilePayload;
@@ -22,6 +23,9 @@ interface OpenedFileProps {
     onOpenDeleteModal: (file: CreateFilePayload) => void;
     onLikeFile: (dto: ChangeFileLikesPayload) => Promise<any>
     openLoginModal: () => void;
+    user: User | null;
+    emailParam: string | undefined;
+    isLoggedIn: boolean;
 }
 
 const OpenedFile: React.FC<OpenedFileProps> = (
@@ -36,6 +40,9 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         onOpenDeleteModal,
         onLikeFile,
         openLoginModal,
+        user,
+        emailParam,
+        isLoggedIn,
     }
 ) => {
     const files = useSelector((state: RootState) => state.fileTree.files);
@@ -74,6 +81,16 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         setIsFileContentChanged(false);
     };
 
+    const isUserCanEdit = () => {
+        if (!isLoggedIn && !emailParam) {
+            return true
+        }
+        const isUserEditor = user?.whoCanEdit.some(user => user.email === localStorage.getItem('email'));
+        const isUserEqualsLoggedIn = user?.email === localStorage.getItem('email');
+        return isUserEditor || isUserEqualsLoggedIn;
+
+    }
+
     const handleLikeFile = async () => {
         const email = localStorage.getItem("email");
         if (!email) {
@@ -104,7 +121,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                     </div>
                     <div className={styles['openedFile__title']}>
                         <div className={styles['openedFile__title-email']}>
-                            {localStorage.getItem('email')}
+                            {user?.email}
                         </div>
                         <span>|</span>
                         <div
@@ -115,9 +132,6 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                     </div>
                 </div>
                 <div className={styles['openedFile__rightSide']}>
-                    {/*<div className={styles['openedFile__download']}>*/}
-                    {/*    <img src={DownloadBtn} alt="Download"/>*/}
-                    {/*</div>*/}
                     <div
                         onClick={() => handleLikeFile()}
                         className={styles['openedFile__like']}
@@ -125,18 +139,22 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                     >
                         Like
                     </div>
-                    <div
-                        className={styles['openedFile__edit']}
-                        onClick={() => setIsEditing(true)}
-                        style={{cursor: 'pointer'}}
-                    >
-                        Edit
-                    </div>
-                    <div
-                        onClick={() => onOpenDeleteModal(file)}
-                        className={styles['openedFile__delete']}>
-                        Delete
-                    </div>
+                    {isUserCanEdit() && (
+                        <div className={styles['openedFile__editAndDelete']}>
+                            <div
+                                className={styles['openedFile__edit']}
+                                onClick={() => setIsEditing(true)}
+                                style={{cursor: 'pointer'}}
+                            >
+                                Edit
+                            </div>
+                            <div
+                                onClick={() => onOpenDeleteModal(file)}
+                                className={styles['openedFile__delete']}>
+                                Delete
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
             {isEditing ?

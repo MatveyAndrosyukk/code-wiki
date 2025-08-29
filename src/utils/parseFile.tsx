@@ -6,24 +6,34 @@ import TerminalBlock from "../pages/main-page/components/opened-file/components/
 function parseInline(text: string): React.ReactNode[] {
     const parts: React.ReactNode[] = [];
 
-    const tagRegex = /\[```l to="([^"]+)"```](.+?)\[```\/l```]/g;
+    const imageRegx = /\[image\/(.+?)]/g;
+    const linkRegx = /\[```l to="([^"]+)"```](.+?)\[```\/l```]/g;
     const simpleTagsRegex = /\[```([ubi])```]([\s\S]+?)\[```\/\1```]/g;
 
     let lastIndex = 0;
 
     function findNextTag(text: string, startPos: number) {
-        tagRegex.lastIndex = startPos;
-        const linkMatch = tagRegex.exec(text);
+        imageRegx.lastIndex = startPos;
+        const imageMatch = imageRegx.exec(text);
+
+        linkRegx.lastIndex = startPos;
+        const linkMatch = linkRegx.exec(text);
+
         simpleTagsRegex.lastIndex = startPos;
         const simpleMatch = simpleTagsRegex.exec(text);
 
-        // Выбираем, какой матч встречается раньше
-        if (linkMatch && simpleMatch) {
-            return linkMatch.index < simpleMatch.index ? {type: 'link', match: linkMatch} : {type: 'simple', match: simpleMatch};
-        }
-        if (linkMatch) return {type: 'link', match: linkMatch};
-        if (simpleMatch) return {type: 'simple', match: simpleMatch};
-        return null;
+        // Находим ближайший матч из всех трех
+        let matches = [
+            imageMatch ? {type: 'image', match: imageMatch} : null,
+            linkMatch ? {type: 'link', match: linkMatch} : null,
+            simpleMatch ? {type: 'simple', match: simpleMatch} : null
+        ].filter(Boolean) as {type: string, match: RegExpExecArray}[];
+
+        if (matches.length === 0) return null;
+
+        matches.sort((a, b) => a.match.index - b.match.index);
+
+        return matches[0];
     }
 
     let nextTag = findNextTag(text, 0);
@@ -45,7 +55,6 @@ function parseInline(text: string): React.ReactNode[] {
                     {children}
                 </a>
             );
-            lastIndex = index + match[0].length;
         } else if (type === 'simple') {
             const tag = match[1];
             const innerContent = match[2];
@@ -69,9 +78,15 @@ function parseInline(text: string): React.ReactNode[] {
                     {children}
                 </span>
             );
-            lastIndex = index + match[0].length;
+        } else if (type === 'image') {
+            const fileName = match[1];
+            const imageUrl = `http://localhost:3000/images/${fileName}`;
+            parts.push(
+                <img key={index} src={imageUrl} alt={fileName} style={{maxWidth: '100%', height: 'auto'}} />
+            );
         }
 
+        lastIndex = index + match[0].length;
         nextTag = findNextTag(text, lastIndex);
     }
 

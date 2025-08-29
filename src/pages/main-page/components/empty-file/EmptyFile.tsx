@@ -22,7 +22,7 @@ const EmptyFile = () => {
                         <path className={styles['book-spine']} d="M11 21V4" stroke="#E8E8E6" strokeWidth="0.7"
                               strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    <div className={styles['emptyFile__text']}>Open your file</div>
+                    <div className={styles['emptyFile__text']}>Open file</div>
                 </div>
             </div>
         </div>

@@ -1,27 +1,25 @@
-import React, {useEffect, useRef, useState} from 'react';
-import styles from './EditFileView.module.css';
-import BoldImage from './images/edit-file-view__bold.svg'
-import ItalicImage from './images/edit-file-view__italic.svg'
-import UnderlinedImage from './images/edit-file-view__underlined.svg'
-import TerminalImage from './images/edit-file-view__terminal.svg'
-import CodeImage from './images/edit-file-view__code.svg'
-import PointImage from './images/edit-file-view__point.svg'
-import LineImage from './images/edit-file-view__line.svg'
-import LinkImage from './images/edit-file-view__link.svg'
-import ImgImage from './images/edit-file-view__image.svg'
+import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
+import styles from './EditFileView.module.scss';
+import {ReactComponent as BoldImage} from './images/edit-file-view__bold.svg'
+import {ReactComponent as ItalicImage} from './images/edit-file-view__italic.svg'
+import {ReactComponent as UnderlinedImage} from './images/edit-file-view__underlined.svg'
+import {ReactComponent as TerminalImage} from './images/edit-file-view__terminal.svg'
+import {ReactComponent as CodeImage} from './images/edit-file-view__code.svg'
+import {ReactComponent as PointImage} from './images/edit-file-view__point.svg'
+import {ReactComponent as LineImage} from './images/edit-file-view__line.svg'
+import {ReactComponent as LinkImage} from './images/edit-file-view__link.svg'
+import {ReactComponent as ImgImage} from './images/edit-file-view__image.svg'
 import SwitchWhileEditModal from "../../../../../../ui-components/switch-while-edit-modal/SwitchWhileEditModal";
-import {CreateFilePayload} from "../../../../../../store/thunks/createFileOnServer";
-import {uploadImage} from "../../../../../../api/uploadImage";
+import {CreateFilePayload} from "../../../../../../store/thunks/files/createFile";
+import {uploadImageAsync} from "../../../../../../services/uploadImageAsync";
+import {AppContext} from "../../../../../../context/AppContext";
 
 interface EditFileViewProps {
     file: CreateFilePayload;
     onSaveEditedFileChanges: (newContent: string) => void;
     onCancelEditedFileChange: () => void;
-    isTryToSwitchWhileEditing: boolean;
-    setIsFileContentChanged: (value: boolean) => void;
-    onConfirmSwitch: () => void;
-    onRejectSwitch: () => void;
-    parseFileTextToHTML: (content: string) => React.ReactNode[];
+    parseFileTextToHTML: (content: string, onImageClick: (imageUrl: string) => void | null) => React.ReactNode[];
+    onImageClick: (imageUrl: string) => void | null;
 }
 
 const EditFileView: React.FC<EditFileViewProps> = (
@@ -29,40 +27,20 @@ const EditFileView: React.FC<EditFileViewProps> = (
         file,
         onSaveEditedFileChanges,
         onCancelEditedFileChange,
-        isTryToSwitchWhileEditing,
-        setIsFileContentChanged,
-        onConfirmSwitch,
-        onRejectSwitch,
         parseFileTextToHTML,
+        onImageClick
     }
 ) => {
+    const context = useContext(AppContext);
+    if (!context) throw new Error("Component can't be used without context");
+    const {fileState} = context;
     const [textareaContent, setTextareaContent] = useState(file.content);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleSelectImage = async (file: File) => {
-        try {
-            const data = await uploadImage(file);
-            if (data && data.fileName) {
-                pasteTag(`[image/${data.fileName}]`);
-            }
-        } catch (error) {
-            console.error('Failed to upload image:', error);
-        }
-    }
-
-    const openFileDialog = () => {
-        fileInputRef.current?.click();
-    }
-
-    const changeFileHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files && files.length > 0){
-            const file = files[0];
-            handleSelectImage(file);
-            e.target.value = '';
-        }
-    }
+    const {
+        setIsFileContentChanged,
+    } = fileState
 
     useEffect(() => {
         setTextareaContent(file.content);
@@ -73,19 +51,72 @@ const EditFileView: React.FC<EditFileViewProps> = (
         textareaRef.current?.focus();
     }, []);
 
-    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setTextareaContent(e.target.value);
-        setIsFileContentChanged(e.target.value !== file.content);
-    };
-
-    const wrapSelection = (tagStart: string, tagEnd: string) => {
+    const pasteTag = useCallback((tag: string) => {
         const textarea = textareaRef.current;
         if (!textarea) return;
 
-        const {selectionStart, selectionEnd, value} = textarea;
+        const { selectionStart, selectionEnd, value } = textarea;
         if (selectionStart === null || selectionEnd === null) return;
 
-        const prevScrollTop = textarea.scrollTop
+        const prevScrollTop = textarea.scrollTop;
+
+        const before = value.substring(0, selectionStart);
+        const after = value.substring(selectionEnd);
+
+        const newText = before + tag + after;
+        setTextareaContent(newText);
+        setIsFileContentChanged(true);
+
+        const cursorStart = selectionStart;
+        const cursorEnd = cursorStart + tag.length;
+
+        setTimeout(() => {
+            if (textarea) {
+                textarea.focus();
+                textarea.setSelectionRange(cursorStart, cursorEnd);
+                textarea.scrollTop = prevScrollTop;
+            }
+        }, 0);
+    }, [setTextareaContent, setIsFileContentChanged, textareaRef]);
+    
+    const handleSelectImage = useCallback(async (file: File) => {
+        try {
+            const data = await uploadImageAsync(file);
+            if (data && data.fileName) {
+                pasteTag(`[image/${data.fileName}]`);
+            }
+        } catch (error) {
+            console.error("Failed to upload image:", error);
+        }
+    }, [pasteTag]);
+
+    const handleOpenFileDialog = useCallback(() => {
+        fileInputRef.current?.click();
+    }, [fileInputRef]);
+
+    const changeFileHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            const file = files[0];
+            handleSelectImage(file).then(() => {
+                e.target.value = "";
+            });
+        }
+    }, [handleSelectImage]);
+
+    const handleChangeTextareaContent = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setTextareaContent(e.target.value);
+        setIsFileContentChanged(e.target.value !== file.content);
+    }, [setTextareaContent, setIsFileContentChanged, file.content]);
+
+    const wrapSelection = useCallback((tagStart: string, tagEnd: string) => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+
+        const { selectionStart, selectionEnd, value } = textarea;
+        if (selectionStart === null || selectionEnd === null) return;
+
+        const prevScrollTop = textarea.scrollTop;
 
         const before = value.substring(0, selectionStart);
         const selected = value.substring(selectionStart, selectionEnd);
@@ -105,88 +136,59 @@ const EditFileView: React.FC<EditFileViewProps> = (
                 textarea.scrollTop = prevScrollTop;
             }
         }, 0);
-    };
-
-    const pasteTag = (tag: string) => {
-        const textarea = textareaRef.current;
-        if (!textarea) return;
-
-        const {selectionStart, selectionEnd, value} = textarea;
-        if (selectionStart === null || selectionEnd === null) return;
-
-        const prevScrollTop = textarea.scrollTop
-
-        const before = value.substring(0, selectionStart);
-        const after = value.substring(selectionEnd);
-
-        const newText = before + tag + after;
-        setTextareaContent(newText);
-        setIsFileContentChanged(true);
-
-        const cursorStart = selectionStart;
-        const cursorEnd = cursorStart + tag.length;
-        setTimeout(() => {
-            if (textarea) {
-                textarea.focus();
-                textarea.setSelectionRange(cursorStart, cursorEnd);
-                textarea.scrollTop = prevScrollTop
-            }
-        }, 0);
-
-
-    }
+    }, [setTextareaContent, setIsFileContentChanged, textareaRef]);
 
     return (
         <div className={styles['editFileView']}>
             <div className={styles['editFileView__header']}>
                 <div className={styles['editFileView__header-edit']}>
                     <div onClick={() => {
-                        wrapSelection('[```b```]', '[```/b```]')
+                        wrapSelection('[`b`]', '[`/b`]')
                     }}>
-                        <img src={BoldImage} alt='Bold' style={{width: '10.45px', height: '12.57px'}}/>
+                        <BoldImage style={{width: '10.45px', height: '12.57px'}}/>
                     </div>
                     <div onClick={() => {
-                        wrapSelection('[```i```]', '[```/i```]')
+                        wrapSelection('[`i`]', '[`/i`]')
                     }}>
-                        <img src={ItalicImage} alt='Italic' style={{width: '9px', height: '10.83px'}}/>
+                        <ItalicImage style={{width: '9px', height: '10.83px'}}/>
                     </div>
                     <div onClick={() => {
-                        wrapSelection('[```u```]', '[```/u```]')
+                        wrapSelection('[`u`]', '[`/u`]')
                     }}>
-                        <img src={UnderlinedImage} alt='Underlined' style={{width: '10.45px', height: '12.57px'}}/>
+                        <UnderlinedImage style={{width: '10.45px', height: '12.57px'}}/>
                     </div>
                     <div onClick={() => {
-                        wrapSelection('[```point```]\n', '\n[```/point```]')
+                        wrapSelection('[`p`]\n', '\n[`/p`]')
                     }}>
-                        <img src={PointImage} alt='Point' style={{width: '4px', height: '4px'}}/>
+                        <PointImage style={{width: '4px', height: '4px'}}/>
                     </div>
                     <div onClick={() => {
-                        wrapSelection('[```l to="https://example.com"```]', '[```/l```]')
+                        wrapSelection('[`l to="https://example.com"`]', '[`/l`]')
                     }}>
-                        <img src={LinkImage} alt='Link' style={{width: '14px', height: '14px'}}/>
+                        <LinkImage style={{width: '14px', height: '14px'}}/>
                     </div>
                     <div onClick={() => {
-                        wrapSelection('[```code```]\n', '\n[```/code```]')
+                        wrapSelection('[`c`]\n', '\n[`/c`]')
                     }}>
-                        <img src={CodeImage} alt='Code' style={{width: '16.32px', height: '14.57px'}}/>
+                        <CodeImage style={{width: '16.32px', height: '14.57px'}}/>
                     </div>
                     <div onClick={() => {
-                        wrapSelection('[```terminal```]\n', '\n[```/terminal```]')
+                        wrapSelection('[`t`]\n', '\n[`/t`]')
                     }}>
-                        <img src={TerminalImage} alt='Terminal' style={{width: '14.25px', height: '12.67px'}}/>
+                        <TerminalImage style={{width: '14.25px', height: '12.67px'}}/>
                     </div>
                     <div onClick={() => {
-                        pasteTag('[```line```]')
+                        pasteTag('[`l`]')
                     }}>
-                        <img src={LineImage} alt='Line' style={{width: '14.25px', height: '1.81px'}}/>
+                        <LineImage style={{width: '14.25px', height: '1.81px'}}/>
                     </div>
-                    <div onClick={openFileDialog}>
-                        <img src={ImgImage} alt="Load img"/>
+                    <div onClick={handleOpenFileDialog}>
+                        <ImgImage/>
                     </div>
                     <input
                         type="file"
                         accept="image/*"
-                        style={{ display: 'none' }}
+                        style={{display: 'none'}}
                         ref={fileInputRef}
                         onChange={changeFileHandler}
                     />
@@ -208,20 +210,15 @@ const EditFileView: React.FC<EditFileViewProps> = (
                     ref={textareaRef}
                     className={styles['editFileView__textarea']}
                     value={textareaContent}
-                    onChange={handleChange}
+                    onChange={handleChangeTextareaContent}
                 />
                 <div className={styles['editFileView__preview']}>
                     <div className={styles['editFileView__preview-title']}>Preview</div>
                     <div
-                        className={styles['editFileView__preview-content']}>{parseFileTextToHTML(textareaContent)}</div>
+                        className={styles['editFileView__preview-content']}>{parseFileTextToHTML(textareaContent, onImageClick)}</div>
                 </div>
             </div>
-
-            <SwitchWhileEditModal
-                isTryToSwitchWhileEditing={isTryToSwitchWhileEditing}
-                onRejectSwitch={onRejectSwitch}
-                onConfirmSwitch={onConfirmSwitch}
-            />
+            <SwitchWhileEditModal/>
         </div>
     );
 };

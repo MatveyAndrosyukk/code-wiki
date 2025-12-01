@@ -1,46 +1,44 @@
-import React, {FC} from 'react';
-import modalStyles from '../modal/ModalContent.module.css'
-import styles from './SwitchWhileEditModal.module.css'
+import React, {FC, useContext} from 'react';
+import modalStyles from '../modal/ModalContent.module.scss'
+import styles from './SwitchWhileEditModal.module.scss'
 import Modal from "../modal/Modal";
+import {AppContext} from "../../context/AppContext";
 
-interface SwitchWhileEditModalProps {
-    isTryToSwitchWhileEditing: boolean;
-    onRejectSwitch: () => void;
-    onConfirmSwitch: () => void;
-}
+const SwitchWhileEditModal: FC = () => {
+    const context = useContext(AppContext);
+    if (!context) throw new Error("Component can't be used without context");
+    const {fileState} = context;
 
-const SwitchWhileEditModal: FC<SwitchWhileEditModalProps> = (
-    {
+    const {
         isTryToSwitchWhileEditing,
-        onRejectSwitch,
-        onConfirmSwitch,
-    }
-) => {
+        handleRejectSwitch,
+        handleConfirmSwitch,
+    } = fileState;
+
     return (
-        <Modal isOpen={isTryToSwitchWhileEditing} onClose={onRejectSwitch}>
+        <Modal isOpen={isTryToSwitchWhileEditing}
+               onClose={handleRejectSwitch}>
             <div
-                className={modalStyles['modal__overlay']}
-                style={{padding: 8}}
+                className={`${modalStyles['modal__overlay']} ${styles['modal__overlay']}`}
             >
                 <div className={modalStyles['modal__form']}>
                     <p
-                        className={modalStyles['modal__text']}
-                        style={{marginBottom: 6}}
+                        className={`${modalStyles['modal__title']} ${styles['modal__title']}`}
                     >
                         Are you sure that you want to open another file?
                         <br/>
                         You will lose all your unsaved changes.
                     </p>
-                    <div className={modalStyles['modal__buttons']}>
+                    <div className={styles['modal__buttons']}>
                         <button
-                            className={styles['modal__buttons-confirm']}
-                            onClick={onConfirmSwitch}
+                            className={`${styles['modal__buttons-confirm']} ${styles['modal__button']}`}
+                            onClick={handleConfirmSwitch}
                         >
                             Open
                         </button>
                         <button
-                            className={styles['modal__buttons-reject']}
-                            onClick={onRejectSwitch}
+                            className={`${styles['modal__buttons-reject']} ${styles['modal__button']}`}
+                            onClick={handleRejectSwitch}
                         >
                             Cancel
                         </button>

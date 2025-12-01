@@ -1,108 +1,104 @@
-import React from 'react';
+import React, {useCallback, useContext} from 'react';
 import {FileStatus, FileType} from "../../../../../../../../types/file";
 import OpenedImg from '../../images/file-list-opened.svg'
 import ClosedImg from '../../images/file-list-closed.svg'
-import FileImg from '../../images/file-list-file.svg'
+import {ReactComponent as FileImg} from '../../images/file-list-file.svg'
 import Line from '../../images/file-list-line.svg'
 import ChildLine from '../../images/file-list-child-line.svg'
 import LastChildLine from '../../images/file-list-last-child-line.svg'
-import styles from '../../FileList.module.css';
-import {CreateFilePayload} from "../../../../../../../../store/thunks/createFileOnServer";
-import {User} from "../../../../../../../../store/slices/userSlice";
+import styles from '../../FileList.module.scss';
+import {CreateFilePayload} from "../../../../../../../../store/thunks/files/createFile";
+import {AppContext} from "../../../../../../../../context/AppContext";
+import {isUserCanEdit} from "../../../../../../../../utils/functions/permissions-utils/isUserCanEdit";
+import {ContextMenuState} from "../../../../../../../../utils/hooks/useContextMenuActions";
 
 interface FileListViewProps {
-    nodes: CreateFilePayload[];
     level?: number;
     ancestors?: boolean[];
-    onTryToOpenFile: (id: number | null) => void;
     onFolderClick: (id: number | null) => void;
-    contextMenuActions: any;
-    isLoggedIn: boolean;
+    contextMenuState: ContextMenuState;
     emailParam: string | undefined;
-    user: User | null;
+    files: CreateFilePayload[]
 }
 
 const FileListView: React.FC<FileListViewProps> = (
     {
-        nodes,
         level = 0,
         ancestors = [],
-        onTryToOpenFile,
         onFolderClick,
-        contextMenuActions,
-        isLoggedIn,
+        contextMenuState,
         emailParam,
-        user,
+        files
     }) => {
-    const isUserCanEdit = () => {
-        if (!isLoggedIn && !emailParam) {
-            return true
-        }
-        const isUserEditor = user?.whoCanEdit.some(user => user.email === localStorage.getItem('email'));
-        const isUserEqualsLoggedIn = user?.email === localStorage.getItem('email');
-        return isUserEditor || isUserEqualsLoggedIn;
+    const context = useContext(AppContext);
+    if (!context) throw new Error("Component can't be used without context");
+    const {viewedUser, authState, fileState} = context;
 
-    }
+    const {
+        isLoggedIn,
+    } = authState;
 
-    const openContextMenuHandler = (
+    const {
+        handleTryToOpenFile
+    } = fileState;
+
+    const openContextMenuHandler = useCallback((
         e: React.MouseEvent<HTMLDivElement>,
         node: CreateFilePayload
     ) => {
-        if (isUserCanEdit()) {
-            contextMenuActions.onOpenContextMenu(e, node)
+        if (isUserCanEdit(isLoggedIn, emailParam, viewedUser)) {
+            contextMenuState.handleOpenContextMenu(e, node);
         }
-        return
-    }
+    }, [contextMenuState, emailParam, isLoggedIn, viewedUser]);
 
     return (
         <>
-            {nodes.map((node, idx) => {
-                const isLast = idx === nodes.length - 1;
+            {files.map((node, idx) => {
+                const isLast = idx === files.length - 1;
                 const linesBlock = (
-                    <span className={styles['fileList__node-lineBlock']}>
-            {ancestors.slice(1).map((hasSibling, i) =>
-                hasSibling ? (
-                    <span key={i} className={styles['fileList__node-line']}>
-                  <img style={{width: 2}} src={Line} alt="line"/>
-                </span>
-                ) : (
-                    <span key={i} className={styles['fileList__node-space']}/>
-                )
-            )}
+                    <span className={styles['file-list__node-line-block']}>
+                {ancestors.slice(1).map((hasSibling, i) =>
+                    hasSibling ? (
+                        <span key={i} className={styles['file-list__node-line']}>
+                            <img style={{width: 2}} src={Line} alt="line" />
+                        </span>
+                    ) : (
+                        <span key={i} className={styles['file-list__node-space']} />
+                    )
+                )}
                         {level > 0 && (() => {
                             const lineSrc = isLast ? LastChildLine : ChildLine;
                             return (
-                                <span className={styles['fileList__node-line']}>
-                  <img style={{width: 10}} src={lineSrc} alt="line"/>
-                </span>
+                                <span className={styles['file-list__node-line']}>
+                            <img style={{width: 10}} src={lineSrc} alt="line" />
+                        </span>
                             )
                         })()}
-          </span>
+            </span>
                 );
 
                 return (
-                    <div className={styles['fileList__node']} style={{marginLeft: 0}} key={node.id}>
-                        <div className={styles['fileList__node-container']}>
+                    <div className={styles['file-list__node']} style={{marginLeft: 0}} key={node.id}>
+                        <div className={styles['file-list__node-container']}>
                             {linesBlock}
                             {node.type === FileType.Folder ? (
                                 <div
-                                    className={styles['fileList__node-folder']}
+                                    className={styles['file-list__node-folder']}
                                     onContextMenu={(e) => openContextMenuHandler(e, node)}
                                     onClick={() => onFolderClick(node.id)}
                                     style={{display: 'flex', alignItems: 'center'}}
                                 >
-                                    <img src={node.status === FileStatus.Opened ? OpenedImg : ClosedImg}
-                                         alt="File Status"/>
+                                    <img src={node.status === FileStatus.Opened ? OpenedImg : ClosedImg} alt="File Status" />
                                     {node.name}
                                 </div>
                             ) : (
                                 <div
-                                    className={styles['fileList__node-file']}
-                                    onContextMenu={(e) => contextMenuActions.onOpenContextMenu(e, node)}
+                                    className={styles['file-list__node-file']}
+                                    onContextMenu={(e) => contextMenuState.handleOpenContextMenu(e, node)}
                                     style={{fontWeight: node.status === FileStatus.Opened ? 'bold' : 'normal'}}
-                                    onClick={() => onTryToOpenFile(node.id)}
+                                    onClick={() => handleTryToOpenFile(node.id)}
                                 >
-                                    <img src={FileImg} alt="File"/> {node.name}
+                                    <FileImg className={styles['file-list__node-image']}/> {node.name}
                                 </div>
                             )}
                         </div>
@@ -111,15 +107,12 @@ const FileListView: React.FC<FileListViewProps> = (
                             node.status === FileStatus.Opened &&
                             node.children &&
                             <FileListView
-                                user={user}
                                 emailParam={emailParam}
-                                isLoggedIn={isLoggedIn}
-                                nodes={node.children}
+                                files={node.children}
                                 level={level + 1}
                                 ancestors={[...ancestors, !isLast]}
-                                onTryToOpenFile={onTryToOpenFile}
                                 onFolderClick={onFolderClick}
-                                contextMenuActions={contextMenuActions}
+                                contextMenuState={contextMenuState}
                             />}
                     </div>
                 )

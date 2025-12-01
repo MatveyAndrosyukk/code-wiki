@@ -1,9 +1,10 @@
-import {createSlice} from "@reduxjs/toolkit";
-import {fetchUser} from "../thunks/user/fetchUser";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {fetchViewedUserByEmail} from "../thunks/user/fetchViewedUserByEmail";
 import {addUserWhoCanEdit} from "../thunks/user/addUserWhoCanEdit";
 import {deleteUserWhoCanEdit} from "../thunks/user/deleteUserWhoCanEdit";
 import {changeUserName} from "../thunks/user/changeUserName";
-import {changeUserIsViewBlocked} from "../thunks/user/changeUserIsViewBlocked";
+import {toggleUserIsViewBlocked} from "../thunks/user/toggleUserIsViewBlocked";
+import {fetchLoggedInUserByEmail} from "../thunks/user/fetchLoggedInUserByEmail";
 
 export interface Role {
     id: number,
@@ -20,48 +21,71 @@ export interface User {
     bannedAt: Date,
     roles: Role[],
     whoCanEdit: User[],
+    isPremium: boolean,
     isViewBlocked: boolean,
+    amountOfFiles: number,
 }
 
 interface UserState {
-    user: User | null;
+    viewedUser: User | null;
+    loggedInUser: User | null;
 }
 
 const initialState: UserState = {
-    user: null,
+    viewedUser: null,
+    loggedInUser: null,
 }
 
 const userSlice = createSlice({
     name: "user",
     initialState,
     reducers: {
-        clearUser(state) {
-            state.user = null;
+        clearViewedUser(state) {
+            state.viewedUser = null;
+        },
+        clearLoggedInUser(state) {
+            state.loggedInUser = null;
+        },
+        incrementUserFilesCount: (state, action) => {
+            if (!state.viewedUser || state.viewedUser.email !== action.payload.email) {
+                return;
+            }
+            state.viewedUser.amountOfFiles += action.payload.count;
         }
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchUser.fulfilled, (state, action) => {
-                state.user = action.payload;
+            .addCase(fetchViewedUserByEmail.fulfilled, (state, action) => {
+                state.viewedUser = action.payload;
             })
-            .addCase(fetchUser.rejected, (state) => {
-                state.user = null;
+            .addCase(fetchViewedUserByEmail.rejected, (state) => {
+                state.viewedUser = null;
+            })
+            .addCase(fetchLoggedInUserByEmail.fulfilled, (state, action) => {
+                state.loggedInUser = action.payload;
+            })
+            .addCase(fetchLoggedInUserByEmail.rejected, (state) => {
+                state.loggedInUser = null;
             })
             .addCase(addUserWhoCanEdit.fulfilled, (state, action) => {
-                state.user = action.payload;
+                state.loggedInUser = action.payload;
             })
             .addCase(deleteUserWhoCanEdit.fulfilled, (state, action) => {
-                state.user = action.payload
+                state.loggedInUser = action.payload
             })
             .addCase(changeUserName.fulfilled, (state, action) => {
-                state.user = action.payload;
+                state.loggedInUser = action.payload;
             })
-            .addCase(changeUserIsViewBlocked.fulfilled, (state, action) => {
-                state.user = action.payload;
+            .addCase(toggleUserIsViewBlocked.fulfilled, (state, action) => {
+                state.viewedUser = action.payload;
             })
     }
 })
 
-export const { clearUser } = userSlice.actions;
+export const {
+    clearViewedUser,
+    clearLoggedInUser,
+    incrementUserFilesCount
+} = userSlice.actions;
 
 export default userSlice.reducer;

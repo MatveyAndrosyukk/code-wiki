@@ -1,33 +1,37 @@
-import React, {useEffect, useRef, useState} from 'react';
-import searchFilesByName, {SearchResult} from "../../../../../../utils/searchFilesByName";
-import styles from './SearchInput.module.css'
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import searchFilesByName, {SearchResult} from "../../../../../../utils/functions/searchFilesByName";
+import styles from './SearchInput.module.scss'
 import FileImage from './images/search-input-file.svg'
 import FolderImage from './images/search-input-folder.svg'
 import {FileType} from "../../../../../../types/file";
 import {SearchType} from "../../../../../../types/searchType";
-import searchFilesByContent from "../../../../../../utils/searchFilesByContent";
-import {CreateFilePayload} from "../../../../../../store/thunks/createFileOnServer";
+import searchFilesByContent from "../../../../../../utils/functions/searchFilesByContent";
+import {AppContext} from "../../../../../../context/AppContext";
 
 interface SearchProps {
-    files: CreateFilePayload[];
-    onSelect: (id: number) => void;
+    onClick: (id: number) => void;
     searchType: SearchType;
 }
 
-const SearchInput: React.FC<SearchProps> = (
-    {
-        files,
-        onSelect,
-        searchType,
-    }
-) => {
+const SearchInput: React.FC<SearchProps> = ({ onClick, searchType }) => {
+    const context = useContext(AppContext);
+    if (!context) throw new Error("Component can't be used without context");
+    const { files } = context;
     const [query, setQuery] = useState('');
+    const [isInputFocused, setIsInputFocused] = useState(false);
+    const searchInputBlockRef = useRef<HTMLDivElement>(null);
     const [results, setResults] = useState<SearchResult[]>([]);
-    const [isFocused, setIsFocused] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const [isNarrowScreen, setIsNarrowScreen] = useState(window.innerWidth < 720);
 
     useEffect(() => {
-        console.log('SearchInput files:', files);
+        function handleResize() {
+            setIsNarrowScreen(window.innerWidth < 457);
+        }
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
         if (query.trim() === '') {
             setResults([]);
             return;
@@ -38,17 +42,16 @@ const SearchInput: React.FC<SearchProps> = (
         } else {
             found = searchFilesByContent(files, query.trim());
         }
-        console.log('SearchInput results:', found);
         setResults(found);
     }, [query, files, searchType]);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (
-                containerRef.current &&
-                !containerRef.current.contains(event.target as Node)
+                searchInputBlockRef.current &&
+                !searchInputBlockRef.current.contains(event.target as Node)
             ) {
-                setIsFocused(false);
+                setIsInputFocused(false);
             }
         }
 
@@ -56,33 +59,39 @@ const SearchInput: React.FC<SearchProps> = (
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    const placeholderText = isNarrowScreen
+        ? "Search..."
+        : (searchType === SearchType.InFileNames
+            ? "Search for files..."
+            : "Search for file content...");
+
     return (
-        <div className={styles["SearchInput"]} ref={containerRef}>
+        <div className={styles["search-input"]} ref={searchInputBlockRef}>
             <input
                 type="text"
-                placeholder={searchType === SearchType.InFileNames ? "Search for files..." : "Search for file content..."}
+                placeholder={placeholderText}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                onFocus={() => setIsFocused(true)}
-                className={styles["SearchInput__input"]}
+                onFocus={() => setIsInputFocused(true)}
+                className={styles["search-input__field"]}
             />
-            {(isFocused && results.length > 0) && (
-                <ul className={styles["SearchInput__list"]}>
+            {(isInputFocused && results.length > 0) && (
+                <ul className={styles["search-input__list"]}>
                     {results.map(({id, type, fullPath, content}) => (
                         <li
                             key={id}
                             title={fullPath}
-                            onClick={() => {
-                                onSelect(id);
-                            }}
-                            className={styles["SearchInput__item"]}
+                            onClick={() => onClick(id)}
+                            className={styles["search-input__item"]}
                         >
-                            <img className={styles["SearchInput__icon"]}
-                                 src={type === FileType.Folder ? FolderImage : FileImage}
-                                 alt='FileImage'/>
-
-                            <span className={styles["SearchInput__text"]}
-                                  title={searchType === SearchType.InFileContents ? fullPath : undefined}
+                            <img
+                                className={styles["search-input__icon"]}
+                                src={type === FileType.Folder ? FolderImage : FileImage}
+                                alt='FileImage'
+                            />
+                            <span
+                                className={styles["search-input__text"]}
+                                title={searchType === SearchType.InFileContents ? fullPath : undefined}
                             >
                                 {searchType === SearchType.InFileNames ? fullPath : content}
                             </span>

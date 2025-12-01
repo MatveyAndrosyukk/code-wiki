@@ -1,0 +1,25 @@
+.modal {
+    &__text {
+        margin-bottom: 13px;
+
+        &-highlighted {
+            font-weight: 500;
+        }
+    }
+
+    &__buttons {
+        &-delete {
+            background-color: #FFB4AD;
+            color: #CC032D;
+
+            &:hover {
+                color: #CC032D;
+            }
+        }
+
+        &-cancel {
+            background: #888C8C;
+            color: #E8E8E6;
+        }
+    }
+}

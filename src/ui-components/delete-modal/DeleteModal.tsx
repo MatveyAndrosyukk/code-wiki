@@ -1,23 +1,23 @@
-import React, {FC} from 'react';
+import React, {FC, useContext} from 'react';
 import Modal from "../../ui-components/modal/Modal";
-import modalStyles from '../modal/ModalContent.module.css'
-import styles from './DeleteModal.module.css'
+import modalStyles from '../modal/ModalContent.module.scss'
+import styles from './DeleteModal.module.scss'
 import {FileType} from "../../types/file";
-import {CreateFilePayload} from "../../store/thunks/createFileOnServer";
+import {AppContext} from "../../context/AppContext";
 
-interface DeleteModalProps {
-    deleteModalState: { open: boolean, file: CreateFilePayload | null };
-    onCancelDeleteFile: () => void;
-    onDeleteFile: () => void;
-}
+const DeleteModal: FC = () => {
+    const context = useContext(AppContext);
+    if (!context) throw new Error("Component can't be used without context");
+    const {fileState} = context;
 
-const DeleteModal: FC<DeleteModalProps> = (
-    {
+    const {
         deleteModalState,
-        onCancelDeleteFile,
-        onDeleteFile
-    }: any) => (
-    <Modal isOpen={deleteModalState.open} onClose={onCancelDeleteFile}>
+        handleCancelDeleteFile,
+        handleConfirmDeleteFile,
+    } = fileState;
+
+    return (<Modal isOpen={deleteModalState.open}
+                   onClose={handleCancelDeleteFile}>
         <div
             className={modalStyles['modal__overlay']}
         >
@@ -44,20 +44,20 @@ const DeleteModal: FC<DeleteModalProps> = (
                 <div className={modalStyles['modal__buttons']}>
                     <button
                         className={styles['modal__buttons-delete']}
-                        onClick={onDeleteFile}
+                        onClick={handleConfirmDeleteFile}
                     >
                         Delete
                     </button>
                     <button
                         className={styles['modal__buttons-cancel']}
-                        onClick={onCancelDeleteFile}
+                        onClick={handleCancelDeleteFile}
                     >
                         Cancel
                     </button>
                 </div>
             </div>
         </div>
-    </Modal>
-);
+    </Modal>);
+}
 
 export default DeleteModal;

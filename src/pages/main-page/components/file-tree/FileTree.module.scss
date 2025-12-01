@@ -1,0 +1,151 @@
+@import "../../../../styles/Mixins.module.scss";
+
+$file-tree-width: 340px;
+$file-tree-min-height: 290px;
+$border-radius: 14px;
+$bg-color: #202222;
+$border-color: #2B2C2D;
+$font-family: "Inter", sans-serif;
+$font-color: #8D9191;
+$button-create-bg: #191A1A;
+$button-create-border-color: #8D9191;
+$button-create-hover-bg: #202222;
+$button-block-bg: #202222;
+$button-block-border-color: #8D9191;
+$button-block-hover-bg: #191A1A;
+
+.file-tree {
+  @include adaptive-size('width', 340px, 280px, 320px);
+  min-height: $file-tree-min-height;
+  border-radius: $border-radius;
+  background-color: $bg-color;
+  border: 1px solid $border-color;
+  margin-top: 20px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  font-family: $font-family;
+  font-optical-sizing: auto;
+  font-style: normal;
+
+  &-closed {
+    display: none;
+  }
+
+  &-fixed {
+    @include adaptive-size('width', 340px, 280px, 320px);
+    min-height: $file-tree-min-height;
+    border-radius: $border-radius;
+    background-color: $bg-color;
+    border: 1px solid $border-color;
+    margin-top: 20px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-self: flex-start;
+    font-family: $font-family;
+    font-optical-sizing: auto;
+    font-style: normal;
+    position: absolute;
+    top: -8%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+  }
+
+  &__content {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__header {
+    margin-bottom: 4px;
+  }
+
+  &__user {
+    color: $font-color;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  &__line {
+    height: 1px;
+    background-color: $border-color;
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__button-create {
+    width: 146px;
+    height: 28px;
+    background-color: $button-create-bg;
+    border: 1px solid $button-create-border-color;
+    color: $button-create-border-color;
+    font-size: 13px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+
+    &:hover {
+      background-color: $button-create-hover-bg;
+    }
+  }
+
+  &__button-block {
+    width: 30px;
+    height: 30px;
+    background-color: $button-block-bg;
+    border: 1px solid $button-block-border-color;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+
+    &:hover {
+      background-color: $button-block-hover-bg;
+    }
+
+    img {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  &__view {
+    text-align: center;
+    color: $font-color;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  &__files {
+    margin-top: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: $font-color $bg-color;
+    overflow: auto;
+    position: relative;
+    flex: 1 1 auto;
+  }
+}
+
+.add-folder-modal {
+  width: 350px;
+  height: 200px;
+  background-color: $button-create-bg;
+  border: 1px solid $button-create-border-color;
+  position: absolute;
+}

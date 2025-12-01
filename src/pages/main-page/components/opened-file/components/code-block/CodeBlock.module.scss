@@ -1,0 +1,44 @@
+.code-block {
+    max-height: 500px;
+    min-width: 0;
+    overflow-y: auto;
+    border-radius: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: #8D9191 #191A1A;
+    position: relative;
+
+    &-expanded {
+        max-height: none;
+    }
+
+    &__code {
+        display: block;
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    &__expand {
+        cursor: pointer;
+        background-color: #191A1A;
+        border: 1px solid #2B2C2D;
+        border-radius: 8px;
+        width: 26px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 8px;
+        right: 7px;
+
+        &:hover {
+            background-color: #202222;
+        }
+
+        &-icon {
+            width: 18px;
+            height: 18px;
+        }
+    }
+}

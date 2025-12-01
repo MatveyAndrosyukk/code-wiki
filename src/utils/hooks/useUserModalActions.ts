@@ -1,27 +1,58 @@
-import React, {useCallback, useEffect, useRef} from "react";
-import {User} from "../../store/slices/userSlice";
-import {useDispatch} from "react-redux";
-import {AppDispatch} from "../../store";
-import {addUserWhoCanEdit} from "../../store/thunks/user/addUserWhoCanEdit";
-import {deleteUserWhoCanEdit} from "../../store/thunks/user/deleteUserWhoCanEdit";
-import {changeUserName} from "../../store/thunks/user/changeUserName";
+import React, { Dispatch, RefObject, SetStateAction, useCallback, useEffect, useRef } from "react";
+import { User } from "../../store/slices/userSlice";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store";
+import { addUserWhoCanEdit } from "../../store/thunks/user/addUserWhoCanEdit";
+import { deleteUserWhoCanEdit } from "../../store/thunks/user/deleteUserWhoCanEdit";
+import { changeUserName } from "../../store/thunks/user/changeUserName";
+import {LoginState} from "../supporting-hooks/useLoginActions";
+
+export interface UserModalState {
+    isEditingName: boolean;
+    setIsEditingName: Dispatch<SetStateAction<boolean>>;
+    editedName: string;
+    setEditedName: Dispatch<SetStateAction<string>>;
+    isUserModalOpen: boolean;
+    setIsUserModalOpen: Dispatch<SetStateAction<boolean>>;
+    userModalValue: string;
+    setUserModalValue: Dispatch<SetStateAction<string>>;
+    usersWhoCanEdit: User[];
+    setUsersWhoCanEdit: Dispatch<SetStateAction<User[]>>;
+    nameInputRef: RefObject<HTMLInputElement | null> | null;
+    userModalInputRef: RefObject<HTMLInputElement | null> | null;
+    editedNameError: string;
+    setEditedNameError: Dispatch<SetStateAction<string>>;
+    addEditorError: string;
+    setAddEditorError: Dispatch<SetStateAction<string>>;
+    changeNameError: string;
+    setChangeNameError: Dispatch<SetStateAction<string>>;
+    handleKeyDownWhileEditing: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+    handleBlurNameAfterEdition: () => void;
+    handleAddUserWhoCanEdit: () => void;
+    handleDeleteUserWhoCanEdit: (targetEmail: string, event: React.MouseEvent<HTMLImageElement>) => void;
+    handleCloseUserModal: () => void;
+    handleOpenUserModal: () => void;
+}
 
 export default function useUserModalActions(
     user: User | null,
-    loginState: any
-) {
-    const [isEditingName, setIsEditingName] = React.useState(false);
-    const [isEditedNameLong, setIsEditedNameLong] = React.useState(false);
-    const [addEditorError, setAddEditorError] = React.useState('');
-    const [changeNameError, setChangeNameError] = React.useState('');
-    const [editedName, setEditedName] = React.useState(user?.name || '');
-    const nameInputRef = React.useRef<HTMLInputElement>(null);
-    const [usersWhoCanEdit, setUsersWhoCanEdit] = React.useState(user?.whoCanEdit || []);
-    const [isUserModalOpen, setIsUserModalOpen] = React.useState(false);
-    const userModalInputRef = useRef<HTMLInputElement>(null);
-    const [userModalValue, setUserModalValue] = React.useState('');
-
+    loginState: LoginState
+): UserModalState {
     const dispatch = useDispatch<AppDispatch>();
+    const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
+    const [editedName, setEditedName] = React.useState<string>(user?.name || '');
+    const [isUserModalOpen, setIsUserModalOpen] = React.useState<boolean>(false);
+    const [userModalValue, setUserModalValue] = React.useState<string>('');
+    const [usersWhoCanEdit, setUsersWhoCanEdit] = React.useState<User[]>(user?.whoCanEdit || []);
+    const nameInputRef = React.useRef<HTMLInputElement>(null);
+    const userModalInputRef = useRef<HTMLInputElement>(null);
+    const [editedNameError, setEditedNameError] = React.useState<string>('');
+    const [addEditorError, setAddEditorError] = React.useState<string>('');
+    const [changeNameError, setChangeNameError] = React.useState<string>('');
+
+    useEffect(() => {
+        setEditedName(user?.name || '');
+    }, [user?.name]);
 
     useEffect(() => {
         if (isEditingName && nameInputRef.current) {
@@ -33,9 +64,11 @@ export default function useUserModalActions(
 
     useEffect(() => {
         if (editedName.length > 25) {
-            setIsEditedNameLong(true)
-        } else {
-            setIsEditedNameLong(false)
+            setEditedNameError('Username is too long');
+        } else if (editedName.length < 4) {
+            setEditedNameError('Username is too short');
+        }else {
+            setEditedNameError('');
         }
     }, [editedName]);
 
@@ -45,91 +78,109 @@ export default function useUserModalActions(
         }
     }, [userModalValue, user?.whoCanEdit]);
 
-    const closeUserModalHandler = () => {
+    const handleCloseUserModal = useCallback(() => {
         setIsUserModalOpen(false);
-        setUserModalValue('')
-        setAddEditorError('')
-        setChangeNameError('')
-    }
+        setUserModalValue('');
+        setAddEditorError('');
+        setChangeNameError('');
+    }, [setIsUserModalOpen, setUserModalValue, setAddEditorError, setChangeNameError]);
 
-    const openUserModalHandler = () => {
+    const handleOpenUserModal = useCallback(() => {
         if (!loginState.isLoggedIn) {
-            loginState.openLoginModal()
+            loginState.handleOpenLoginModal();
             return;
         }
-
         setIsUserModalOpen(true);
-    }
+    }, [loginState, setIsUserModalOpen]);
 
-    const addUserWhoCanEditHandler = useCallback(() => {
+    const handleAddUserWhoCanEdit = useCallback(() => {
         const currentUserEmail = localStorage.getItem('email');
-        dispatch(addUserWhoCanEdit({
-            userEmail: currentUserEmail as string,
-            whoCanEditEmail: userModalValue
-        }))
+        dispatch(
+            addUserWhoCanEdit({
+                userEmail: currentUserEmail as string,
+                whoCanEditEmail: userModalValue,
+            })
+        )
             .unwrap()
             .then(() => {
-                setAddEditorError('')
-                setUserModalValue('')
+                setAddEditorError('');
+                setUserModalValue('');
             })
             .catch((e) => setAddEditorError(e.message));
-    }, [dispatch, userModalValue, setUserModalValue])
+    }, [dispatch, userModalValue, setUserModalValue]);
 
-    const deleteUserWhoCanEditHandler = useCallback((targetEmail: string) => {
-        const currentUserEmail = localStorage.getItem('email');
-        dispatch(deleteUserWhoCanEdit({
-            userEmail: currentUserEmail as string,
-            whoCanEditEmail: targetEmail
-        }))
-    }, [dispatch])
+    const handleDeleteUserWhoCanEdit = useCallback(
+        (targetEmail: string, event: React.MouseEvent<HTMLImageElement>) => {
+            event.stopPropagation();
 
-    const nameEditConfirmHandler = () => {
-        dispatch(changeUserName({
-            name: editedName,
-            email: user?.email as string
-        }))
+            const currentUserEmail = localStorage.getItem('email');
+            dispatch(
+                deleteUserWhoCanEdit({
+                    userEmail: currentUserEmail as string,
+                    whoCanEditEmail: targetEmail,
+                })
+            );
+        },
+        [dispatch]
+    );
+
+    const handleConfirmNameEdition = useCallback(() => {
+        dispatch(
+            changeUserName({
+                name: editedName,
+                email: user?.email as string,
+            })
+        )
             .unwrap()
             .then(() => {
                 setIsEditingName(false);
             })
-            .catch((e) => setChangeNameError(e.message));
-    }
+            .catch((e) => setEditedNameError('Username already exists'));
+    }, [dispatch, editedName, user?.email]);
 
-    const nameKeyDownHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDownWhileEditing = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            nameEditConfirmHandler()
+            if (editedNameError){
+                return
+            }
+            handleConfirmNameEdition();
         }
         if (e.key === 'Escape') {
             setIsEditingName(false);
-            setEditedName(user?.name || '')
+            setEditedName(user?.name || '');
         }
-    }
+    }, [editedNameError, handleConfirmNameEdition, user?.name]);
 
-    const nameEditBlurHandler = () => {
-        setIsEditingName(false)
-        setEditedName(user?.name || '')
-        setChangeNameError('')
-    }
+    const handleBlurNameAfterEdition = useCallback(() => {
+        setIsEditingName(false);
+        setChangeNameError('');
+        setEditedName(user?.name || user?.email || '');
+    }, [user?.name, user?.email]);
 
     return {
         isEditingName,
         setIsEditingName,
         editedName,
         setEditedName,
-        isEditedNameLong,
-        nameInputRef,
-        changeNameError,
-        addEditorError,
+        isUserModalOpen,
+        setIsUserModalOpen,
+        userModalValue,
+        setUserModalValue,
         usersWhoCanEdit,
-        onKeyDown: nameKeyDownHandler,
-        onBlur: nameEditBlurHandler,
-        addUserWhoCanEdit: addUserWhoCanEditHandler,
-        deleteUserWhoCanEdit: deleteUserWhoCanEditHandler,
-        onCloseModal: closeUserModalHandler,
-        onOpenModal: openUserModalHandler,
-        isModalOpen: isUserModalOpen,
-        modalInputRef: userModalInputRef,
-        modalValue: userModalValue,
-        setModalValue: setUserModalValue,
-    }
+        setUsersWhoCanEdit,
+        nameInputRef,
+        userModalInputRef,
+        editedNameError,
+        setEditedNameError,
+        addEditorError,
+        setAddEditorError,
+        changeNameError,
+        setChangeNameError,
+        handleKeyDownWhileEditing,
+        handleBlurNameAfterEdition,
+        handleAddUserWhoCanEdit,
+        handleDeleteUserWhoCanEdit,
+        handleCloseUserModal,
+        handleOpenUserModal,
+    };
 }

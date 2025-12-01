@@ -1,0 +1,41 @@
+.modal {
+    &__title {
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    &__buttons {
+        display: flex;
+        gap: 10px;
+
+        &-confirm {
+            background-color: #81A2FA;
+
+            &:hover {
+                background-color: #8eafff;
+            }
+        }
+
+        &-reject {
+            background: #888C8C;
+        }
+    }
+
+    &__overlay {
+        padding: 14px;
+    }
+
+    &__button {
+        width: 57px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.5s ease;
+        color: #E8E8E6;
+        font-weight: 600;
+        font-size: 11px;
+    }
+}

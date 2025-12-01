@@ -1,0 +1,52 @@
+.context-menu {
+    position: fixed;
+    z-index: 1000;
+    background-color: #191A1A;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 5px;
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-size: 13px;
+    font-weight: 400;
+    color: #E8E8E6;
+    text-decoration: none;
+    user-select: none;
+    border: 1px solid #2B2C2D;
+
+    &__item {
+        padding: 7px 7px;
+        text-align: center;
+        cursor: pointer;
+        position: relative;
+
+        &:hover {
+            color: #fff;
+        }
+
+        &::after {
+            content: ' ';
+            width: 20px;
+            background-color: #E8E8E6;
+            height: 2px;
+            position: absolute;
+            bottom: 0;
+            left: 36%;
+            transform-origin: center;
+            transform: scaleY(0.5);
+        }
+
+        &:last-child::after {
+            width: 0;
+            height: 0;
+        }
+
+        &-delete {
+            & :hover {
+                color: #FF6B68;
+            }
+        }
+    }
+}

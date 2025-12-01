@@ -1,52 +1,42 @@
-import React, {FC, useEffect} from 'react';
+import React, {FC, useContext, useEffect} from 'react';
 import Modal from "../../ui-components/modal/Modal";
-import styles from './EditModal.module.css'
-import modalStyles from '../modal/ModalContent.module.css'
+import styles from './EditModal.module.scss'
+import modalStyles from '../modal/ModalContent.module.scss'
 import {FileType} from "../../types/file";
-import {ActionType} from "../../utils/hooks/useFileTreeActions";
-import {CreateFilePayload} from "../../store/thunks/createFileOnServer";
+import {AppContext} from "../../context/AppContext";
+import {ActionType} from "../../utils/supporting-hooks/useModalActions";
 
-interface EditModalProps {
-    isModalOpen: boolean;
-    onCloseModal: () => void;
-    modalOpenState: { reason: ActionType | null, id: number | null, title: string | null };
-    modalValue: string;
-    setModalValue: (value: string) => void;
-    modalInputRef: any;
-    onModalConfirmByReason: (
-        title: string,
-        id: number | null,
-        actionType: ActionType
-    ) => void;
-    copiedFile: CreateFilePayload | null;
-    isNameConflictReason: () => boolean;
-}
-
-const EditModal: FC<EditModalProps> = (
-    {
-        isModalOpen,
-        onCloseModal,
-        modalOpenState,
-        modalValue,
-        setModalValue,
-        modalInputRef,
-        onModalConfirmByReason,
-        copiedFile,
-        isNameConflictReason,
-    }) => {
+const EditModal: FC = () => {
+    const context = useContext(AppContext);
+    if (!context) throw new Error("Component can't be used without context");
+    const {fileState} = context;
     const [lengthError, setLengthError] = React.useState('');
+
+    const {
+        modalValue,
+        isModalOpen,
+        modalOpenState,
+        copiedFile,
+        modalInputRef,
+        modalError,
+        setModalError,
+        isNameConflictReason,
+        setModalValue,
+        handleCloseModal,
+        handleConfirmModalByReason,
+    } = fileState;
 
     useEffect(() => {
         if (modalValue.length >= 20) {
-            setLengthError('Name is too long');
+            setModalError('Name is too long');
         } else {
-            setLengthError('')
+            setModalError('')
         }
-    }, [modalValue]);
+    }, [modalValue, setModalError]);
 
     return <Modal
         isOpen={isModalOpen}
-        onClose={onCloseModal}
+        onClose={handleCloseModal}
     >
         <div
             className={modalStyles['modal__overlay']}
@@ -56,9 +46,9 @@ const EditModal: FC<EditModalProps> = (
                     {modalOpenState.title}
                 </div>
                 {isNameConflictReason() ?
-                    lengthError ? (
+                    modalError ? (
                         <p className={`${modalStyles['modal__error']} ${styles['modal__error']}`}>
-                            {lengthError}
+                            {modalError}
                         </p>
                     ) : (
                         <p className={`${modalStyles['modal__error']} ${styles['modal__error']}`}>
@@ -68,9 +58,9 @@ const EditModal: FC<EditModalProps> = (
                         </p>
                     ) :
                     (
-                        lengthError ? (
+                        modalError ? (
                             <p className={`${modalStyles['modal__error']} ${styles['modal__error']}`}>
-                                {lengthError}
+                                {modalError}
                             </p>
                         ) : (
                             <p className={`${modalStyles['modal__error']} ${styles['modal__error']} ${modalStyles['modal__hidden']}`}>
@@ -91,12 +81,13 @@ const EditModal: FC<EditModalProps> = (
                     onChange={(e) => setModalValue(e.target.value)}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
-                            if (lengthError) return
-                            onModalConfirmByReason(
-                                modalValue,
-                                modalOpenState.id,
-                                modalOpenState.reason as ActionType
-                            );
+                            e.preventDefault();
+                            if (lengthError) return;
+                            handleConfirmModalByReason({
+                                title: modalValue,
+                                id: modalOpenState.id,
+                                reason: modalOpenState.reason as ActionType
+                            });
                         }
                     }}
                 />

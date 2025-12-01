@@ -1,0 +1,13 @@
+@mixin adaptive-size($property, $maxValue, $minValue, $minScreen: 320px, $maxScreen: 1920px) {
+  #{$property}: #{$maxValue};
+
+  @media (max-width: $maxScreen) and (min-width: $minScreen) {
+    #{$property}: calc(
+            #{$minValue} + (#{$maxValue} - #{$minValue}) * ((100vw - #{$minScreen}) / (#{$maxScreen} - #{$minScreen}))
+    );
+  }
+
+  @media (max-width: $minScreen) {
+    #{$property}: #{$minValue};
+  }
+}

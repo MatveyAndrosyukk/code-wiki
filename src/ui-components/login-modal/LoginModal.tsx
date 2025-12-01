@@ -1,79 +1,109 @@
-import React, {FC, useState} from 'react';
-import styles from './LoginModal.module.css'
-import modalStyles from '../modal/ModalContent.module.css'
+import React, {FC, useCallback, useContext} from 'react';
+import styles from './LoginModal.module.scss'
+import modalStyles from '../modal/ModalContent.module.scss'
 import Modal from "../modal/Modal";
+import {AppContext} from "../../context/AppContext";
+import CustomGoogleButton from "../custom-google-button/CustomGoogleButton";
+import {ReactComponent as SwitchAuthSvg} from './images/login-modal-switch-auth.svg';
 
-interface LoginModalProps {
-    isModalOpen: boolean;
-    onCloseModal: () => void;
-    modalValue: { login: string, password: string };
-    setModalValue: (value: { login: string, password: string }) => void;
-    modalInputRef: any;
-    onLogin: () => void;
-}
+const LoginModal: FC = () => {
+    const context = useContext(AppContext);
+    if (!context) throw new Error("Component must be used within AppProvider");
+    const {authState} = context;
+    const {
+        isLoginModalOpen,
+        handleCloseAuthModal,
+        isRegisterModal,
+        registerError,
+        loginError,
+        loginModalInputRef,
+        loginLoading,
+        registerModalValue,
+        loginModalValue,
+        loginMessage,
+        registerMessage,
+        setIsEnterEmailModalOpened,
+        handleChangeEmailInput,
+        handleChangePasswordInput,
+        handleChangeRePasswordInput,
+        handleSwitchAuthorization,
+        handleAuthorize,
+        getAuthorizationText,
+    } = authState;
 
-const LoginModal: FC<LoginModalProps> = (
-    {
-        isModalOpen,
-        onCloseModal,
-        modalValue,
-        setModalValue,
-        modalInputRef,
-        onLogin
-    }) => {
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const handleOpenEnterEmailModal = useCallback(() => {
+        handleCloseAuthModal()
+        setIsEnterEmailModalOpened(true);
+    }, [handleCloseAuthModal, setIsEnterEmailModalOpened])
 
-    const handleLogin = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            await onLogin()
-            setLoading(false);
-        } catch (error) {
-            setError('Authorization failed, try again');
-            setLoading(false);
-        }
-    }
-
-    const handleCloseModal = () => {
-        setError(null);
-        onCloseModal();
-    }
-
-    if (!isModalOpen) return null;
+    if (!isLoginModalOpen) return null;
 
     return (
         <Modal
-            isOpen={isModalOpen}
-            onClose={handleCloseModal}
+            isOpen={isLoginModalOpen}
+            onClose={handleCloseAuthModal}
         >
             <div className={`${modalStyles.modal__overlay} ${styles.modal__overlay}`}>
                 <div className={`${modalStyles.modal__form} ${styles.modal__form}`}>
-                    <p className={`${styles['modal__form-text']}`}>Login</p>
-                    <p className={error ? `${styles.modal__error}` : `${styles.modal__error} ${styles.hidden}`}>{error}</p>
+                    <div className={`${styles['modal__header']}`}>
+                        <p className={`${styles['modal__form-text']}`}>
+                            {isRegisterModal ? 'Register' : 'Login'}</p>
+                        <SwitchAuthSvg
+                            className={`${styles['modal__switch']}`}
+                            onClick={handleSwitchAuthorization}/>
+                    </div>
+                    <p className={
+                        loginMessage || registerMessage
+                            ? modalStyles.modal__message
+                            : (loginError || registerError)
+                                ? modalStyles.modal__error
+                                : `${modalStyles.modal__message} ${modalStyles.hidden}`
+                    }>
+                        {loginMessage || registerMessage || loginError || registerError}</p>
                     <input
-                        ref={modalInputRef}
+                        ref={loginModalInputRef}
                         type='text'
-                        className={styles['modal__input']}
+                        className={`${modalStyles['modal__input']}`}
                         placeholder={"Enter your email"}
-                        value={modalValue.login}
-                        onChange={(e) => setModalValue({...modalValue, login: e.currentTarget.value})}
+                        value={isRegisterModal ? registerModalValue.email : loginModalValue.login}
+                        onChange={(e) => handleChangeEmailInput(e)}
                     />
                     <input
                         type='password'
-                        className={styles['modal__input']}
+                        className={`${modalStyles['modal__input']}`}
                         placeholder={"Enter your password"}
-                        value={modalValue.password}
-                        onChange={(e) => setModalValue({...modalValue, password: e.currentTarget.value})}
+                        value={isRegisterModal ? registerModalValue.password : loginModalValue.password}
+                        onChange={(e) => handleChangePasswordInput(e)}
                     />
-                    <button
-                        className={`${styles.modal__button}`}
-                        disabled={loading}
-                        onClick={handleLogin}
-                    >
-                        {loading ? 'Logining...' : 'Login'}
-                    </button>
+                    {isRegisterModal &&
+                        <input
+                            type='password'
+                            className={`${modalStyles['modal__input']}`}
+                            placeholder={"Repeat your password"}
+                            value={registerModalValue.rePassword}
+                            onChange={(e) => handleChangeRePasswordInput(e)}
+                        />
+                    }
+                    <div className={`${styles['modal__footer']}`}>
+                        <div className={`${styles['footer__left']}`}>
+                            <p
+                                className={`${styles['modal__forgot-password']}`}
+                                onClick={handleOpenEnterEmailModal}>
+                                Forgot password?
+                            </p>
+                        </div>
+                        <div className={`${styles['footer__center']}`}>
+                            <button
+                                className={`${modalStyles.modal__button}`}
+                                disabled={loginLoading}
+                                onClick={handleAuthorize}>
+                                {getAuthorizationText()}
+                            </button>
+                        </div>
+                        <div className={`${styles['footer__right']}`}>
+                            <CustomGoogleButton/>
+                        </div>
+                    </div>
                 </div>
             </div>
         </Modal>

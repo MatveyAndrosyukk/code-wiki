@@ -1,0 +1,127 @@
+.modal {
+    &__overlay {
+        font-family: "Inter", sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
+        height: 100%;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    &__header {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    &__form {
+        font-family: "Inter", sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: column;
+    }
+
+    &__error {
+        color: #FFB4AD;
+        font-size: 13px;
+        align-self: flex-start;
+        height: 17px;
+        margin-left: 12px;
+    }
+
+    &__message {
+        color: #E8E8E6;
+        font-size: 13px;
+        align-self: flex-start;
+        height: 17px;
+        margin-left: 12px;
+    }
+
+    &__text {
+        color: #E8E8E6;
+        font-size: 13px;
+        margin-bottom: 6px;
+        font-family: "Lato", sans-serif;
+        font-weight: 500;
+        font-style: normal;
+        text-align: center;
+    }
+
+    &__title {
+        font-size: 13px;
+        font-weight: 500;
+        color: #E8E8E6;
+        text-decoration: none;
+        user-select: none;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    &__buttons {
+        display: flex;
+        gap: 10px;
+
+        button {
+            padding: 4px 6px;
+            border-radius: 4px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.5s ease;
+            font-weight: 600;
+            font-size: 13px;
+        }
+    }
+
+    &__input {
+        width: 222px;
+        height: 27px;
+        border: 1px solid #8D9191;
+        border-radius: 7px;
+        background-color: #191A1A;
+        padding-left: 11px;
+        color: #8D9191;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 5px;
+
+        &::placeholder {
+            color: #8D9191;
+            font-size: 12px;
+            font-weight: 500;
+        }
+    }
+
+    &__button {
+        width: 57px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        cursor: pointer;
+        background-color: #81A2FA;
+        transition: background-color 0.5s ease;
+        color: #E8E8E6;
+        font-weight: 600;
+        font-size: 11px;
+    }
+
+    &__content {
+        background-color: #202222;
+        border: 1px solid #2B2C2D;
+        border-radius: 9px;
+        position: relative;
+    }
+
+    &__hidden {
+        visibility: hidden;
+    }
+}

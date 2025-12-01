@@ -1,4 +1,4 @@
-import {CreateFilePayload} from "../thunks/createFileOnServer";
+import {CreateFilePayload} from "../thunks/files/createFile";
 import {FileStatus, FileType} from "../../types/file";
 
 export function findAndUpdate(

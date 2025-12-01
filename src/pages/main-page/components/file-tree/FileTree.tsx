@@ -1,146 +1,137 @@
-import React, {FC} from 'react';
-import styles from './FileTree.module.css'
-import fileTreeLock from './images/fileTree-lock.svg'
+import React, {Dispatch, FC, SetStateAction, useCallback, useContext, useEffect, useRef, useState} from 'react';
+import styles from './FileTree.module.scss'
+import {ReactComponent as LockSvg} from './images/fileTree-lock.svg'
 import FileList from "./components/file-list/FileList";
-import {ActionType} from "../../../../utils/hooks/useFileTreeActions";
-import {CreateFilePayload} from "../../../../store/thunks/createFileOnServer";
-import {User} from "../../../../store/slices/userSlice";
 import {AppDispatch} from "../../../../store";
 import {useDispatch} from "react-redux";
-import {changeUserIsViewBlocked} from "../../../../store/thunks/user/changeUserIsViewBlocked";
+import {toggleUserIsViewBlocked} from "../../../../store/thunks/user/toggleUserIsViewBlocked";
+import {AppContext} from "../../../../context/AppContext";
+import {ActionType} from "../../../../utils/supporting-hooks/useModalActions";
+import {isUserCanEdit} from "../../../../utils/functions/permissions-utils/isUserCanEdit";
+import {isUserCanView} from "../../../../utils/functions/permissions-utils/isUserCanView";
+import {isUserEqualsLoggedIn} from "../../../../utils/functions/permissions-utils/isUserEqualsLoggedIn";
 
 interface FileTreeProps {
-    files: CreateFilePayload[];
-    copiedFile: CreateFilePayload | null;
-    onTryToOpenFile: (id: number | null) => void;
-    onOpenModalByReason: (args: { reason: ActionType, id: number | null, title: string }) => void;
-    onCopyFile: (file: CreateFilePayload) => void;
-    onPasteFile: (id: number | null) => void;
-    onOpenDeleteModal: (file: CreateFilePayload) => void;
-    isLoggedIn: boolean;
-    setIsLoginModalOpen: (isOpen: boolean) => void;
-    user: User | null;
     emailParam: string | undefined;
+    isOpened: boolean;
+    setIsOpened: Dispatch<SetStateAction<boolean>>;
 }
 
 const FileTree: FC<FileTreeProps> = (
     {
-        files,
-        copiedFile,
-        onTryToOpenFile,
-        onOpenModalByReason,
-        onCopyFile,
-        onPasteFile,
-        onOpenDeleteModal,
-        isLoggedIn,
-        setIsLoginModalOpen,
-        user,
         emailParam,
+        isOpened,
+        setIsOpened,
     }) => {
     const dispatch = useDispatch<AppDispatch>();
+    const context = useContext(AppContext);
+    if (!context) throw new Error("Component can't be used without context");
+    const {viewedUser, authState, fileState} = context;
+    const [fileTreeStyles, setFileTreeStyles] = useState(``);
+    const fileTreeRef = useRef<HTMLDivElement>(null);
 
-    const blockViewHandler = () => {
-        dispatch(changeUserIsViewBlocked(user?.email as string)).then(() => console.log(user))
-    }
+    const {
+        isLoggedIn,
+        setIsLoginModalOpen,
+    } = authState;
 
-    const handleCreateRootFolder = () => {
-        isLoggedIn ? onOpenModalByReason({
-            reason: ActionType.AddRootFolder,
-            id: null,
-            title: "Add root folder"
-        }) : setIsLoginModalOpen(true);
-    }
+    const {
+        handleOpenModalByReason,
+    } = fileState
 
-    const isUserCanEdit = () => {
-        if (!isLoggedIn && !emailParam){
-            return true
+    const blockViewHandler = useCallback(() => {
+        if (viewedUser?.email) {
+            dispatch(toggleUserIsViewBlocked(viewedUser.email));
         }
-        const isUserEditor = user?.whoCanEdit.some(user => user.email === localStorage.getItem('email'));
-        const isUserEqualsLoggedIn = user?.email === localStorage.getItem('email');
-        return isUserEditor || isUserEqualsLoggedIn;
+    }, [dispatch, viewedUser]);
 
-    }
+    useEffect(() => {
+        if (window.innerWidth < 1270){
+            const handleClickOutsideFileTree = (event: MouseEvent) => {
+                if (fileTreeRef.current && !fileTreeRef.current.contains(event.target as Node)) {
+                    setIsOpened(false);
+                }
+            };
 
-    const isUserCanView = () => {
-        const isUserViewBlocked = user?.isViewBlocked ?? false;
-        const isUserEditor = user?.whoCanEdit.some(u => u.email === localStorage.getItem('email'));
-        const isUserEqualsLoggedIn = user?.email === localStorage.getItem('email');
-        if (isUserViewBlocked) {
+            if (isOpened) {
+                document.addEventListener('dblclick', handleClickOutsideFileTree);
+            }
 
-            return isUserEditor || isUserEqualsLoggedIn;
+            return () => {
+                document.removeEventListener('dblclick', handleClickOutsideFileTree);
+            };
+        }
+    }, [isOpened, setIsOpened]);
+
+    useEffect(() => {
+        const handleChooseFileTreeStyles = () => {
+            if (isOpened && window.innerWidth > 1270){
+                setFileTreeStyles(`${styles['file-tree']}`)
+            } else if (isOpened && window.innerWidth < 1270){
+                setFileTreeStyles(`${styles['file-tree-fixed']}`)
+            } else if (!isOpened){
+                setFileTreeStyles(`${styles['file-tree-closed']}`)
+            }
         }
 
-        return true;
-    };
+        handleChooseFileTreeStyles();
+    }, [isOpened]);
 
-    const isUserEqualsLoggedIn = () => {
-        if (!emailParam && !isLoggedIn){
-            return false;
+    const handleCreateRootFolder = useCallback(() => {
+        if (isLoggedIn) {
+            handleOpenModalByReason({
+                reason: ActionType.AddRootFolder,
+                id: null,
+                title: "Add root folder",
+            });
+        } else {
+            setIsLoginModalOpen(true);
         }
-        return user?.email !== localStorage.getItem('email');
-
-    }
+    }, [isLoggedIn, handleOpenModalByReason, setIsLoginModalOpen]);
 
     return (
-        <div className={styles['fileTree']}>
-            <div className={styles['fileTree__content']}>
-                {isUserEqualsLoggedIn() && (
-                    <div className={styles['fileTree__header']}>
-                        <div className={styles['fileTree__user']}>
-                            {user?.email}
+        <div
+            ref={fileTreeRef}
+            className={fileTreeStyles}>
+            <div className={styles['file-tree__content']}>
+                {isUserEqualsLoggedIn(emailParam, isLoggedIn, viewedUser) && (
+                    <div className={styles['file-tree__header']}>
+                        <div className={styles['file-tree__user']}>
+                            {viewedUser?.email}
                         </div>
-                        <div className={styles['fileTree__line']}>
-
-                        </div>
+                        <div className={styles['file-tree__line']}></div>
                     </div>
                 )}
-                {!isUserCanView() && (
-                    <div className={styles['fileTree__view']}>
+                {!isUserCanView(viewedUser) && (
+                    <div className={styles['file-tree__view']}>
                         User blocked his files for view
                     </div>
                 )}
-                {isUserCanEdit() && (
-                    <div
-                        className={styles['fileTree__buttons']}
-                    >
+                {isUserCanEdit(isLoggedIn, emailParam, viewedUser) && (
+                    <div className={styles['file-tree__buttons']}>
                         <div
-                            className={styles['fileTree__buttons-create']}
+                            className={styles['file-tree__button-create']}
                             onClick={() => handleCreateRootFolder()}
                         >
                             Create a root folder
                         </div>
                         {isLoggedIn && (
                             <div
-                                className={styles['fileTree__buttons-block']}
-                                title={user?.isViewBlocked
+                                className={styles['file-tree__button-block']}
+                                title={viewedUser?.isViewBlocked
                                     ? 'Unblock view for other users'
                                     : 'Block view for other users'}
                                 onClick={() => blockViewHandler()}
-                                style={{background: user?.isViewBlocked ? '#191A1A' : '#202222'}}
+                                style={{background: viewedUser?.isViewBlocked ? '#191A1A' : '#202222'}}
                             >
-                                <img src={fileTreeLock} alt="Lock"/>
+                                <LockSvg/>
                             </div>
                         )}
                     </div>
-                )
-                }
-                {isUserCanView() && (
-                    <div
-                        className={styles['fileTree__files']}>
-                        <FileList
-                            user={user}
-                            emailParam={emailParam}
-                            isLoggedIn={isLoggedIn}
-                            {...{
-                                files,
-                                copiedFile,
-                                onTryToOpenFile,
-                                onCopyFile,
-                                onPasteFile,
-                                onOpenModalByReason,
-                                onOpenDeleteModal,
-                            }}
-                        />
+                )}
+                {isUserCanView(viewedUser) && (
+                    <div className={styles['file-tree__files']}>
+                        <FileList {...{ emailParam }} />
                     </div>
                 )}
             </div>

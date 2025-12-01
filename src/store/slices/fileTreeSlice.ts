@@ -1,10 +1,10 @@
 import {FileStatus, FileType} from "../../types/file";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {fetchFiles} from "../thunks/fetchFiles";
-import {createFileOnServer, CreateFilePayload} from "../thunks/createFileOnServer";
-import {deleteFileOnServer} from "../thunks/deleteFileOnServer";
-import {changeFileContentOnServer} from "../thunks/changeFileContentOnServer";
-import {changeFileLikesOnServer} from "../thunks/changeFileLikesOnServer";
+import {fetchFilesByEmail} from "../thunks/files/fetchFilesByEmail";
+import {createFile, CreateFilePayload} from "../thunks/files/createFile";
+import {deleteFileById} from "../thunks/files/deleteFileById";
+import {updateFileContent} from "../thunks/files/updateFileContent";
+import {toggleFileLikes} from "../thunks/files/toggleFileLikes";
 import {
     closeAllChildren,
     closeAllFiles,
@@ -14,7 +14,8 @@ import {
     findPathToNode,
     openFoldersOnPathPreserveOthers
 } from "../utils/fileTreeActionUtils";
-import {findNodeById} from "../../utils/modalUtils";
+import {findNodeById} from "../../utils/functions/modalUtils";
+import {updateFileName} from "../thunks/files/updateFileName";
 
 interface FileTreeState {
     files: CreateFilePayload[];
@@ -85,13 +86,13 @@ const fileTreeSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchFiles.fulfilled, (state, action) => {
+            .addCase(fetchFilesByEmail.fulfilled, (state, action) => {
                 state.files = action.payload;
             })
-            .addCase(fetchFiles.rejected, (state) => {
+            .addCase(fetchFilesByEmail.rejected, (state) => {
                 state.files = []
             })
-            .addCase(createFileOnServer.fulfilled, (state, action) => {
+            .addCase(createFile.fulfilled, (state, action) => {
                 const newFile = action.payload;
                 const parentId =
                     newFile.parent === null
@@ -113,11 +114,11 @@ const fileTreeSlice = createSlice({
                     });
                 }
             })
-            .addCase(deleteFileOnServer.fulfilled, (state, action) => {
+            .addCase(deleteFileById.fulfilled, (state, action) => {
                 const deletedFileId = action.payload;
                 state.files = deleteById(state.files, deletedFileId);
             })
-            .addCase(changeFileContentOnServer.fulfilled, (state, action) => {
+            .addCase(updateFileContent.fulfilled, (state, action) => {
                 const changedFile = action.payload;
 
                 function update(nodes: CreateFilePayload[]) {
@@ -135,12 +136,19 @@ const fileTreeSlice = createSlice({
 
                 update(state.files);
             })
-            .addCase(changeFileLikesOnServer.fulfilled, (state, action) => {
+            .addCase(toggleFileLikes.fulfilled, (state, action) => {
                 const likedFile = action.payload;
 
                 findAndUpdate(state.files, likedFile.id, (node) => {
                     node.likes = likedFile.likes
                 });
+            })
+            .addCase(updateFileName.fulfilled, (state, action) => {
+                const renamedFile = action.payload;
+
+                findAndUpdate(state.files, renamedFile.id, (node) => {
+                    node.name = renamedFile.name;
+                })
             })
     }
 

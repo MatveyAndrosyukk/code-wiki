@@ -1,16 +1,29 @@
-import React from "react";
-import {CreateFilePayload} from "../../store/thunks/createFileOnServer";
+import React, {Dispatch, SetStateAction, useCallback} from "react";
+import {CreateFilePayload} from "../../store/thunks/files/createFile";
 
-export default function useContextMenuActions(){
+export interface OpenedContextMenuState {
+    visible: boolean,
+    clickX: number,
+    clickY: number,
+    file: CreateFilePayload | null;
+}
 
-    const [contextMenuState, setContextMenuState] = React.useState<{
-        visible: boolean,
-        clickX: number,
-        clickY: number,
-        file: CreateFilePayload | null;
-    }>({visible: false, clickX: 0, clickY: 0, file: null});
+export interface ContextMenuState {
+    contextMenuState: OpenedContextMenuState;
+    setContextMenuState: Dispatch<SetStateAction<OpenedContextMenuState>>;
+    handleOpenContextMenu: (event: React.MouseEvent, file: CreateFilePayload) => void;
+    handleCloseContextMenu: () => void;
+}
 
-    const openContextMenuHandler = (event: React.MouseEvent, file: CreateFilePayload) => {
+export default function useContextMenuActions(): ContextMenuState {
+    const [contextMenuState, setContextMenuState] = React.useState<OpenedContextMenuState>({
+        visible: false,
+        clickX: 0,
+        clickY: 0,
+        file: null
+    });
+
+    const handleOpenContextMenu = useCallback((event: React.MouseEvent, file: CreateFilePayload) => {
         event.preventDefault();
         setContextMenuState({
             visible: true,
@@ -18,16 +31,16 @@ export default function useContextMenuActions(){
             clickY: event.clientY,
             file,
         });
-    };
+    }, [setContextMenuState]);
 
-    const closeContextMenuHandler = () => {
-        setContextMenuState({...contextMenuState, visible: false});
-    }
+    const handleCloseContextMenu = useCallback(() => {
+        setContextMenuState(prev => ({ ...prev, visible: false }));
+    }, [setContextMenuState]);
 
     return {
         contextMenuState,
         setContextMenuState,
-        onOpenContextMenu: openContextMenuHandler,
-        onCloseContextMenu: closeContextMenuHandler,
+        handleOpenContextMenu,
+        handleCloseContextMenu,
     }
 }

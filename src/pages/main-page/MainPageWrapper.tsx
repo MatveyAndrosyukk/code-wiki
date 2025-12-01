@@ -1,11 +1,20 @@
 import React from 'react';
-import {useParams} from "react-router-dom";
+import {useLocation, useParams} from "react-router-dom";
 import MainPage from "./MainPage";
 
-const MainPageWrapper = () => {
-    const {email} = useParams<{email: string}>();
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+}
 
-    return <MainPage emailParam={email} />
+const MainPageWrapper = () => {
+    const query = useQuery()
+    const token = query.get("token") || undefined;
+
+    const {email} = useParams<{ email: string }>();
+
+    return <MainPage
+        resetToken={token}
+        emailParam={email}/>
 };
 
 export default MainPageWrapper;

@@ -1,71 +1,49 @@
-import React from 'react';
-import styles from './FileList.module.css'
+import React, {useCallback, useContext} from 'react';
+import styles from './FileList.module.scss'
 import {useDispatch} from "react-redux";
 import {toggleFolder} from "../../../../../../store/slices/fileTreeSlice";
 import ContextMenu from "../../../../../../ui-components/context-menu/ContextMenu";
 import useContextMenuActions from "../../../../../../utils/hooks/useContextMenuActions";
 import FileListView from "./components/file-list-view/FileListView";
-import {ActionType} from "../../../../../../utils/hooks/useFileTreeActions";
-import {CreateFilePayload} from "../../../../../../store/thunks/createFileOnServer";
-import {User} from "../../../../../../store/slices/userSlice";
+import {AppContext} from "../../../../../../context/AppContext";
 
 interface FileListProps {
-    files: CreateFilePayload[];
-    copiedFile: CreateFilePayload | null;
-    onTryToOpenFile: (id: number | null) => void;
-    onOpenModalByReason: (args: {reason: ActionType, id: number | null, title: string}) => void;
-    onCopyFile: (file: CreateFilePayload) => void;
-    onPasteFile: (id: number | null) => void;
-    onOpenDeleteModal: (file: CreateFilePayload) => void;
-    isLoggedIn: boolean;
     emailParam: string | undefined;
-    user: User | null;
 }
 
 const FileList: React.FC<FileListProps> = (
     {
-        files,
-        copiedFile,
-        onTryToOpenFile,
-        onCopyFile,
-        onPasteFile,
-        onOpenModalByReason,
-        onOpenDeleteModal,
-        isLoggedIn,
         emailParam,
-        user,
     }
 ) => {
-    const contextMenuActions = useContextMenuActions()
     const dispatch = useDispatch();
+    const context = useContext(AppContext);
+    if (!context) throw new Error("MainPage must be used within AppProvider");
+    const {files} = context;
+    const contextMenuAcState = useContextMenuActions()
 
-    const onFolderClick = (id: number | null) => {
-        dispatch(toggleFolder({id}))
-    };
+    const {
+        contextMenuState,
+        handleCloseContextMenu
+    } = contextMenuAcState;
 
-    return <div className={styles['fileList']}>
+    const onFolderClick = useCallback((id: number | null) => {
+        dispatch(toggleFolder({id}));
+    }, [dispatch]);
+
+    return <div className={styles['file-list']}>
         <FileListView
-            user={user}
+            files={files}
             emailParam={emailParam}
-            isLoggedIn={isLoggedIn}
-            nodes={files}
-            onTryToOpenFile={onTryToOpenFile}
             onFolderClick={onFolderClick}
-            contextMenuActions={contextMenuActions}
+            contextMenuState={contextMenuAcState}
         />
-        {contextMenuActions.contextMenuState.visible && contextMenuActions.contextMenuState.file && (
+        {contextMenuState.visible && contextMenuState.file && (
             <ContextMenu
-                clickX={contextMenuActions.contextMenuState.clickX}
-                clickY={contextMenuActions.contextMenuState.clickY}
-                file={contextMenuActions.contextMenuState.file}
-                onCloseContextMenu={contextMenuActions.onCloseContextMenu}
-                {...{
-                    copiedFile,
-                    onCopyFile,
-                    onPasteFile,
-                    onOpenModalByReason,
-                    onOpenDeleteModal
-                }}
+                clickX={contextMenuState.clickX}
+                clickY={contextMenuState.clickY}
+                file={contextMenuState.file}
+                onCloseContextMenu={handleCloseContextMenu}
             />
         )}
     </div>;

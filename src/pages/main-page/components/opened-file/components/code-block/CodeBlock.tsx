@@ -1,6 +1,8 @@
-import React, {FC, useEffect, useRef} from 'react';
+import React, {FC, useCallback, useEffect, useRef} from 'react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/custom-theme-9.css';
+import styles from './CodeBlock.module.scss'
+import {ReactComponent as ExpandCodeSvg} from './images/code-block-expand-code.svg'
 
 interface CodeBlockProps {
     code: string;
@@ -8,6 +10,12 @@ interface CodeBlockProps {
 
 const CodeBlock: FC<CodeBlockProps> = ({code}) => {
     const codeRef = useRef(null);
+    const [isCodeExpanded, setIsCodeExpanded] = React.useState(false);
+    
+    const handleExpandCode = useCallback(() => {
+        setIsCodeExpanded(!isCodeExpanded);
+    }, [isCodeExpanded])
+    
     useEffect(() => {
         if (codeRef.current) {
             hljs.highlightElement(codeRef.current)
@@ -16,20 +24,17 @@ const CodeBlock: FC<CodeBlockProps> = ({code}) => {
 
     return (
         <pre
-            style={{
-                maxHeight: 500,
-                overflowY: 'auto',
-                borderRadius: '6px',
-                scrollbarWidth: 'thin',
-                scrollbarColor: '#8D9191 #191A1A',
-            }}>
+            className={`${styles['code-block']} ${isCodeExpanded ? styles['code-block-expanded'] : ''}`}>
             <code
-                style={{
-                    whiteSpace: 'pre',
-                    display: 'block'
-                }} ref={codeRef}>
+                className={`${styles['code-block__code']}`}
+                ref={codeRef}>
                 {code}
             </code>
+            <div className={`${styles['code-block__expand']}`}>
+                <ExpandCodeSvg
+                    className={`${styles['code-block__expand-icon']}`}
+                    onClick={handleExpandCode}/>
+            </div>
         </pre>
     );
 };

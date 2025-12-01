@@ -1,5 +1,5 @@
 import React, {FC} from 'react';
-import styles from './TerminalBlock.module.css'
+import styles from './TerminalBlock.module.scss'
 
 interface TerminalBlockProps {
     commands: string;

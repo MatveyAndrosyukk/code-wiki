@@ -11,7 +11,7 @@ import {createFile, CreateFilePayload} from "../../store/thunks/files/createFile
 import useCopyPasteActions, {CopyPasteState} from "./useCopyPasteActions";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../store";
-import {incrementUserFilesCount, User} from "../../store/slices/userSlice";
+import {User} from "../../store/slices/userSlice";
 import {fetchViewedUserByEmail} from "../../store/thunks/user/fetchViewedUserByEmail";
 
 export enum ActionType {
@@ -51,7 +51,7 @@ export type ModalActionsState = CopyPasteState & {
 
 export default function useModalActions(
     files: CreateFilePayload[],
-    viewedUser: User | null
+    viewedUser: User | null,
 ): ModalActionsState {
     const dispatch = useDispatch<AppDispatch>();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -141,15 +141,14 @@ export default function useModalActions(
                 break;
 
             case ActionType.AddFile:
-                console.log(viewedUser)
                 if (handleNameConflictInFolder(
                     files,
                     id,
                     trimmedTitle,
                     ActionType.ResolveNameConflictAddFile,
                     handleOpenModalByReason)) return;
-                if (viewedUser && viewedUser.amountOfFiles >= 2) {
-                    setModalError(`Sorry, but you can't create more than 20 files`);
+                if (viewedUser && viewedUser.amountOfFiles >= 20) {
+                    setModalError(`You can't create more than 20 files`);
                     return;
                 }
                 const result = dispatch(createFile(createFilePayload(
@@ -160,10 +159,9 @@ export default function useModalActions(
                 )));
                 await result;
 
-                // if (viewedUser) {
-                //     dispatch(fetchViewedUserByEmail(viewedUser.email));
-                // }
-                dispatch(incrementUserFilesCount({ email: viewedUser?.email || '', count: 1 }));
+                if (viewedUser) {
+                    dispatch(fetchViewedUserByEmail(viewedUser.email));
+                }
                 break;
 
             case ActionType.ResolveNameConflictRoot:
@@ -203,12 +201,21 @@ export default function useModalActions(
                     ActionType.ResolveNameConflictAddFile,
                     handleOpenModalByReason
                 )) return;
-                dispatch(createFile(createFilePayload(
+                if (viewedUser && viewedUser.amountOfFiles >= 20) {
+                    setModalError(`You can't create more than 20 files`);
+                    return;
+                }
+                const addFileAfterNameConflict = dispatch(createFile(createFilePayload(
                     trimmedTitle,
                     localStorage.getItem('email'),
                     'File',
                     id
                 )));
+                await addFileAfterNameConflict;
+
+                if (viewedUser) {
+                    dispatch(fetchViewedUserByEmail(viewedUser.email));
+                }
                 break;
 
             case ActionType.ResolveNameConflictAddFolder:

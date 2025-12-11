@@ -4,7 +4,7 @@ import {CreateFilePayload} from "./createFile";
 
 export const fetchFilesByEmail = createAsyncThunk<CreateFilePayload[], string>(
     'fileTree/fetchFilesByEmail',
-    async (email, thunkApi) => {
+    async (email) => {
         const token = localStorage.getItem('token');
 
         const response = await fetch(
@@ -19,6 +19,6 @@ export const fetchFilesByEmail = createAsyncThunk<CreateFilePayload[], string>(
         if (!response.ok) {
             throw new Error('Failed to fetch files');
         }
-        return  await response.json();
+        return await response.json();
     }
 )

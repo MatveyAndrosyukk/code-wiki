@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect} from 'react'
+import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo} from 'react'
 import styles from './OpenedFile.module.scss'
 import emptyStyles from './EmplyFile.module.scss'
 import {ReactComponent as HeartBtn} from './images/opened-file-heart.svg'
@@ -17,6 +17,9 @@ import {updateFileContent} from '../../../../store/thunks/files/updateFileConten
 import {checkIsUserLikedFileAsync} from '../../../../services/checkIsUserLikedFileAsync'
 import {AppContext} from '../../../../context/AppContext'
 import {isUserCanEdit} from '../../../../utils/functions/permissions-utils/isUserCanEdit'
+import {useNavigate} from "react-router-dom";
+import extractImagesName from "../../../../utils/functions/extractImageNames";
+import {deleteExtraImagesAsync} from "../../../../services/deleteExtraImagesAsync";
 
 interface OpenedFileProps {
     file?: CreateFilePayload | null
@@ -33,6 +36,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         setIsFileTreeOpened
     }) => {
     const dispatch = useDispatch<AppDispatch>()
+    const navigate = useNavigate()
     const context = useContext(AppContext)
     if (!context) throw new Error("Component can't be used without context")
     const {viewedUser, files, fileState, authState, loggedInUser} = context
@@ -42,6 +46,10 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = React.useState(false)
 
     useEffect(() => {
+        if (window.innerWidth <= 370) {
+            setIsMobile(true)
+        }
+
         const handleResize = () => {
             if (window.innerWidth <= 370) {
                 setIsMobile(true)
@@ -93,17 +101,39 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         handleOpenLoginModal
     } = authState
 
-    const handleSaveEditedFileChanges = useCallback((newContent: string) => {
+    const handleSaveEditedFileChanges = useCallback(async (
+        newContent: string,
+        addedImages: string[],
+        onSuccess: () => void) => {
         if (!file) return
+
         dispatch(updateFileContent({id: file.id as number, content: newContent, editor: loggedInUser?.email}))
+
+        if (addedImages.length > 0) {
+            const savedImages: string[] = extractImagesName(newContent);
+            const extraImages = addedImages.filter(image => !savedImages.includes(image));
+            await deleteExtraImagesAsync(extraImages);
+        }
+
         setIsEditing(false)
         setIsFileContentChanged(false)
+
+        onSuccess();
     }, [dispatch, file, loggedInUser?.email, setIsEditing, setIsFileContentChanged])
 
-    const handleCancelEditedFileChanges = useCallback(() => {
+    const handleCancelEditedFileChanges = useCallback(async (
+        addedImages: string[],
+        onSuccess: () => void) => {
+        if (addedImages.length > 0) {
+            const savedImages: string[] = extractImagesName(file?.content || '');
+            const extraImages = addedImages.filter(image => !savedImages.includes(image));
+            await deleteExtraImagesAsync(extraImages);
+        }
+
         setIsEditing(false)
         setIsFileContentChanged(false)
-    }, [setIsEditing, setIsFileContentChanged])
+        onSuccess();
+    }, [file?.content, setIsEditing, setIsFileContentChanged])
 
     const handleTryToLikeFile = useCallback(async () => {
         if (!file) return
@@ -116,13 +146,24 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             id: file.id as number,
             email: email,
         }
+        setIsLiked(prev => !prev)
         try {
             await handleLikeFile(dto)
-            setIsLiked(prev => !prev)
         } catch (error) {
             console.error("Failed to like file", error)
         }
     }, [file, handleOpenLoginModal, handleLikeFile])
+
+    const likesClass = useMemo(() => {
+        const likesCount = file?.likes?.toString().length || 1;
+        return likesCount === 1 ? 'one-digit' :
+            likesCount === 2 ? 'two-digit' :
+                likesCount === 3 ? 'three-digit' : 'four-digit';
+    }, [file?.likes]);
+
+    const handleGoToUsersPage = useCallback((user: string | null) => {
+        return navigate(`/${encodeURIComponent(user as string)}`)
+    }, [navigate])
 
     if (!file) {
         return (
@@ -168,7 +209,8 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             <div className={styles['openedFile__header']}>
                 <div className={styles['openedFile__leftSide']}>
                     <div className={styles['openedFile__likes']}>
-                        <div className={styles['openedFile__likes-amount']}>{file.likes}</div>
+                        <div
+                            className={`${styles['openedFile__likes-amount']} ${styles[likesClass]}`}>{file.likes}</div>
                         <HeartBtn/>
                     </div>
                     <div className={styles['openedFile__title']}>
@@ -183,7 +225,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                             <LikeSvg
                                 className={isLiked
                                     ? `${styles['buttons-preview']} ${styles['buttons-preview-liked']}`
-                                    : `${styles['buttons-item']}`}
+                                    : `${styles['buttons-preview']}`}
                                 onClick={() => handleTryToLikeFile()}/>
                             <OpenButtonsSvg
                                 className={`${styles['buttons-open']}`}
@@ -206,7 +248,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                             >
                                 Like
                             </div>
-                            {isUserCanEdit(isLoggedIn, emailParam, viewedUser) && (
+                            {isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && (
                                 <div className={styles['openedFile__editAndDelete']}>
                                     <div
                                         className={styles['openedFile__edit']}
@@ -235,7 +277,6 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                     />
                 </div>
             )}
-
             {isEditing ? (
                 <EditFileView
                     file={file}
@@ -247,9 +288,18 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             ) : (
                 <div className={styles['openedFile__content']}>{contentElements}</div>
             )}
-            <div className={styles['openedFile__footer']}>
-                Last edited by: <span className={styles['openedFile__editor']}>{file.lastEditor}</span>
-            </div>
+            {
+                !isEditing && (
+                    <div className={styles['openedFile__footer']}>
+                        Last edited by:
+                        <span
+                            onClick={() => handleGoToUsersPage(file.lastEditor)}
+                            className={styles['openedFile__editor']}>
+                            {file.lastEditor}
+                        </span>
+                    </div>
+                )
+            }
             <div
                 style={{display: isFileTreeOpened ? 'none' : 'flex'}}
                 className={emptyStyles['fileTree']}
@@ -258,6 +308,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                     setIsFileTreeOpened(!isFileTreeOpened)
                 }}>
                 <BurgerSvg className={emptyStyles['fileTree-image']}/>
+
             </div>
         </div>
     )

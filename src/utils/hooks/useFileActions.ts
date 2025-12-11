@@ -14,10 +14,10 @@ export type FileActionsState = DeleteFileState & ModalActionsState & EditFileVie
 
 export default function useFileActions(
     files: CreateFilePayload[],
-    viewedUser: User | null
+    viewedUser: User | null,
 ): FileActionsState {
     const dispatch = useDispatch<AppDispatch>();
-    const deleteFileState = useDeleteFileActions()
+    const deleteFileState = useDeleteFileActions(viewedUser)
     const modalState = useModalActions(files, viewedUser)
     const editFileState = useEditFileActions()
 

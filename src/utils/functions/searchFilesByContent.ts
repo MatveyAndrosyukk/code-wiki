@@ -1,4 +1,3 @@
-import {File} from "../../types/file";
 import {SearchResult} from "./searchFilesByName";
 import {CreateFilePayload} from "../../store/thunks/files/createFile";
 

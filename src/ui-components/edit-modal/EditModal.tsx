@@ -10,7 +10,7 @@ const EditModal: FC = () => {
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
     const {fileState} = context;
-    const [lengthError, setLengthError] = React.useState('');
+    const [lengthError] = React.useState('');
 
     const {
         modalValue,

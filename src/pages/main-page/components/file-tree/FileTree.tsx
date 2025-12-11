@@ -1,6 +1,7 @@
 import React, {Dispatch, FC, SetStateAction, useCallback, useContext, useEffect, useRef, useState} from 'react';
 import styles from './FileTree.module.scss'
 import {ReactComponent as LockSvg} from './images/fileTree-lock.svg'
+import {ReactComponent as BanSvg} from './images/fileTree-ban.svg'
 import FileList from "./components/file-list/FileList";
 import {AppDispatch} from "../../../../store";
 import {useDispatch} from "react-redux";
@@ -10,6 +11,7 @@ import {ActionType} from "../../../../utils/supporting-hooks/useModalActions";
 import {isUserCanEdit} from "../../../../utils/functions/permissions-utils/isUserCanEdit";
 import {isUserCanView} from "../../../../utils/functions/permissions-utils/isUserCanView";
 import {isUserEqualsLoggedIn} from "../../../../utils/functions/permissions-utils/isUserEqualsLoggedIn";
+import {isUserOwner} from "../../../../utils/functions/permissions-utils/isUserOwner";
 
 interface FileTreeProps {
     emailParam: string | undefined;
@@ -26,18 +28,18 @@ const FileTree: FC<FileTreeProps> = (
     const dispatch = useDispatch<AppDispatch>();
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
-    const {viewedUser, authState, fileState} = context;
+    const {viewedUser, loggedInUser, authState, fileState, banState} = context;
     const [fileTreeStyles, setFileTreeStyles] = useState(``);
     const fileTreeRef = useRef<HTMLDivElement>(null);
+
+    const {setIsBanModalOpened} = banState;
 
     const {
         isLoggedIn,
         setIsLoginModalOpen,
     } = authState;
 
-    const {
-        handleOpenModalByReason,
-    } = fileState
+    const {handleOpenModalByReason} = fileState;
 
     const blockViewHandler = useCallback(() => {
         if (viewedUser?.email) {
@@ -46,7 +48,7 @@ const FileTree: FC<FileTreeProps> = (
     }, [dispatch, viewedUser]);
 
     useEffect(() => {
-        if (window.innerWidth < 1270){
+        if (window.innerWidth < 1270) {
             const handleClickOutsideFileTree = (event: MouseEvent) => {
                 if (fileTreeRef.current && !fileTreeRef.current.contains(event.target as Node)) {
                     setIsOpened(false);
@@ -65,14 +67,14 @@ const FileTree: FC<FileTreeProps> = (
 
     useEffect(() => {
         const handleChooseFileTreeStyles = () => {
-            if (isOpened && window.innerWidth > 1270){
-                setFileTreeStyles(`${styles['file-tree']}`)
-            } else if (isOpened && window.innerWidth < 1270){
-                setFileTreeStyles(`${styles['file-tree-fixed']}`)
-            } else if (!isOpened){
-                setFileTreeStyles(`${styles['file-tree-closed']}`)
+            if (isOpened && window.innerWidth > 1270) {
+                setFileTreeStyles(styles['file-tree']);
+            } else if (isOpened && window.innerWidth < 1270) {
+                setFileTreeStyles(`${styles['file-tree']}  ${styles['file-tree--fixed']}`);
+            } else {
+                setFileTreeStyles(styles['file-tree-closed']);
             }
-        }
+        };
 
         handleChooseFileTreeStyles();
     }, [isOpened]);
@@ -89,29 +91,50 @@ const FileTree: FC<FileTreeProps> = (
         }
     }, [isLoggedIn, handleOpenModalByReason, setIsLoginModalOpen]);
 
+    const isBanned = !!viewedUser?.banned;
+
     return (
         <div
             ref={fileTreeRef}
-            className={fileTreeStyles}>
+            className={fileTreeStyles}
+        >
             <div className={styles['file-tree__content']}>
                 {isUserEqualsLoggedIn(emailParam, isLoggedIn, viewedUser) && (
                     <div className={styles['file-tree__header']}>
-                        <div className={styles['file-tree__user']}>
-                            {viewedUser?.email}
+                        <div className={styles['file-tree__top']}>
+                            <div className={styles['file-tree__user']}>
+                                {viewedUser?.email}
+                            </div>
+                            {isUserOwner(loggedInUser) && (
+                                <div
+                                    className={styles['file-tree__ban']}
+                                    onClick={() => setIsBanModalOpened(true)}
+                                >
+                                    <BanSvg/>
+                                </div>
+                            )}
                         </div>
                         <div className={styles['file-tree__line']}></div>
                     </div>
                 )}
-                {!isUserCanView(viewedUser) && (
+
+                {isBanned ? (
                     <div className={styles['file-tree__view']}>
-                        User blocked his files for view
+                        This user has been banned
                     </div>
+                ) : (
+                    !isUserCanView(viewedUser, loggedInUser) && (
+                        <div className={styles['file-tree__view']}>
+                            User blocked his files for view
+                        </div>
+                    )
                 )}
-                {isUserCanEdit(isLoggedIn, emailParam, viewedUser) && (
+
+                {!isBanned && isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && (
                     <div className={styles['file-tree__buttons']}>
                         <div
                             className={styles['file-tree__button-create']}
-                            onClick={() => handleCreateRootFolder()}
+                            onClick={handleCreateRootFolder}
                         >
                             Create a root folder
                         </div>
@@ -121,7 +144,7 @@ const FileTree: FC<FileTreeProps> = (
                                 title={viewedUser?.isViewBlocked
                                     ? 'Unblock view for other users'
                                     : 'Block view for other users'}
-                                onClick={() => blockViewHandler()}
+                                onClick={blockViewHandler}
                                 style={{background: viewedUser?.isViewBlocked ? '#191A1A' : '#202222'}}
                             >
                                 <LockSvg/>
@@ -129,9 +152,9 @@ const FileTree: FC<FileTreeProps> = (
                         )}
                     </div>
                 )}
-                {isUserCanView(viewedUser) && (
+                {!isBanned && isUserCanView(viewedUser, loggedInUser) && (
                     <div className={styles['file-tree__files']}>
-                        <FileList {...{ emailParam }} />
+                        <FileList emailParam={emailParam}/>
                     </div>
                 )}
             </div>

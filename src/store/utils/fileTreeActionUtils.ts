@@ -75,17 +75,6 @@ export function findPathToNode(nodes: CreateFilePayload[], targetId: number, pat
     return null;
 }
 
-export function findNodeById(nodes: CreateFilePayload[], targetId: number): CreateFilePayload | null {
-    for (const node of nodes) {
-        if (node.id === targetId) return node;
-        if (node.children && node.children.length > 0) {
-            const found = findNodeById(node.children, targetId);
-            if (found) return found;
-        }
-    }
-    return null;
-}
-
 export function openFoldersOnPathPreserveOthers(nodes: CreateFilePayload[], pathIds: number[]): CreateFilePayload[] {
     return nodes.map(node => {
         const newNode = {...node};

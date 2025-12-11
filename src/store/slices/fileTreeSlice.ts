@@ -29,7 +29,7 @@ const fileTreeSlice = createSlice({
     name: 'fileTree',
     initialState,
     reducers: {
-        clearFiles(state){
+        clearFiles(state) {
             state.files = [];
         },
         openFile(state, action: PayloadAction<{ id: number | null }>) {
@@ -125,6 +125,7 @@ const fileTreeSlice = createSlice({
                     for (const node of nodes) {
                         if (node.id === changedFile.id && node.type === FileType.File) {
                             node.content = changedFile.content;
+                            node.lastEditor = changedFile.lastEditor;
                             return true;
                         }
                         if (node.children && node.children.length > 0) {

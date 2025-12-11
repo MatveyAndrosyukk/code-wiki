@@ -1,6 +1,5 @@
 import {CreateFilePayload} from "../../store/thunks/files/createFile";
 import {ActionType} from "../supporting-hooks/useModalActions";
-import {User} from "../../store/slices/userSlice";
 
 export function findNodeById(nodes: CreateFilePayload[], id: number | null): CreateFilePayload | null {
     for (const node of nodes) {
@@ -40,17 +39,6 @@ export function isNameExistsInRoot(files: CreateFilePayload[], name: string): bo
     return files.some(file => file.name === name);
 }
 
-export function checkFreeSpaceForFile(viewedUser: User): boolean{
-    console.log(viewedUser)
-    if (viewedUser.isPremium && viewedUser.amountOfFiles < 2){
-        return true;
-    }
-    if (viewedUser.amountOfFiles < 2){
-        return true;
-    }
-    return false;
-}
-
 export function handleNameConflictInFolder(
     files: CreateFilePayload[],
     id: number | null,
@@ -63,17 +51,17 @@ export function handleNameConflictInFolder(
         switch (reason) {
             case ActionType.AddFile:
             case ActionType.ResolveNameConflictAddFile:
-                openModalByReasonHandler({ reason: ActionType.ResolveNameConflictAddFile, id, title: "Add file"});
+                openModalByReasonHandler({reason: ActionType.ResolveNameConflictAddFile, id, title: "Add file"});
                 break;
             case ActionType.AddFolder:
             case ActionType.ResolveNameConflictAddFolder:
-                openModalByReasonHandler({ reason: ActionType.ResolveNameConflictAddFolder, id, title: "Add folder"});
+                openModalByReasonHandler({reason: ActionType.ResolveNameConflictAddFolder, id, title: "Add folder"});
                 break;
             case ActionType.ResolveNameConflictPaste:
-                openModalByReasonHandler({ reason: ActionType.ResolveNameConflictPaste, id, title: "Paste file" });
+                openModalByReasonHandler({reason: ActionType.ResolveNameConflictPaste, id, title: "Paste file"});
                 break;
             case ActionType.ResolveNameConflictRename:
-                openModalByReasonHandler({ reason: ActionType.ResolveNameConflictRename, id, title: "Rename file" });
+                openModalByReasonHandler({reason: ActionType.ResolveNameConflictRename, id, title: "Rename file"});
                 break;
         }
         return true;

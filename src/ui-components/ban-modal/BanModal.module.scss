@@ -1,0 +1,42 @@
+.modal {
+  &__overlay {
+    padding: 11px;
+    min-width: 260px;
+  }
+
+  &__switch {
+    position: absolute;
+    right: 6px;
+    top: 9px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  &__title {
+    font-weight: 300;
+    align-self: flex-start;
+  }
+
+  &__body {
+    display: flex;
+    gap: 12px;
+  }
+
+  &__user {
+    font-weight: 500;
+  }
+
+  &__input {
+    &-input {
+      width: 177px;
+    }
+  }
+
+  &__button {
+    &-button {
+      width: 43px;
+      height: 27px;
+    }
+  }
+}

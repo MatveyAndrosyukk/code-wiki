@@ -60,7 +60,7 @@ const UserModal: FC<LoginModalProps> = (
         if (!loggedInUser?.email) return;
 
         const profileUrl = `${window.location.origin}/${loggedInUser.email}`;
-        navigator.clipboard.writeText(profileUrl)
+        navigator.clipboard.writeText(profileUrl).catch(console.error);
     }, [loggedInUser]);
 
     const handleGoToUsersPage = useCallback((user: User) => {

@@ -33,20 +33,7 @@ $button-block-hover-bg: #191A1A;
     display: none;
   }
 
-  &-fixed {
-    @include adaptive-size('width', 340px, 280px, 320px);
-    min-height: $file-tree-min-height;
-    border-radius: $border-radius;
-    background-color: $bg-color;
-    border: 1px solid $border-color;
-    margin-top: 20px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-self: flex-start;
-    font-family: $font-family;
-    font-optical-sizing: auto;
-    font-style: normal;
+  &--fixed {
     position: absolute;
     top: -8%;
     left: 50%;
@@ -62,6 +49,14 @@ $button-block-hover-bg: #191A1A;
 
   &__header {
     margin-bottom: 4px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   &__user {
@@ -69,6 +64,11 @@ $button-block-hover-bg: #191A1A;
     font-size: 13px;
     font-weight: 600;
     text-align: center;
+  }
+
+  &__ban {
+    margin-left: 5px;
+    cursor: pointer;
   }
 
   &__line {

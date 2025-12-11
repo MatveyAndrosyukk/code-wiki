@@ -9,13 +9,14 @@ export enum FileStatus {
 }
 
 export interface File {
-    id: number;
-    likes: number;
-    author: string;
-    type: FileType;
+    id: number | null;
+    author: string | null;
+    type: string;
     name: string;
     content: string;
-    status: FileStatus;
-    children: File[];
-    parent: File | null;
+    status: string | null;
+    likes: number | null;
+    children: File[] | null;
+    parent: number | { id: number } | null;
+    lastEditor: string | null;
 }

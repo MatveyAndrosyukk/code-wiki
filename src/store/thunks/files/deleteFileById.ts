@@ -8,7 +8,7 @@ interface DeleteFilePayload {
 
 export const deleteFileById = createAsyncThunk<number, DeleteFilePayload>(
     'fileTree/deleteFileById',
-    async (body, thunkApi) => {
+    async (body) => {
         const token = localStorage.getItem('token');
         const response = await fetch(`${API_BASE_URL}/files`, {
             method: 'DELETE',

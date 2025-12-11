@@ -12,6 +12,7 @@ function parseInline(
     const imageRegx = /\[image\/(.+?)]/g;
     const linkRegx = /\[`l to="([^"]+)"`](.+?)\[`\/l`]/g;
     const simpleTagsRegex = /\[`([ubi])`]([\s\S]+?)\[`\/\1`]/g;
+    const lineCode = /\[`lc`](.*?)\[`\/lc`]/g;
 
     let lastIndex = 0;
 
@@ -25,10 +26,14 @@ function parseInline(
         simpleTagsRegex.lastIndex = startPos;
         const simpleMatch = simpleTagsRegex.exec(text);
 
+        lineCode.lastIndex = startPos;
+        const lineCodeMatch = lineCode.exec(text);
+
         let matches = [
             imageMatch ? {type: 'image', match: imageMatch} : null,
             linkMatch ? {type: 'link', match: linkMatch} : null,
-            simpleMatch ? {type: 'simple', match: simpleMatch} : null
+            simpleMatch ? {type: 'simple', match: simpleMatch} : null,
+            lineCodeMatch ? {type: 'lineCode', match: lineCodeMatch} : null
         ].filter(Boolean) as { type: string, match: RegExpExecArray }[];
 
         if (matches.length === 0) return null;
@@ -92,6 +97,14 @@ function parseInline(
                     style={{maxWidth: '100%', height: 'auto'}}
                     onClick={() => onImageClick(imageUrl)}
                 />
+            );
+        }else if (type === 'lineCode') {
+            const innerContent = match[1];
+            const children = parseInline(innerContent, onImageClick);
+            parts.push(
+                <span key={index} className={styles['openedFile__content-spanCode']}>
+            {children}
+        </span>
             );
         }
 

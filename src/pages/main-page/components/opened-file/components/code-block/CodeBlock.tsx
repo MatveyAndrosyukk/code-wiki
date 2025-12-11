@@ -11,11 +11,11 @@ interface CodeBlockProps {
 const CodeBlock: FC<CodeBlockProps> = ({code}) => {
     const codeRef = useRef(null);
     const [isCodeExpanded, setIsCodeExpanded] = React.useState(false);
-    
+
     const handleExpandCode = useCallback(() => {
         setIsCodeExpanded(!isCodeExpanded);
     }, [isCodeExpanded])
-    
+
     useEffect(() => {
         if (codeRef.current) {
             hljs.highlightElement(codeRef.current)

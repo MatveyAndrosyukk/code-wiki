@@ -16,7 +16,7 @@ export interface CreateFilePayload {
 
 export const createFile = createAsyncThunk<CreateFilePayload, CreateFilePayload>(
     'fileTree/createFile',
-    async (body, thunkApi) => {
+    async (body) => {
         const token = localStorage.getItem('token');
 
         const response = await fetch(`${API_BASE_URL}/files`, {

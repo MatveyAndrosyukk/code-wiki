@@ -1,17 +1,23 @@
-.modal__overlay {
+.modal {
+  &__overlay {
     padding: 11px;
-}
+  }
 
-.modal__body {
+  &__body {
     display: flex;
     gap: 12px;
-}
+  }
 
-.modal__input-input {
-    width: 177px;
-}
+  &__input {
+    &-input {
+      width: 177px;
+    }
+  }
 
-.modal_button-button {
-    width: 43px;
-    height: 27px;
+  &__button {
+    &-button {
+      width: 43px;
+      height: 27px;
+    }
+  }
 }

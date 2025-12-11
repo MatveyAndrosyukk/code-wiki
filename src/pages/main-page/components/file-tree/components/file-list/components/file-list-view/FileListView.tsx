@@ -1,4 +1,4 @@
-import React, {useCallback, useContext} from 'react';
+import React, {useCallback, useContext, useRef} from 'react';
 import {FileStatus, FileType} from "../../../../../../../../types/file";
 import OpenedImg from '../../images/file-list-opened.svg'
 import ClosedImg from '../../images/file-list-closed.svg'
@@ -32,7 +32,8 @@ const FileListView: React.FC<FileListViewProps> = (
     }) => {
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
-    const {viewedUser, authState, fileState} = context;
+    const pressTimerRef = useRef<NodeJS.Timeout | null>(null)
+    const {viewedUser, authState, fileState, loggedInUser} = context;
 
     const {
         isLoggedIn,
@@ -42,14 +43,35 @@ const FileListView: React.FC<FileListViewProps> = (
         handleTryToOpenFile
     } = fileState;
 
+    const touchStartHandler = useCallback((node: CreateFilePayload, touchEvent?: React.TouchEvent) => {
+        pressTimerRef.current = setTimeout(() => {
+            if (isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && touchEvent) {
+                const touch = touchEvent.touches[0];
+                const fakeMouseEvent = new MouseEvent('contextmenu', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY,
+                    bubbles: true
+                });
+                contextMenuState.handleOpenContextMenu(fakeMouseEvent as any, node);
+            }
+        }, 500);
+    }, [contextMenuState, emailParam, isLoggedIn, loggedInUser, viewedUser]);
+
+    const touchEndHandler = useCallback(() => {
+        if (pressTimerRef.current) {
+            clearTimeout(pressTimerRef.current);
+            pressTimerRef.current = null;
+        }
+    }, [])
+
     const openContextMenuHandler = useCallback((
         e: React.MouseEvent<HTMLDivElement>,
         node: CreateFilePayload
     ) => {
-        if (isUserCanEdit(isLoggedIn, emailParam, viewedUser)) {
+        if (isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser)) {
             contextMenuState.handleOpenContextMenu(e, node);
         }
-    }, [contextMenuState, emailParam, isLoggedIn, viewedUser]);
+    }, [contextMenuState, emailParam, isLoggedIn, loggedInUser, viewedUser]);
 
     return (
         <>
@@ -60,17 +82,17 @@ const FileListView: React.FC<FileListViewProps> = (
                 {ancestors.slice(1).map((hasSibling, i) =>
                     hasSibling ? (
                         <span key={i} className={styles['file-list__node-line']}>
-                            <img style={{width: 2}} src={Line} alt="line" />
+                            <img style={{width: 2}} src={Line} alt="line"/>
                         </span>
                     ) : (
-                        <span key={i} className={styles['file-list__node-space']} />
+                        <span key={i} className={styles['file-list__node-space']}/>
                     )
                 )}
                         {level > 0 && (() => {
                             const lineSrc = isLast ? LastChildLine : ChildLine;
                             return (
                                 <span className={styles['file-list__node-line']}>
-                            <img style={{width: 10}} src={lineSrc} alt="line" />
+                            <img style={{width: 10}} src={lineSrc} alt="line"/>
                         </span>
                             )
                         })()}
@@ -85,16 +107,21 @@ const FileListView: React.FC<FileListViewProps> = (
                                 <div
                                     className={styles['file-list__node-folder']}
                                     onContextMenu={(e) => openContextMenuHandler(e, node)}
+                                    onTouchStart={(e) => touchStartHandler(node, e)}
+                                    onTouchEnd={touchEndHandler}
                                     onClick={() => onFolderClick(node.id)}
                                     style={{display: 'flex', alignItems: 'center'}}
                                 >
-                                    <img src={node.status === FileStatus.Opened ? OpenedImg : ClosedImg} alt="File Status" />
+                                    <img src={node.status === FileStatus.Opened ? OpenedImg : ClosedImg}
+                                         alt="File Status"/>
                                     {node.name}
                                 </div>
                             ) : (
                                 <div
                                     className={styles['file-list__node-file']}
                                     onContextMenu={(e) => contextMenuState.handleOpenContextMenu(e, node)}
+                                    onTouchStart={(e) => touchStartHandler(node, e)}
+                                    onTouchEnd={touchEndHandler}
                                     style={{fontWeight: node.status === FileStatus.Opened ? 'bold' : 'normal'}}
                                     onClick={() => handleTryToOpenFile(node.id)}
                                 >

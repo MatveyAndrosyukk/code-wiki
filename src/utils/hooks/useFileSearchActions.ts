@@ -15,7 +15,7 @@ export default function useFileSearchActions(): FileSearchState {
     const [searchType, setSearchType] = useState<SearchType>(SearchType.InFileNames);
 
     const handleOpenPathToSelectedFile = useCallback((id: number) => {
-        dispatch(openPathToNode({ id }));
+        dispatch(openPathToNode({id}));
     }, [dispatch]);
 
     const handleSwitchSearchType = useCallback(() => {

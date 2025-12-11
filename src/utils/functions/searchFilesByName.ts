@@ -1,4 +1,4 @@
-import {File, FileType} from "../../types/file";
+import {FileType} from "../../types/file";
 import {CreateFilePayload} from "../../store/thunks/files/createFile";
 
 export interface SearchResult {

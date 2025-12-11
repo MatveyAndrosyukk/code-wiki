@@ -10,7 +10,7 @@ export async function sendResetPasswordLinkAsync(email: string) {
     })
 
     if (!response.ok) {
-        throw new Error('Email address doesn\'t exist');
+        throw new Error('Email address is not registered');
     }
 
     return response.json();

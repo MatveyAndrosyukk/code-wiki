@@ -5,7 +5,7 @@ import {UserWhoCanEditPayload} from "./addUserWhoCanEdit";
 
 export const deleteUserWhoCanEdit = createAsyncThunk<User, UserWhoCanEditPayload>(
     'user/deleteUserWhoCanEdit',
-    async (body, thunkApi) => {
+    async (body) => {
         const token = localStorage.getItem('token');
 
         const response = await fetch(
@@ -22,6 +22,6 @@ export const deleteUserWhoCanEdit = createAsyncThunk<User, UserWhoCanEditPayload
         if (!response.ok) {
             throw new Error(`Failed to delete user from editors!`);
         }
-        return  await response.json();
+        return await response.json();
     }
 )

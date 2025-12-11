@@ -5,6 +5,7 @@ import {ReactComponent as ItalicImage} from './images/edit-file-view__italic.svg
 import {ReactComponent as UnderlinedImage} from './images/edit-file-view__underlined.svg'
 import {ReactComponent as TerminalImage} from './images/edit-file-view__terminal.svg'
 import {ReactComponent as CodeImage} from './images/edit-file-view__code.svg'
+import {ReactComponent as CodeLineImage} from './images/edit-file-view__codeLine.svg'
 import {ReactComponent as PointImage} from './images/edit-file-view__point.svg'
 import {ReactComponent as LineImage} from './images/edit-file-view__line.svg'
 import {ReactComponent as LinkImage} from './images/edit-file-view__link.svg'
@@ -13,12 +14,20 @@ import SwitchWhileEditModal from "../../../../../../ui-components/switch-while-e
 import {CreateFilePayload} from "../../../../../../store/thunks/files/createFile";
 import {uploadImageAsync} from "../../../../../../services/uploadImageAsync";
 import {AppContext} from "../../../../../../context/AppContext";
+import extractImagesName from "../../../../../../utils/functions/extractImageNames";
 
 interface EditFileViewProps {
     file: CreateFilePayload;
-    onSaveEditedFileChanges: (newContent: string) => void;
-    onCancelEditedFileChange: () => void;
-    parseFileTextToHTML: (content: string, onImageClick: (imageUrl: string) => void | null) => React.ReactNode[];
+    onSaveEditedFileChanges: (
+        newContent: string,
+        addedImages: string[],
+        onSuccess: () => void) => void,
+    onCancelEditedFileChange: (
+        addedImages: string[],
+        onSuccess: () => void) => void;
+    parseFileTextToHTML: (
+        content: string,
+        onImageClick: (imageUrl: string) => void | null) => React.ReactNode[];
     onImageClick: (imageUrl: string) => void | null;
 }
 
@@ -37,10 +46,15 @@ const EditFileView: React.FC<EditFileViewProps> = (
     const [textareaContent, setTextareaContent] = useState(file.content);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [addedImagesWhileEditing, setAddedImagesWhileEditing] = useState<string[]>([]);
 
     const {
         setIsFileContentChanged,
     } = fileState
+
+    useEffect(() => {
+        setAddedImagesWhileEditing(extractImagesName(file.content));
+    }, [file.content]);
 
     useEffect(() => {
         setTextareaContent(file.content);
@@ -55,7 +69,7 @@ const EditFileView: React.FC<EditFileViewProps> = (
         const textarea = textareaRef.current;
         if (!textarea) return;
 
-        const { selectionStart, selectionEnd, value } = textarea;
+        const {selectionStart, selectionEnd, value} = textarea;
         if (selectionStart === null || selectionEnd === null) return;
 
         const prevScrollTop = textarea.scrollTop;
@@ -78,12 +92,13 @@ const EditFileView: React.FC<EditFileViewProps> = (
             }
         }, 0);
     }, [setTextareaContent, setIsFileContentChanged, textareaRef]);
-    
+
     const handleSelectImage = useCallback(async (file: File) => {
         try {
             const data = await uploadImageAsync(file);
             if (data && data.fileName) {
                 pasteTag(`[image/${data.fileName}]`);
+                setAddedImagesWhileEditing(prev => [...prev, data.fileName]);
             }
         } catch (error) {
             console.error("Failed to upload image:", error);
@@ -113,7 +128,7 @@ const EditFileView: React.FC<EditFileViewProps> = (
         const textarea = textareaRef.current;
         if (!textarea) return;
 
-        const { selectionStart, selectionEnd, value } = textarea;
+        const {selectionStart, selectionEnd, value} = textarea;
         if (selectionStart === null || selectionEnd === null) return;
 
         const prevScrollTop = textarea.scrollTop;
@@ -142,47 +157,72 @@ const EditFileView: React.FC<EditFileViewProps> = (
         <div className={styles['editFileView']}>
             <div className={styles['editFileView__header']}>
                 <div className={styles['editFileView__header-edit']}>
-                    <div onClick={() => {
-                        wrapSelection('[`b`]', '[`/b`]')
-                    }}>
+                    <div
+                        title='Bold'
+                        onClick={() => {
+                            wrapSelection('[`b`]', '[`/b`]')
+                        }}>
                         <BoldImage style={{width: '10.45px', height: '12.57px'}}/>
                     </div>
-                    <div onClick={() => {
-                        wrapSelection('[`i`]', '[`/i`]')
-                    }}>
+                    <div
+                        title='Italic'
+                        onClick={() => {
+                            wrapSelection('[`i`]', '[`/i`]')
+                        }}>
                         <ItalicImage style={{width: '9px', height: '10.83px'}}/>
                     </div>
-                    <div onClick={() => {
-                        wrapSelection('[`u`]', '[`/u`]')
-                    }}>
+                    <div
+                        title='Underlined'
+                        onClick={() => {
+                            wrapSelection('[`u`]', '[`/u`]')
+                        }}>
                         <UnderlinedImage style={{width: '10.45px', height: '12.57px'}}/>
                     </div>
-                    <div onClick={() => {
-                        wrapSelection('[`p`]\n', '\n[`/p`]')
-                    }}>
+                    <div
+                        title='Point'
+                        onClick={() => {
+                            wrapSelection('[`p`]\n', '\n[`/p`]')
+                        }}>
                         <PointImage style={{width: '4px', height: '4px'}}/>
                     </div>
-                    <div onClick={() => {
-                        wrapSelection('[`l to="https://example.com"`]', '[`/l`]')
-                    }}>
+                    <div
+                        title='Link'
+                        onClick={() => {
+                            wrapSelection('[`l to="https://example.com"`]', '[`/l`]')
+                        }}>
                         <LinkImage style={{width: '14px', height: '14px'}}/>
                     </div>
-                    <div onClick={() => {
-                        wrapSelection('[`c`]\n', '\n[`/c`]')
-                    }}>
+                    <div
+                        title='Code'
+                        onClick={() => {
+                            wrapSelection('[`c`]\n', '\n[`/c`]')
+                        }}>
                         <CodeImage style={{width: '16.32px', height: '14.57px'}}/>
                     </div>
-                    <div onClick={() => {
-                        wrapSelection('[`t`]\n', '\n[`/t`]')
-                    }}>
+                    <div
+                        title='Code line'
+                        onClick={() => {
+                            wrapSelection('[`lc`]', '[`/lc`]')
+                        }}>
+                        <CodeLineImage style={{width: '16px', height: '16px'}}/>
+                    </div>
+                    <div
+                        title='Terminal'
+                        onClick={() => {
+                            wrapSelection('[`t`]\n', '\n[`/t`]')
+                        }}>
                         <TerminalImage style={{width: '14.25px', height: '12.67px'}}/>
                     </div>
-                    <div onClick={() => {
-                        pasteTag('[`l`]')
-                    }}>
+                    <div
+                        title='Line'
+                        onClick={() => {
+                            pasteTag('[`l`]')
+                        }}>
                         <LineImage style={{width: '14.25px', height: '1.81px'}}/>
                     </div>
-                    <div onClick={handleOpenFileDialog}>
+                    <div
+                        title='Image'
+                        onClick={handleOpenFileDialog}>
                         <ImgImage/>
                     </div>
                     <input
@@ -196,11 +236,16 @@ const EditFileView: React.FC<EditFileViewProps> = (
                 <div className={styles['editFileView__header-buttons']}>
                     <button
                         className={styles['editFileView__header-save']}
-                        onClick={() => onSaveEditedFileChanges(textareaContent)}
+                        onClick={() => onSaveEditedFileChanges(
+                            textareaContent,
+                            addedImagesWhileEditing,
+                            () => setAddedImagesWhileEditing([]))}
                         disabled={!setIsFileContentChanged}>Save
                     </button>
                     <button
-                        onClick={onCancelEditedFileChange}
+                        onClick={() => onCancelEditedFileChange(
+                            addedImagesWhileEditing,
+                            () => setAddedImagesWhileEditing([]))}
                         className={styles['editFileView__header-cancel']}>Cancel
                     </button>
                 </div>
@@ -218,7 +263,10 @@ const EditFileView: React.FC<EditFileViewProps> = (
                         className={styles['editFileView__preview-content']}>{parseFileTextToHTML(textareaContent, onImageClick)}</div>
                 </div>
             </div>
-            <SwitchWhileEditModal/>
+            <SwitchWhileEditModal
+                onCancelEditedFileChange={onCancelEditedFileChange}
+                addedImagesWhileEditing={addedImagesWhileEditing}
+                onSuccessCanceling={() => setAddedImagesWhileEditing([])}/>
         </div>
     );
 };

@@ -2,9 +2,11 @@ import {ChangeEvent, useCallback} from "react";
 import useRegisterActions, {RegisterState} from "../supporting-hooks/useRegisterActions";
 import useLoginActions, {LoginState} from "../supporting-hooks/useLoginActions";
 import {CodeResponse} from "@react-oauth/google";
-import {handleGoogleLogin} from "../../services/handleGoogleLogin";
 import useEmailModalActions, {EmailModalState} from "../supporting-hooks/useEmailModalActions";
 import useResetPasswordActions, {ResetPasswordState} from "../supporting-hooks/useResetPasswordActions";
+import {jwtDecode} from "jwt-decode";
+import {performGoogleLoginAsync} from "../../services/performGoogleLoginAsync";
+import {CustomJwtPayload} from "../../types/customJWTPayload";
 
 export type AuthorizationState = RegisterState & EmailModalState & ResetPasswordState & LoginState & {
     handleChangeEmailInput: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -24,18 +26,29 @@ export default function useAuthorizationActions(): AuthorizationState {
     const emailModalState = useEmailModalActions();
     const resetPasswordState = useResetPasswordActions();
 
-    const handleGoogleSuccess = (codeResponse: CodeResponse) => {
+    const handleGoogleSuccess = useCallback((codeResponse: CodeResponse) => {
         const authorizationCode = codeResponse.code;
 
-        handleGoogleLogin(authorizationCode)
-            .then(() => {
+        performGoogleLoginAsync(authorizationCode)
+            .then((data: { token: string; user: any }) => {
+                const decoded: CustomJwtPayload = jwtDecode(data.token);
+                const roleValues = decoded.roles.map((role: any) => role.value);
+
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('email', decoded.email);
+                localStorage.setItem('roles', JSON.stringify(roleValues));
+
                 loginState.setIsLoggedIn(true);
                 loginState.setIsLoginModalOpen(false);
             })
             .catch((error) => {
+                loginState.setLoginMessage(null);
+                if (error instanceof Error) {
+                    loginState.setLoginError(error.message);
+                }
                 console.error('Google login error', error);
             });
-    };
+    }, [loginState]);
 
     const handleGoogleError = () => {
         console.error('Google Login Failed');
@@ -88,7 +101,7 @@ export default function useAuthorizationActions(): AuthorizationState {
 
     const handleAuthorize = useCallback(() => {
         if (registerState.isRegisterModal) {
-            registerState.handleRegister()
+            registerState.handleRegister().catch(console.error);
         } else {
             loginState.handleLogin()
                 .then(() => handleCloseAuthModal())
@@ -112,7 +125,7 @@ export default function useAuthorizationActions(): AuthorizationState {
     const handleClickResetPassword = useCallback(async (resetToken: string | undefined) => {
         try {
             resetPasswordState.handleChangePassword(resetToken);
-            loginState.setLoginModalValue({ login: '', password: '' });
+            loginState.setLoginModalValue({login: '', password: ''});
             loginState.setLoginError(null);
             loginState.setLoginMessage('Password was reset successfully');
             resetPasswordState.setIsResetPasswordModalOpened(false);

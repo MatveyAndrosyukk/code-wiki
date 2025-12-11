@@ -1,10 +1,23 @@
-import React, {FC, useContext} from 'react';
+import React, {FC, useCallback, useContext} from 'react';
 import modalStyles from '../modal/ModalContent.module.scss'
 import styles from './SwitchWhileEditModal.module.scss'
 import Modal from "../modal/Modal";
 import {AppContext} from "../../context/AppContext";
 
-const SwitchWhileEditModal: FC = () => {
+interface SwitchWhileEditModalProps {
+    onCancelEditedFileChange: (
+        addedImages: string[],
+        onSuccess: () => void) => void;
+    addedImagesWhileEditing: string[];
+    onSuccessCanceling: () => void;
+}
+
+const SwitchWhileEditModal: FC<SwitchWhileEditModalProps> = (
+    {
+        onCancelEditedFileChange,
+        addedImagesWhileEditing,
+        onSuccessCanceling,
+    }) => {
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
     const {fileState} = context;
@@ -14,6 +27,11 @@ const SwitchWhileEditModal: FC = () => {
         handleRejectSwitch,
         handleConfirmSwitch,
     } = fileState;
+
+    const confirmSwitchHandler = useCallback(() => {
+        handleConfirmSwitch()
+        onCancelEditedFileChange(addedImagesWhileEditing, onSuccessCanceling)
+    }, [addedImagesWhileEditing, handleConfirmSwitch, onCancelEditedFileChange, onSuccessCanceling])
 
     return (
         <Modal isOpen={isTryToSwitchWhileEditing}
@@ -29,10 +47,10 @@ const SwitchWhileEditModal: FC = () => {
                         <br/>
                         You will lose all your unsaved changes.
                     </p>
-                    <div className={styles['modal__buttons']}>
+                    <div className={modalStyles['modal__buttons']}>
                         <button
                             className={`${styles['modal__buttons-confirm']} ${styles['modal__button']}`}
-                            onClick={handleConfirmSwitch}
+                            onClick={confirmSwitchHandler}
                         >
                             Open
                         </button>

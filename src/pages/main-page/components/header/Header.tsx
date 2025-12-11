@@ -71,7 +71,7 @@ const Header: FC = () => {
         return () => {
             document.removeEventListener('click', handleClickOutside);
         };
-    }, [burgerOpen]);
+    }, [burgerOpen, handleClickOutside]);
 
     const handleBurgerToggle = () => {
         setBurgerOpen(!burgerOpen);

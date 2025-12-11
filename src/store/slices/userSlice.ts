@@ -1,4 +1,4 @@
-import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {createSlice} from "@reduxjs/toolkit";
 import {fetchViewedUserByEmail} from "../thunks/user/fetchViewedUserByEmail";
 import {addUserWhoCanEdit} from "../thunks/user/addUserWhoCanEdit";
 import {deleteUserWhoCanEdit} from "../thunks/user/deleteUserWhoCanEdit";

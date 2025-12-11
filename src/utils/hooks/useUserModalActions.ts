@@ -1,10 +1,10 @@
-import React, { Dispatch, RefObject, SetStateAction, useCallback, useEffect, useRef } from "react";
-import { User } from "../../store/slices/userSlice";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../store";
-import { addUserWhoCanEdit } from "../../store/thunks/user/addUserWhoCanEdit";
-import { deleteUserWhoCanEdit } from "../../store/thunks/user/deleteUserWhoCanEdit";
-import { changeUserName } from "../../store/thunks/user/changeUserName";
+import React, {Dispatch, RefObject, SetStateAction, useCallback, useEffect, useRef} from "react";
+import {User} from "../../store/slices/userSlice";
+import {useDispatch} from "react-redux";
+import {AppDispatch} from "../../store";
+import {addUserWhoCanEdit} from "../../store/thunks/user/addUserWhoCanEdit";
+import {deleteUserWhoCanEdit} from "../../store/thunks/user/deleteUserWhoCanEdit";
+import {changeUserName} from "../../store/thunks/user/changeUserName";
 import {LoginState} from "../supporting-hooks/useLoginActions";
 
 export interface UserModalState {
@@ -67,7 +67,7 @@ export default function useUserModalActions(
             setEditedNameError('Username is too long');
         } else if (editedName.length < 4) {
             setEditedNameError('Username is too short');
-        }else {
+        } else {
             setEditedNameError('');
         }
     }, [editedName]);
@@ -135,12 +135,12 @@ export default function useUserModalActions(
             .then(() => {
                 setIsEditingName(false);
             })
-            .catch((e) => setEditedNameError('Username already exists'));
+            .catch(() => setEditedNameError('Username already exists'));
     }, [dispatch, editedName, user?.email]);
 
     const handleKeyDownWhileEditing = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            if (editedNameError){
+            if (editedNameError) {
                 return
             }
             handleConfirmNameEdition();

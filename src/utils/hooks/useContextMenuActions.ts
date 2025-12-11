@@ -27,15 +27,27 @@ export default function useContextMenuActions(): ContextMenuState {
         event.preventDefault();
         setContextMenuState({
             visible: true,
-            clickX: event.clientX,
+            clickX: getAdjustedX(event.clientX),
             clickY: event.clientY,
             file,
         });
     }, [setContextMenuState]);
 
     const handleCloseContextMenu = useCallback(() => {
-        setContextMenuState(prev => ({ ...prev, visible: false }));
+        setContextMenuState(prev => ({...prev, visible: false}));
     }, [setContextMenuState]);
+
+    const getAdjustedX = (clientX: number) => {
+        const width = window.innerWidth;
+        if (width < 420) {
+            return clientX - width * 0.15;
+        } else if (width < 700) {
+            return clientX - width * 0.25;
+        } else if (width < 1270) {
+            return clientX - width * 0.35;
+        }
+        return clientX;
+    };
 
     return {
         contextMenuState,

@@ -19,7 +19,7 @@ const DeleteModal: FC = () => {
     return (<Modal isOpen={deleteModalState.open}
                    onClose={handleCancelDeleteFile}>
         <div
-            className={modalStyles['modal__overlay']}
+            className={`${modalStyles['modal__overlay']} ${styles['modal__overlay']}`}
         >
             <div className={modalStyles['modal__form']}>
                 <p className={`${modalStyles['modal__text']} ${styles['modal__text']}`}>
@@ -46,7 +46,7 @@ const DeleteModal: FC = () => {
                         className={styles['modal__buttons-delete']}
                         onClick={handleConfirmDeleteFile}
                     >
-                        Delete
+                        OK
                     </button>
                     <button
                         className={styles['modal__buttons-cancel']}

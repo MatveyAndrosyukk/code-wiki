@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import searchFilesByName, {SearchResult} from "../../../../../../utils/functions/searchFilesByName";
 import styles from './SearchInput.module.scss'
 import FileImage from './images/search-input-file.svg'
@@ -13,10 +13,10 @@ interface SearchProps {
     searchType: SearchType;
 }
 
-const SearchInput: React.FC<SearchProps> = ({ onClick, searchType }) => {
+const SearchInput: React.FC<SearchProps> = ({onClick, searchType}) => {
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
-    const { files } = context;
+    const {files} = context;
     const [query, setQuery] = useState('');
     const [isInputFocused, setIsInputFocused] = useState(false);
     const searchInputBlockRef = useRef<HTMLDivElement>(null);
@@ -27,6 +27,7 @@ const SearchInput: React.FC<SearchProps> = ({ onClick, searchType }) => {
         function handleResize() {
             setIsNarrowScreen(window.innerWidth < 457);
         }
+
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
@@ -60,7 +61,9 @@ const SearchInput: React.FC<SearchProps> = ({ onClick, searchType }) => {
     }, []);
 
     const placeholderText = isNarrowScreen
-        ? "Search..."
+        ? (searchType === SearchType.InFileNames
+            ? "Files..."
+            : "Text...")
         : (searchType === SearchType.InFileNames
             ? "Search for files..."
             : "Search for file content...");

@@ -9,7 +9,7 @@ export interface UserNamePayload {
 
 export const changeUserName = createAsyncThunk<User, UserNamePayload>(
     'user/changeUserName',
-    async (body, thunkApi) => {
+    async (body) => {
         const token = localStorage.getItem('token');
 
         const response = await fetch(

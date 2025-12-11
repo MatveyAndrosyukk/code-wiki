@@ -9,7 +9,7 @@ export interface UserWhoCanEditPayload {
 
 export const addUserWhoCanEdit = createAsyncThunk<User, UserWhoCanEditPayload>(
     'user/addUserWhoCanEdit',
-    async (body, thunkApi) => {
+    async (body) => {
         const token = localStorage.getItem('token');
 
         const response = await fetch(
@@ -27,6 +27,6 @@ export const addUserWhoCanEdit = createAsyncThunk<User, UserWhoCanEditPayload>(
             const errorData = await response.json();
             throw new Error(errorData.message || JSON.stringify(errorData));
         }
-        return  await response.json();
+        return await response.json();
     }
 )

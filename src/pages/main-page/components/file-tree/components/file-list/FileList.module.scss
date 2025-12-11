@@ -1,79 +1,80 @@
 .file-list {
-    font-family: "Inter", sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
-    padding-left: 2px;
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  padding-left: 2px;
 
-    &__node {
-        font-size: 13px;
-        font-weight: 400;
-        color: #E8E8E6;
-        text-decoration: none;
-        user-select: none;
-        position: relative;
+  &__node {
+    font-size: 13px;
+    font-weight: 400;
+    color: #E8E8E6;
+    text-decoration: none;
+    user-select: none;
+    position: relative;
 
-        &-line-block {
-            display: flex;
-            flex-direction: row;
-        }
-
-        &-line {
-            width: 12px;
-            flex-shrink: 0;
-            display: inline-block;
-            position: relative;
-            margin-left: 0;
-            margin-right: 10px;
-            height: 27px;
-
-            img {
-                position: absolute;
-                top: 0;
-                left: 2px;
-                height: 27px;
-            }
-        }
-
-        &-space {
-            margin-right: 10px;
-            width: 12px;
-            flex-shrink: 0;
-            display: inline-block;
-        }
-
-        &-container {
-            display: flex;
-            align-items: center;
-        }
-
-        &-folder {
-            display: flex;
-            align-items: center;
-            height: 27px;
-            cursor: pointer;
-
-            &:hover {
-                font-weight: bold;
-            }
-
-            img {
-                margin-right: 8px;
-            }
-        }
-
-        &-file {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            height: 27px;
-
-            &:hover {
-                font-weight: bold;
-            }
-        }
-        &-image {
-            margin-right: 6px;
-            margin-top: -2px;
-        }
+    &-line-block {
+      display: flex;
+      flex-direction: row;
     }
+
+    &-line {
+      width: 12px;
+      flex-shrink: 0;
+      display: inline-block;
+      position: relative;
+      margin-left: 0;
+      margin-right: 10px;
+      height: 27px;
+
+      img {
+        position: absolute;
+        top: 0;
+        left: 2px;
+        height: 27px;
+      }
+    }
+
+    &-space {
+      margin-right: 10px;
+      width: 12px;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    &-container {
+      display: flex;
+      align-items: center;
+    }
+
+    &-folder {
+      display: flex;
+      align-items: center;
+      height: 27px;
+      cursor: pointer;
+
+      &:hover {
+        font-weight: bold;
+      }
+
+      img {
+        margin-right: 8px;
+      }
+    }
+
+    &-file {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      height: 27px;
+
+      &:hover {
+        font-weight: bold;
+      }
+    }
+
+    &-image {
+      margin-right: 6px;
+      margin-top: -2px;
+    }
+  }
 }

@@ -9,7 +9,7 @@ interface ChangeFileNamePayload {
 
 export const updateFileName = createAsyncThunk<CreateFilePayload, ChangeFileNamePayload>(
     'fileTree/updateFileName',
-    async (body, thunkApi) => {
+    async (body) => {
         const token = localStorage.getItem('token');
 
         const response = await fetch(`${API_BASE_URL}/files/rename`, {

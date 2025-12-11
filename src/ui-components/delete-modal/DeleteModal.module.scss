@@ -1,25 +1,26 @@
 .modal {
-    &__text {
-        margin-bottom: 13px;
+  &__overlay {
+    padding: 16px;
+  }
 
-        &-highlighted {
-            font-weight: 500;
-        }
+  &__text {
+    margin-bottom: 13px;
+    align-self: flex-start;
+
+    &-highlighted {
+      font-weight: 500;
+    }
+  }
+
+  &__buttons {
+    &-delete {
+      background-color: #3574F0;
+      color: #E8E8E6;
     }
 
-    &__buttons {
-        &-delete {
-            background-color: #FFB4AD;
-            color: #CC032D;
-
-            &:hover {
-                color: #CC032D;
-            }
-        }
-
-        &-cancel {
-            background: #888C8C;
-            color: #E8E8E6;
-        }
+    &-cancel {
+      border: 1px solid #8D9191;
+      color: #E8E8E6;
     }
+  }
 }

@@ -1,26 +1,27 @@
 import {useCallback, useState} from "react";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../store";
-import {createFile, CreateFilePayload} from "../../store/thunks/files/createFile";
+import {createFile} from "../../store/thunks/files/createFile";
 import {ActionType} from "./useModalActions";
+import {File} from "../../types/file";
 
 
 export interface CopyPasteState {
-    copiedFile: CreateFilePayload | null;
-    setCopiedFile: (file: CreateFilePayload | null) => void;
-    handleCopyFile: (file: CreateFilePayload) => void;
+    copiedFile: File | null;
+    setCopiedFile: (file: File | null) => void;
+    handleCopyFile: (file: File) => void;
     handlePasteFile: (id: number | null) => void;
 }
 
 export default function useCopyPasteActions(
-    files: CreateFilePayload[],
+    files: File[],
     openModalByReason: ({reason, id, title}: { reason: ActionType, id: number | null, title: string }) => void,
-    checkIfNameExists: (files: CreateFilePayload[], folderId: number | null, name: string) => boolean
+    checkIfNameExists: (files: File[], folderId: number | null, name: string) => boolean
 ): CopyPasteState {
     const dispatch = useDispatch<AppDispatch>();
-    const [copiedFile, setCopiedFile] = useState<CreateFilePayload | null>(null);
+    const [copiedFile, setCopiedFile] = useState<File | null>(null);
 
-    const handleCopyFile = useCallback((file: CreateFilePayload) => {
+    const handleCopyFile = useCallback((file: File) => {
         setCopiedFile(file);
     }, []);
 

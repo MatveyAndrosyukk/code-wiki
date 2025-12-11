@@ -1,20 +1,20 @@
 import {useCallback, useState} from "react";
-import {CreateFilePayload} from "../../store/thunks/files/createFile";
 import {deleteFileById} from "../../store/thunks/files/deleteFileById";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../store";
 import {User} from "../../store/slices/userSlice";
 import {fetchViewedUserByEmail} from "../../store/thunks/user/fetchViewedUserByEmail";
+import {File} from "../../types/file";
 
 export interface DeleteModalState {
     open: boolean;
-    file: CreateFilePayload | null;
+    file: File | null;
     user: User | null;
 }
 
 export interface DeleteFileState {
     deleteModalState: DeleteModalState;
-    handleOpenDeleteModal: (file: CreateFilePayload, user: User | null) => void;
+    handleOpenDeleteModal: (file: File, user: User | null) => void;
     handleConfirmDeleteFile: () => void;
     handleCancelDeleteFile: () => void;
 }
@@ -29,7 +29,7 @@ export default function useDeleteFileActions(
         user: null,
     });
 
-    const handleOpenDeleteModal = useCallback((file: CreateFilePayload, user: User | null) => {
+    const handleOpenDeleteModal = useCallback((file: File, user: User | null) => {
         setDeleteModalState({open: true, file, user});
     }, [setDeleteModalState]);
 

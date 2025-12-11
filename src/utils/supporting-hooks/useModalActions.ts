@@ -7,12 +7,13 @@ import {
     handleNameConflictInFolder,
     isNameExistsInRoot
 } from "../functions/modalUtils";
-import {createFile, CreateFilePayload} from "../../store/thunks/files/createFile";
+import {createFile} from "../../store/thunks/files/createFile";
 import useCopyPasteActions, {CopyPasteState} from "./useCopyPasteActions";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../store";
 import {User} from "../../store/slices/userSlice";
 import {fetchViewedUserByEmail} from "../../store/thunks/user/fetchViewedUserByEmail";
+import {File} from "../../types/file";
 
 export enum ActionType {
     RenameFile = "RenameFile",
@@ -43,14 +44,14 @@ export type ModalActionsState = CopyPasteState & {
     setModalOpenState: Dispatch<SetStateAction<ModalOpenState>>;
     modalInputRef: Ref<HTMLInputElement | null> | null;
     isNameConflictReason: () => boolean;
-    handleOpenRenameModal: (file: CreateFilePayload) => void;
+    handleOpenRenameModal: (file: File) => void;
     handleCloseModal: () => void;
     handleConfirmModalByReason: (modalState: ModalOpenState & { title: string }) => void;
     handleOpenModalByReason: (modalState: ModalOpenState) => void;
 }
 
 export default function useModalActions(
-    files: CreateFilePayload[],
+    files: File[],
     viewedUser: User | null,
 ): ModalActionsState {
     const dispatch = useDispatch<AppDispatch>();
@@ -259,7 +260,7 @@ export default function useModalActions(
         setModalOpenState({reason: null, id: null, title: null});
     }, [files, dispatch, handleOpenModalByReason, viewedUser, copyPasteActions]);
 
-    const handleOpenRenameModal = useCallback((file: CreateFilePayload) => {
+    const handleOpenRenameModal = useCallback((file: File) => {
         handleOpenModalByReason({reason: ActionType.RenameFile, id: file.id, title: 'Rename file'});
         setModalValue(file.name);
     }, [handleOpenModalByReason]);

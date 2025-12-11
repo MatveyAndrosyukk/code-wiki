@@ -1,14 +1,13 @@
 import React, {FC, useContext, useEffect} from 'react';
 import styles from './ContextMenu.module.scss'
-import {FileType} from "../../types/file";
-import {CreateFilePayload} from "../../store/thunks/files/createFile";
+import {File, FileType} from "../../types/file";
 import {AppContext} from "../../context/AppContext";
 import {ActionType} from "../../utils/supporting-hooks/useModalActions";
 
 interface ContextMenuProps {
     clickX: number;
     clickY: number;
-    file: CreateFilePayload;
+    file: File;
     onCloseContextMenu: () => void;
 }
 

@@ -1,6 +1,6 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import API_BASE_URL from "../../../config/api-config";
-import {CreateFilePayload} from "./createFile";
+import {File} from "../../../types/file";
 
 interface ChangeFileContentPayload {
     id: number;
@@ -8,7 +8,7 @@ interface ChangeFileContentPayload {
     editor: string | undefined;
 }
 
-export const updateFileContent = createAsyncThunk<CreateFilePayload, ChangeFileContentPayload>(
+export const updateFileContent = createAsyncThunk<File, ChangeFileContentPayload>(
     'fileTree/updateFileContent',
     async (body) => {
         const token = localStorage.getItem('token');

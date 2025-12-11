@@ -1,7 +1,7 @@
-import {FileStatus, FileType} from "../../types/file";
+import {File, FileStatus, FileType} from "../../types/file";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {fetchFilesByEmail} from "../thunks/files/fetchFilesByEmail";
-import {createFile, CreateFilePayload} from "../thunks/files/createFile";
+import {createFile} from "../thunks/files/createFile";
 import {deleteFileById} from "../thunks/files/deleteFileById";
 import {updateFileContent} from "../thunks/files/updateFileContent";
 import {toggleFileLikes} from "../thunks/files/toggleFileLikes";
@@ -18,7 +18,7 @@ import {findNodeById} from "../../utils/functions/modalUtils";
 import {updateFileName} from "../thunks/files/updateFileName";
 
 interface FileTreeState {
-    files: CreateFilePayload[];
+    files: File[];
 }
 
 const initialState: FileTreeState = {
@@ -42,7 +42,7 @@ const fileTreeSlice = createSlice({
             })
         },
         toggleFolder(state, action: PayloadAction<{ id: number | null }>) {
-            function toggle(nodes: CreateFilePayload[]): CreateFilePayload[] {
+            function toggle(nodes: File[]): File[] {
                 return nodes.map(node => {
                     if (node.id === action.payload.id && node.type === FileType.Folder) {
                         const newStatus = node.status === FileStatus.Opened ? FileStatus.Closed : FileStatus.Opened;
@@ -121,7 +121,7 @@ const fileTreeSlice = createSlice({
             .addCase(updateFileContent.fulfilled, (state, action) => {
                 const changedFile = action.payload;
 
-                function update(nodes: CreateFilePayload[]) {
+                function update(nodes: File[]) {
                     for (const node of nodes) {
                         if (node.id === changedFile.id && node.type === FileType.File) {
                             node.content = changedFile.content;

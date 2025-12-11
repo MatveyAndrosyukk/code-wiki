@@ -1,10 +1,9 @@
-import {CreateFilePayload} from "../thunks/files/createFile";
-import {FileStatus, FileType} from "../../types/file";
+import {File, FileStatus, FileType} from "../../types/file";
 
 export function findAndUpdate(
-    nodes: CreateFilePayload[],
+    nodes: File[],
     id: number | null,
-    updater: (node: CreateFilePayload, idx: number, arr: CreateFilePayload[]) => boolean | void
+    updater: (node: File, idx: number, arr: File[]) => boolean | void
 ): boolean {
     for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i];
@@ -19,7 +18,7 @@ export function findAndUpdate(
     return false;
 }
 
-export function deepCloneWithNewIds(file: CreateFilePayload): CreateFilePayload {
+export function deepCloneWithNewIds(file: File): File {
     const newId = Date.now() + Math.floor(Math.random() * 1000000);
     return {
         ...file,
@@ -30,7 +29,7 @@ export function deepCloneWithNewIds(file: CreateFilePayload): CreateFilePayload 
     };
 }
 
-export function closeAllFiles(nodes: CreateFilePayload[]): CreateFilePayload[] {
+export function closeAllFiles(nodes: File[]): File[] {
     return nodes.map(node => {
         const newNode = {...node};
         if (newNode.type === FileType.File) {
@@ -43,7 +42,7 @@ export function closeAllFiles(nodes: CreateFilePayload[]): CreateFilePayload[] {
     });
 }
 
-export function closeAllChildren(nodes: CreateFilePayload[]): CreateFilePayload[] {
+export function closeAllChildren(nodes: File[]): File[] {
     return nodes.map(node => ({
         ...node,
         status: node.type === FileType.Folder ? FileStatus.Closed : node.status,
@@ -51,7 +50,10 @@ export function closeAllChildren(nodes: CreateFilePayload[]): CreateFilePayload[
     }));
 }
 
-export function deleteById(nodes: CreateFilePayload[], id: number | null): CreateFilePayload[] {
+export function deleteById(
+    nodes: File[],
+    id: number | null
+): File[] {
     return nodes
         .filter(node => node.id !== id)
         .map(node => ({
@@ -60,7 +62,11 @@ export function deleteById(nodes: CreateFilePayload[], id: number | null): Creat
         }));
 }
 
-export function findPathToNode(nodes: CreateFilePayload[], targetId: number, path: number[] | null = []): number[] | null {
+export function findPathToNode(
+    nodes: File[],
+    targetId: number,
+    path: number[] | null = []
+): number[] | null {
     for (const node of nodes) {
         // @ts-ignore
         const currentPath = [...path, node.id];
@@ -75,7 +81,10 @@ export function findPathToNode(nodes: CreateFilePayload[], targetId: number, pat
     return null;
 }
 
-export function openFoldersOnPathPreserveOthers(nodes: CreateFilePayload[], pathIds: number[]): CreateFilePayload[] {
+export function openFoldersOnPathPreserveOthers(
+    nodes: File[],
+    pathIds: number[]
+): File[] {
     return nodes.map(node => {
         const newNode = {...node};
         if (newNode.type === FileType.Folder) {
@@ -90,7 +99,10 @@ export function openFoldersOnPathPreserveOthers(nodes: CreateFilePayload[], path
     });
 }
 
-export function closeAllFilesExcept(nodes: CreateFilePayload[], openedFileId: number | null): CreateFilePayload[] {
+export function closeAllFilesExcept(
+    nodes: File[],
+    openedFileId: number | null
+): File[] {
     return nodes.map(node => {
         const newNode = {...node};
         if (newNode.type === FileType.File) {

@@ -3,15 +3,15 @@ import useAuthorizationActions, {AuthorizationState} from "../utils/hooks/useAut
 import {useSelector} from "react-redux";
 import {RootState} from "../store";
 import {User} from "../store/slices/userSlice";
-import {CreateFilePayload} from "../store/thunks/files/createFile";
 import useFileActions, {FileActionsState} from "../utils/hooks/useFileActions";
 import useBanActions, {BanState} from "../utils/hooks/useBanActions";
+import {File} from "../types/file";
 
 export interface AppProviderState {
     authState: AuthorizationState;
     viewedUser: User | null;
     loggedInUser: User | null;
-    files: CreateFilePayload[];
+    files: File[];
     fileState: FileActionsState;
     banState: BanState;
 }

@@ -1,5 +1,4 @@
-import {FileType} from "../../types/file";
-import {CreateFilePayload} from "../../store/thunks/files/createFile";
+import {File, FileType} from "../../types/file";
 
 export interface SearchResult {
     id: number;
@@ -10,7 +9,7 @@ export interface SearchResult {
 }
 
 export default function searchFilesByName(
-    nodes: CreateFilePayload[],
+    nodes: File[],
     query: string,
     path: string = ''
 ): SearchResult[] {

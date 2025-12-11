@@ -1,8 +1,8 @@
 import {SearchResult} from "./searchFilesByName";
-import {CreateFilePayload} from "../../store/thunks/files/createFile";
+import {File} from "../../types/file";
 
 export default function searchFilesByContent(
-    nodes: CreateFilePayload[],
+    nodes: File[],
     query: string,
     path: string = ''
 ): SearchResult[] {

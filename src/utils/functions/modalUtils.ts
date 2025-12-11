@@ -1,7 +1,7 @@
-import {CreateFilePayload} from "../../store/thunks/files/createFile";
 import {ActionType} from "../supporting-hooks/useModalActions";
+import {File} from "../../types/file";
 
-export function findNodeById(nodes: CreateFilePayload[], id: number | null): CreateFilePayload | null {
+export function findNodeById(nodes: File[], id: number | null): File | null {
     for (const node of nodes) {
         if (node.id === id) return node;
         if (node.type === 'Folder' && node.children) {
@@ -13,11 +13,11 @@ export function findNodeById(nodes: CreateFilePayload[], id: number | null): Cre
 }
 
 export function checkIfNameExistsInFolder(
-    files: CreateFilePayload[],
+    files: File[],
     folderId: number | null,
     name: string
 ): boolean {
-    function findFolderById(nodes: CreateFilePayload[]): CreateFilePayload | null {
+    function findFolderById(nodes: File[]): File | null {
         for (const node of nodes) {
             if (node.id === folderId && node.type === 'Folder') return node;
             if (node.type === 'Folder' && node.children) {
@@ -35,12 +35,12 @@ export function checkIfNameExistsInFolder(
     return false;
 }
 
-export function isNameExistsInRoot(files: CreateFilePayload[], name: string): boolean {
+export function isNameExistsInRoot(files: File[], name: string): boolean {
     return files.some(file => file.name === name);
 }
 
 export function handleNameConflictInFolder(
-    files: CreateFilePayload[],
+    files: File[],
     id: number | null,
     name: string,
     reason: ActionType,
@@ -74,8 +74,8 @@ export function createFilePayload(
     author: string | null,
     type: 'File' | 'Folder',
     parent: number | null,
-    extraFields?: Partial<CreateFilePayload>
-): CreateFilePayload {
+    extraFields?: Partial<File>
+): File {
     return {
         id: null,
         status: null,

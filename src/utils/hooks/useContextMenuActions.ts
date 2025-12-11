@@ -1,17 +1,17 @@
 import React, {Dispatch, SetStateAction, useCallback} from "react";
-import {CreateFilePayload} from "../../store/thunks/files/createFile";
+import {File} from "../../types/file";
 
 export interface OpenedContextMenuState {
     visible: boolean,
     clickX: number,
     clickY: number,
-    file: CreateFilePayload | null;
+    file: File | null;
 }
 
 export interface ContextMenuState {
     contextMenuState: OpenedContextMenuState;
     setContextMenuState: Dispatch<SetStateAction<OpenedContextMenuState>>;
-    handleOpenContextMenu: (event: React.MouseEvent, file: CreateFilePayload) => void;
+    handleOpenContextMenu: (event: React.MouseEvent, file: File) => void;
     handleCloseContextMenu: () => void;
 }
 
@@ -23,7 +23,7 @@ export default function useContextMenuActions(): ContextMenuState {
         file: null
     });
 
-    const handleOpenContextMenu = useCallback((event: React.MouseEvent, file: CreateFilePayload) => {
+    const handleOpenContextMenu = useCallback((event: React.MouseEvent, file: File) => {
         event.preventDefault();
         setContextMenuState({
             visible: true,

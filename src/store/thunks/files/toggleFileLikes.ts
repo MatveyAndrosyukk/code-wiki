@@ -1,13 +1,13 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import API_BASE_URL from "../../../config/api-config";
-import {CreateFilePayload} from "./createFile";
+import {File} from "../../../types/file";
 
 export interface ChangeFileLikesPayload {
     id: number;
     email: string;
 }
 
-export const toggleFileLikes = createAsyncThunk<CreateFilePayload, ChangeFileLikesPayload>(
+export const toggleFileLikes = createAsyncThunk<File, ChangeFileLikesPayload>(
     'fileTree/toggleFileLikes',
     async (body) => {
         const token = localStorage.getItem('token');

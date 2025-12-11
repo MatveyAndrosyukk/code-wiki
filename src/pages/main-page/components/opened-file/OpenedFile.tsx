@@ -12,7 +12,6 @@ import {AppDispatch} from '../../../../store'
 import {parseFileTextToHTML} from '../../../../utils/functions/parseFile'
 import findPathToFile from '../../../../utils/functions/findFilePath'
 import EditFileView from './components/edit-file-view/EditFileView'
-import {CreateFilePayload} from '../../../../store/thunks/files/createFile'
 import {updateFileContent} from '../../../../store/thunks/files/updateFileContent'
 import {checkIsUserLikedFileAsync} from '../../../../services/checkIsUserLikedFileAsync'
 import {AppContext} from '../../../../context/AppContext'
@@ -20,9 +19,10 @@ import {isUserCanEdit} from '../../../../utils/functions/permissions-utils/isUse
 import {useNavigate} from "react-router-dom";
 import extractImagesName from "../../../../utils/functions/extractImageNames";
 import {deleteExtraImagesAsync} from "../../../../services/deleteExtraImagesAsync";
+import {File} from "../../../../types/file";
 
 interface OpenedFileProps {
-    file?: CreateFilePayload | null
+    file?: File | null
     emailParam: string | undefined
     isFileTreeOpened: boolean
     setIsFileTreeOpened: Dispatch<SetStateAction<boolean>>

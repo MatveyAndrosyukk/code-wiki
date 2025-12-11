@@ -1,7 +1,6 @@
-// Возвращает массив file.name от корневой папки до файла.
-import {CreateFilePayload} from "../../store/thunks/files/createFile";
+import {File} from "../../types/file";
 
-export default function findPathToFile(nodes: CreateFilePayload[], targetId: number | null, path: string[] = []): string[] | null {
+export default function findPathToFile(nodes: File[], targetId: number | null, path: string[] = []): string[] | null {
     for (const node of nodes) {
         const currentPath = [...path, node.name];
         if (node.id === targetId) {

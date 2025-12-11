@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useRef} from 'react';
-import {FileStatus, FileType} from "../../../../../../../../types/file";
+import {File, FileStatus, FileType} from "../../../../../../../../types/file";
 import OpenedImg from '../../images/file-list-opened.svg'
 import ClosedImg from '../../images/file-list-closed.svg'
 import {ReactComponent as FileImg} from '../../images/file-list-file.svg'
@@ -7,7 +7,6 @@ import Line from '../../images/file-list-line.svg'
 import ChildLine from '../../images/file-list-child-line.svg'
 import LastChildLine from '../../images/file-list-last-child-line.svg'
 import styles from '../../FileList.module.scss';
-import {CreateFilePayload} from "../../../../../../../../store/thunks/files/createFile";
 import {AppContext} from "../../../../../../../../context/AppContext";
 import {isUserCanEdit} from "../../../../../../../../utils/functions/permissions-utils/isUserCanEdit";
 import {ContextMenuState} from "../../../../../../../../utils/hooks/useContextMenuActions";
@@ -18,7 +17,7 @@ interface FileListViewProps {
     onFolderClick: (id: number | null) => void;
     contextMenuState: ContextMenuState;
     emailParam: string | undefined;
-    files: CreateFilePayload[]
+    files: File[]
 }
 
 const FileListView: React.FC<FileListViewProps> = (
@@ -43,7 +42,7 @@ const FileListView: React.FC<FileListViewProps> = (
         handleTryToOpenFile
     } = fileState;
 
-    const touchStartHandler = useCallback((node: CreateFilePayload, touchEvent?: React.TouchEvent) => {
+    const touchStartHandler = useCallback((node: File, touchEvent?: React.TouchEvent) => {
         pressTimerRef.current = setTimeout(() => {
             if (isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && touchEvent) {
                 const touch = touchEvent.touches[0];
@@ -66,7 +65,7 @@ const FileListView: React.FC<FileListViewProps> = (
 
     const openContextMenuHandler = useCallback((
         e: React.MouseEvent<HTMLDivElement>,
-        node: CreateFilePayload
+        node: File
     ) => {
         if (isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser)) {
             contextMenuState.handleOpenContextMenu(e, node);

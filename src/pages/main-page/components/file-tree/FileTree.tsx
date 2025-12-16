@@ -1,5 +1,6 @@
 import React, {Dispatch, FC, SetStateAction, useCallback, useContext, useEffect, useRef, useState} from 'react';
 import styles from './FileTree.module.scss'
+import commonStyles from '../../../../styles/Common.module.scss'
 import {ReactComponent as LockSvg} from './images/fileTree-lock.svg'
 import {ReactComponent as BanSvg} from './images/fileTree-ban.svg'
 import FileList from "./components/file-list/FileList";
@@ -30,6 +31,7 @@ const FileTree: FC<FileTreeProps> = (
     if (!context) throw new Error("Component can't be used without context");
     const {viewedUser, loggedInUser, authState, fileState, banState} = context;
     const [fileTreeStyles, setFileTreeStyles] = useState(``);
+    const [showBlockMessage, setShowBlockMessage] = useState(false);
     const fileTreeRef = useRef<HTMLDivElement>(null);
 
     const {setIsBanModalOpened} = banState;
@@ -41,9 +43,18 @@ const FileTree: FC<FileTreeProps> = (
 
     const {handleOpenModalByReason} = fileState;
 
-    const blockViewHandler = useCallback(() => {
+    const blockViewHandler = useCallback(async () => {
         if (viewedUser?.email) {
-            dispatch(toggleUserIsViewBlocked(viewedUser.email));
+            try {
+                await dispatch(toggleUserIsViewBlocked(viewedUser.email));
+                setShowBlockMessage(true);
+
+                setTimeout(() => {
+                    setShowBlockMessage(false);
+                }, 3000);
+            } catch (error) {
+                console.error('Failed to toggle view block:', error);
+            }
         }
     }, [dispatch, viewedUser]);
 
@@ -128,6 +139,12 @@ const FileTree: FC<FileTreeProps> = (
                             User blocked his files for view
                         </div>
                     )
+                )}
+
+                {showBlockMessage && (
+                    <div className={commonStyles['common__notification']}>
+                        You {viewedUser?.isViewBlocked ? 'blocked' : 'unblocked'} files for view of other people
+                    </div>
                 )}
 
                 {!isBanned && isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && (

@@ -53,25 +53,25 @@ const Header: FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const handleClickOutside = (event: MouseEvent) => {
-        const target = event.target as Node;
-        if (
-            burgerOpen &&
-            menuRef.current &&
-            !menuRef.current.contains(target) &&
-            burgerButtonRef.current &&
-            !burgerButtonRef.current.contains(target)
-        ) {
-            setBurgerOpen(false);
-        }
-    };
-
     useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as Node;
+            if (
+                burgerOpen &&
+                menuRef.current &&
+                !menuRef.current.contains(target) &&
+                burgerButtonRef.current &&
+                !burgerButtonRef.current.contains(target)
+            ) {
+                setBurgerOpen(false);
+            }
+        };
+        
         document.addEventListener('click', handleClickOutside);
         return () => {
             document.removeEventListener('click', handleClickOutside);
         };
-    }, [burgerOpen, handleClickOutside]);
+    }, [burgerOpen]);
 
     const handleBurgerToggle = () => {
         setBurgerOpen(!burgerOpen);

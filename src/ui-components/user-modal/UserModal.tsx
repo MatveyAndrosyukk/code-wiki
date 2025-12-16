@@ -1,5 +1,6 @@
 import React, {FC, useCallback, useContext, useEffect, useState} from 'react';
 import styles from './UserModal.module.scss'
+import commonStyles from '../../styles/Common.module.scss'
 import modalStyles from '../modal/ModalContent.module.scss'
 import Modal from "../modal/Modal";
 import CopyLinkSvg from './images/user-modal-copyLink.svg'
@@ -22,6 +23,7 @@ const UserModal: FC<LoginModalProps> = (
     if (!context) throw new Error("Component can't be used without context");
     const {loggedInUser} = context;
     const [isScreenSmall, setIsScreenSmall] = useState<boolean>(window.innerWidth <= 750);
+    const [showCopyMessage, setShowCopyMessage] = useState(false);
 
     const {
         isEditingName,
@@ -61,6 +63,12 @@ const UserModal: FC<LoginModalProps> = (
 
         const profileUrl = `${window.location.origin}/${loggedInUser.email}`;
         navigator.clipboard.writeText(profileUrl).catch(console.error);
+
+        setShowCopyMessage(true);
+
+        setTimeout(() => {
+            setShowCopyMessage(false);
+        }, 3000);
     }, [loggedInUser]);
 
     const handleGoToUsersPage = useCallback((user: User) => {
@@ -79,6 +87,11 @@ const UserModal: FC<LoginModalProps> = (
             <div className={`${modalStyles.modal__overlay} ${styles.modal__overlay}`}>
                 <div className={`${modalStyles.modal__form} ${styles.modal__form}`}>
                     <div className={styles['modal__head']}>
+                        {showCopyMessage && (
+                            <div className={commonStyles['common__notification']}>
+                                Link copied to clipboard
+                            </div>
+                        )}
                         <div className={styles['modal__head-name']}>
                             <div className={styles['modal__name']}>
                                 {isEditingName ? (

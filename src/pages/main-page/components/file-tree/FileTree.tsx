@@ -1,4 +1,14 @@
-import React, {Dispatch, FC, SetStateAction, useCallback, useContext, useEffect, useRef, useState} from 'react';
+import React, {
+    Dispatch,
+    FC,
+    SetStateAction,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState
+} from 'react';
 import styles from './FileTree.module.scss'
 import commonStyles from '../../../../styles/Common.module.scss'
 import {ReactComponent as LockSvg} from './images/fileTree-lock.svg'
@@ -30,8 +40,8 @@ const FileTree: FC<FileTreeProps> = (
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
     const {viewedUser, loggedInUser, authState, fileState, banState} = context;
-    const [fileTreeStyles, setFileTreeStyles] = useState(``);
-    const [showBlockMessage, setShowBlockMessage] = useState(false);
+    const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
+    const [showBlockMessage, setShowBlockMessage] = useState<boolean>(false);
     const fileTreeRef = useRef<HTMLDivElement>(null);
 
     const {setIsBanModalOpened} = banState;
@@ -42,21 +52,6 @@ const FileTree: FC<FileTreeProps> = (
     } = authState;
 
     const {handleOpenModalByReason} = fileState;
-
-    const blockViewHandler = useCallback(async () => {
-        if (viewedUser?.email) {
-            try {
-                await dispatch(toggleUserIsViewBlocked(viewedUser.email));
-                setShowBlockMessage(true);
-
-                setTimeout(() => {
-                    setShowBlockMessage(false);
-                }, 3000);
-            } catch (error) {
-                console.error('Failed to toggle view block:', error);
-            }
-        }
-    }, [dispatch, viewedUser]);
 
     useEffect(() => {
         if (window.innerWidth < 1270) {
@@ -77,18 +72,35 @@ const FileTree: FC<FileTreeProps> = (
     }, [isOpened, setIsOpened]);
 
     useEffect(() => {
-        const handleChooseFileTreeStyles = () => {
-            if (isOpened && window.innerWidth > 1270) {
-                setFileTreeStyles(styles['file-tree']);
-            } else if (isOpened && window.innerWidth < 1270) {
-                setFileTreeStyles(`${styles['file-tree']}  ${styles['file-tree--fixed']}`);
-            } else {
-                setFileTreeStyles(styles['file-tree-closed']);
-            }
-        };
+        const onResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
 
-        handleChooseFileTreeStyles();
-    }, [isOpened]);
+    const fileTreeStyles = useMemo(() => {
+        if (isOpened && windowWidth > 1270) {
+            return styles['file-tree'];
+        } else if (isOpened && windowWidth < 1270) {
+            return `${styles['file-tree']} ${styles['file-tree--fixed']}`;
+        } else {
+            return styles['file-tree-closed'];
+        }
+    }, [isOpened, windowWidth]);
+
+    const blockViewHandler = useCallback(async () => {
+        if (viewedUser?.email) {
+            try {
+                await dispatch(toggleUserIsViewBlocked(viewedUser.email));
+                setShowBlockMessage(true);
+
+                setTimeout(() => {
+                    setShowBlockMessage(false);
+                }, 3000);
+            } catch (error) {
+                console.error('Failed to toggle view block:', error);
+            }
+        }
+    }, [dispatch, viewedUser]);
 
     const handleCreateRootFolder = useCallback(() => {
         if (isLoggedIn) {
@@ -171,7 +183,9 @@ const FileTree: FC<FileTreeProps> = (
                 )}
                 {!isBanned && isUserCanView(viewedUser, loggedInUser) && (
                     <div className={styles['file-tree__files']}>
-                        <FileList emailParam={emailParam}/>
+                        <FileList
+                            windowWidth={windowWidth}
+                            emailParam={emailParam}/>
                     </div>
                 )}
             </div>

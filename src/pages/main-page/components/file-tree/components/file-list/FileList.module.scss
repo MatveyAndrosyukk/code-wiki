@@ -3,6 +3,9 @@
   font-optical-sizing: auto;
   font-style: normal;
   padding-left: 2px;
+  height: 100%;
+  width: 100%;
+  min-height: 200px;
 
   &__node {
     font-size: 13px;
@@ -11,10 +14,13 @@
     text-decoration: none;
     user-select: none;
     position: relative;
+    height: 32px;
+    padding: 4px 0;
 
     &-line-block {
       display: flex;
       flex-direction: row;
+      flex-shrink: 0;
     }
 
     &-line {
@@ -44,6 +50,7 @@
     &-container {
       display: flex;
       align-items: center;
+      height: 100%;
     }
 
     &-folder {
@@ -51,6 +58,7 @@
       align-items: center;
       height: 27px;
       cursor: pointer;
+      flex: 1;
 
       &:hover {
         font-weight: bold;
@@ -58,6 +66,7 @@
 
       img {
         margin-right: 8px;
+        margin-top: 2px;
       }
     }
 
@@ -66,6 +75,7 @@
       align-items: center;
       cursor: pointer;
       height: 27px;
+      flex: 1;
 
       &:hover {
         font-weight: bold;
@@ -74,7 +84,7 @@
 
     &-image {
       margin-right: 6px;
-      margin-top: -2px;
+      margin-top: -1px;
     }
   }
 }

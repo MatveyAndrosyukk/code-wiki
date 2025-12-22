@@ -1,0 +1,15 @@
+.file-list {
+  height: 100%; // Важно для react-window
+  font-family: "Inter", sans-serif;
+
+  &__node {
+    height: 32px; // Фиксированная высота для виртуализации
+    padding: 4px 0;
+
+    &-container {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+  }
+}

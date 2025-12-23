@@ -47,6 +47,14 @@ const EditFileView: React.FC<EditFileViewProps> = (
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [addedImagesWhileEditing, setAddedImagesWhileEditing] = useState<string[]>([]);
+    const [previewContent, setPreviewContent] = useState<React.ReactNode>([]);
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setPreviewContent(parseFileTextToHTML(textareaContent, onImageClick));
+        }, 300);
+        return () => clearTimeout(timeoutId);
+    }, [textareaContent, onImageClick, parseFileTextToHTML]);
 
     const {
         setIsFileContentChanged,
@@ -122,7 +130,7 @@ const EditFileView: React.FC<EditFileViewProps> = (
     const handleChangeTextareaContent = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setTextareaContent(e.target.value);
         setIsFileContentChanged(e.target.value !== file.content);
-    }, [setTextareaContent, setIsFileContentChanged, file.content]);
+    }, [file.content, setIsFileContentChanged]);
 
     const wrapSelection = useCallback((tagStart: string, tagEnd: string) => {
         const textarea = textareaRef.current;
@@ -239,8 +247,7 @@ const EditFileView: React.FC<EditFileViewProps> = (
                         onClick={() => onSaveEditedFileChanges(
                             textareaContent,
                             addedImagesWhileEditing,
-                            () => setAddedImagesWhileEditing([]))}
-                        disabled={!setIsFileContentChanged}>Save
+                            () => setAddedImagesWhileEditing([]))}>Save
                     </button>
                     <button
                         onClick={() => onCancelEditedFileChange(
@@ -260,7 +267,7 @@ const EditFileView: React.FC<EditFileViewProps> = (
                 <div className={styles['editFileView__preview']}>
                     <div className={styles['editFileView__preview-title']}>Preview</div>
                     <div
-                        className={styles['editFileView__preview-content']}>{parseFileTextToHTML(textareaContent, onImageClick)}</div>
+                        className={styles['editFileView__preview-content']}>{previewContent}</div>
                 </div>
             </div>
             <SwitchWhileEditModal

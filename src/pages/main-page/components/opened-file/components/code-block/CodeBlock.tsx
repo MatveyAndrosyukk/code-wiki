@@ -1,41 +1,49 @@
-import React, {FC, useCallback, useEffect, useRef} from 'react';
-import hljs from 'highlight.js';
-import 'highlight.js/styles/custom-code.css';
-import styles from './CodeBlock.module.scss'
-import {ReactComponent as ExpandCodeSvg} from './images/code-block-expand-code.svg'
+import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
+import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter';
+import {darcula} from 'react-syntax-highlighter/dist/esm/styles/prism';
+import styles from './CodeBlock.module.scss';
+import {ReactComponent as ExpandCodeSvg} from './images/code-block-expand-code.svg';
+import {getLanguage} from "../../../../../../utils/functions/getLanguage";
 
 interface CodeBlockProps {
     code: string;
 }
 
 const CodeBlock: FC<CodeBlockProps> = ({code}) => {
-    const codeRef = useRef(null);
-    const [isCodeExpanded, setIsCodeExpanded] = React.useState(false);
-
-    const handleExpandCode = useCallback(() => {
-        setIsCodeExpanded(!isCodeExpanded);
-    }, [isCodeExpanded])
+    const [isCodeExpanded, setIsCodeExpanded] = useState(false);
+    const [debouncedCode, setDebouncedCode] = useState(code);
 
     useEffect(() => {
-        if (codeRef.current) {
-            hljs.highlightElement(codeRef.current)
-        }
-    }, [])
+        const timeout = setTimeout(() => setDebouncedCode(code), 300);
+        return () => clearTimeout(timeout);
+    }, [code]);
+
+    const detectedLanguage = useMemo(() => getLanguage(debouncedCode), [debouncedCode]);
+
+    const handleExpandCode = useCallback(() => {
+        setIsCodeExpanded(prev => !prev);
+    }, []);
 
     return (
-        <pre
-            className={`${styles['code-block']} ${isCodeExpanded ? styles['code-block-expanded'] : ''}`}>
-            <code
-                className={`${styles['code-block__code']}`}
-                ref={codeRef}>
-                {code}
-            </code>
-            <div className={`${styles['code-block__expand']}`}>
-                <ExpandCodeSvg
-                    className={`${styles['code-block__expand-icon']}`}
-                    onClick={handleExpandCode}/>
+        <div
+            style={{maxHeight: isCodeExpanded ? 'none' : '37vh'}}
+            className={`${styles['code-block']}`}>
+            <div className={`${styles['code-block-wrapper']} ${isCodeExpanded ? styles['code-block-expanded'] : ''}`}>
+                <SyntaxHighlighter
+                    language={detectedLanguage}
+                    style={darcula}
+                    showLineNumbers={false}
+                    wrapLines={true}
+                    PreTag="pre"
+                    CodeTag="code"
+                >
+                    {code}
+                </SyntaxHighlighter>
             </div>
-        </pre>
+            <div className={styles['code-block__expand']}>
+                <ExpandCodeSvg className={styles['code-block__expand-icon']} onClick={handleExpandCode}/>
+            </div>
+        </div>
     );
 };
 

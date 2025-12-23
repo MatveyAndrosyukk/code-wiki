@@ -65,7 +65,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     const handleImageClick = useCallback((imageUrl: string) => {
         setOpenedImage(imageUrl)
-    }, [])
+    }, []);
 
     useEffect(() => {
         if (!file) return;
@@ -87,6 +87,17 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             setIsLiked(isLikedValue)
         })
     }, [file])
+
+    const parseFileTextToHTMLMemo = useCallback(
+        (content: string, onImageClick: (url: string) => void) =>
+            parseFileTextToHTML(content, onImageClick),
+        []
+    );
+
+    const contentElements = useMemo(() => {
+        if (!file?.content) return [];
+        return parseFileTextToHTML(file.content, handleImageClick);
+    }, [file?.content, handleImageClick]);
 
     const {
         isEditing,
@@ -202,7 +213,6 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     }
 
     const pathToFile = findPathToFile(files, file.id)?.join('/')
-    const contentElements = parseFileTextToHTML(file.content, handleImageClick)
 
     return (
         <div className={styles['openedFile']}>
@@ -282,7 +292,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                     file={file}
                     onSaveEditedFileChanges={handleSaveEditedFileChanges}
                     onCancelEditedFileChange={handleCancelEditedFileChanges}
-                    parseFileTextToHTML={parseFileTextToHTML}
+                    parseFileTextToHTML={parseFileTextToHTMLMemo}
                     onImageClick={handleImageClick}
                 />
             ) : (

@@ -1,21 +1,41 @@
 .code-block {
-  max-height: 500px;
   min-width: 0;
   overflow-y: auto;
+  overflow-x: auto;
   border-radius: 6px;
   scrollbar-width: thin;
   scrollbar-color: #8D9191 #191A1A;
   position: relative;
 
-  &-expanded {
-    max-height: none;
+  &-wrapper {
+    position: relative;
+    max-height: inherit;
+
+    &.code-block-expanded {
+      max-height: none;
+    }
   }
 
-  &__code {
-    display: block;
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow-wrap: break-word;
+  & pre {
+    margin: 0 !important;
+    padding: 1em !important;
+    background: #191A1A !important;
+    border-radius: 6px !important;
+    font-family: "Fira Code", monospace !important;
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+    max-height: inherit;
+    overflow: visible !important;
+  }
+
+  & code {
+    background: #191A1A !important;
+    display: block !important;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   &__expand {
@@ -31,6 +51,7 @@
     position: absolute;
     top: 8px;
     right: 7px;
+    z-index: 10;
 
     &:hover {
       background-color: #202222;

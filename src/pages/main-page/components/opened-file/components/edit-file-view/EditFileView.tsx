@@ -27,7 +27,9 @@ interface EditFileViewProps {
         onSuccess: () => void) => void;
     parseFileTextToHTML: (
         content: string,
-        onImageClick: (imageUrl: string) => void | null) => React.ReactNode[];
+        onImageClick: (imageUrl: string) => void | null,
+        isFileTreeOpened: boolean) => React.ReactNode[],
+    isFileTreeOpened: boolean,
     onImageClick: (imageUrl: string) => void | null;
 }
 
@@ -37,7 +39,8 @@ const EditFileView: React.FC<EditFileViewProps> = (
         onSaveEditedFileChanges,
         onCancelEditedFileChange,
         parseFileTextToHTML,
-        onImageClick
+        onImageClick,
+        isFileTreeOpened,
     }
 ) => {
     const context = useContext(AppContext);
@@ -51,10 +54,10 @@ const EditFileView: React.FC<EditFileViewProps> = (
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            setPreviewContent(parseFileTextToHTML(textareaContent, onImageClick));
+            setPreviewContent(parseFileTextToHTML(textareaContent, onImageClick, isFileTreeOpened));
         }, 300);
         return () => clearTimeout(timeoutId);
-    }, [textareaContent, onImageClick, parseFileTextToHTML]);
+    }, [textareaContent, onImageClick, parseFileTextToHTML, isFileTreeOpened]);
 
     const {
         setIsFileContentChanged,

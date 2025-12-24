@@ -6,6 +6,7 @@
   scrollbar-width: thin;
   scrollbar-color: #8D9191 #191A1A;
   position: relative;
+  background: #191A1A !important;
 
   &-wrapper {
     position: relative;
@@ -51,7 +52,7 @@
     position: absolute;
     top: 8px;
     right: 7px;
-    z-index: 10;
+    z-index: 5;
 
     &:hover {
       background-color: #202222;

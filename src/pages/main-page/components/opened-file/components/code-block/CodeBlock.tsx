@@ -7,9 +7,14 @@ import {getLanguage} from "../../../../../../utils/functions/getLanguage";
 
 interface CodeBlockProps {
     code: string;
+    isFileTreeOpened: boolean;
 }
 
-const CodeBlock: FC<CodeBlockProps> = ({code}) => {
+const CodeBlock: FC<CodeBlockProps> = (
+    {
+        code,
+        isFileTreeOpened
+    }) => {
     const [isCodeExpanded, setIsCodeExpanded] = useState(false);
     const [debouncedCode, setDebouncedCode] = useState(code);
 
@@ -17,6 +22,10 @@ const CodeBlock: FC<CodeBlockProps> = ({code}) => {
         const timeout = setTimeout(() => setDebouncedCode(code), 300);
         return () => clearTimeout(timeout);
     }, [code]);
+
+    const maxHeight = isCodeExpanded
+        ? 'none'
+        : (isFileTreeOpened ? '21em' : '22em');
 
     const detectedLanguage = useMemo(() => getLanguage(debouncedCode), [debouncedCode]);
 
@@ -26,7 +35,7 @@ const CodeBlock: FC<CodeBlockProps> = ({code}) => {
 
     return (
         <div
-            style={{maxHeight: isCodeExpanded ? 'none' : '37vh'}}
+            style={{maxHeight}}
             className={`${styles['code-block']}`}>
             <div className={`${styles['code-block-wrapper']} ${isCodeExpanded ? styles['code-block-expanded'] : ''}`}>
                 <SyntaxHighlighter

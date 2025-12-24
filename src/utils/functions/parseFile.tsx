@@ -121,7 +121,8 @@ function parseInline(
 
 export function parseFileTextToHTML(
     file: string,
-    onImageClick: (imageUrl: string) => void | null
+    onImageClick: (imageUrl: string) => void | null,
+    isFileTreeOpened: boolean,
 ): ReactNode[] {
     const lines = file.split('\n');
 
@@ -145,7 +146,9 @@ export function parseFileTextToHTML(
             const codeText = codeLines.join('\n');
             elements.push(
                 <div key={`code-${i}`} className={styles['openedFile__content-code']}>
-                    <CodeBlock code={codeText}/>
+                    <CodeBlock
+                        code={codeText}
+                        isFileTreeOpened={isFileTreeOpened}/>
                 </div>
             );
             continue;

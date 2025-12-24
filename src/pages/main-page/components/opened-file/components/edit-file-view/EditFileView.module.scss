@@ -7,6 +7,9 @@
   flex-direction: column;
   flex: 1 1 auto;
   width: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #8D9191 #202222;
 
   &__header {
     height: 35px;
@@ -101,6 +104,8 @@
     font-size: 14px;
     line-height: 19px;
     color: #E8E8E6;
+    scrollbar-width: thin;
+    scrollbar-color: #8D9191 #202222;
   }
 
   &__preview {
@@ -124,7 +129,7 @@
     &-content {
       flex: 1 1 auto;
       overflow-y: auto;
-      padding: 12px;
+      padding: 12px 12px 0 12px;
       white-space: pre-wrap;
       word-wrap: break-word;
       overflow-wrap: break-word;

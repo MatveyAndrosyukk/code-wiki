@@ -2,8 +2,8 @@ import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, use
 import styles from './OpenedFile.module.scss'
 import emptyStyles from './EmplyFile.module.scss'
 import {ReactComponent as HeartBtn} from './images/opened-file-heart.svg'
+import {ReactComponent as LikedHeartBtn} from './images/opened-file-red-heart.svg'
 import {ReactComponent as BurgerSvg} from './images/empty-file-burger.svg'
-import {ReactComponent as LikeSvg} from './images/opened-file-like.svg';
 import {ReactComponent as EditFileSvg} from './images/opened-file-edit.svg'
 import {ReactComponent as DeleteFileSvg} from './images/opened-file-delete.svg'
 import {ReactComponent as OpenButtonsSvg} from './images/opened-file-open.svg'
@@ -46,12 +46,12 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = React.useState(false)
 
     useEffect(() => {
-        if (window.innerWidth <= 370) {
+        if (window.innerWidth <= 435) {
             setIsMobile(true)
         }
 
         const handleResize = () => {
-            if (window.innerWidth <= 370) {
+            if (window.innerWidth <= 435) {
                 setIsMobile(true)
             } else {
                 setIsMobile(false)
@@ -89,14 +89,16 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     }, [file])
 
     const parseFileTextToHTMLMemo = useCallback(
-        (content: string, onImageClick: (url: string) => void) =>
-            parseFileTextToHTML(content, onImageClick),
+        (content: string,
+         onImageClick: (url: string) => void,
+         isFileTreeOpened: boolean) =>
+            parseFileTextToHTML(content, onImageClick, isFileTreeOpened),
         []
     );
 
     const contentElements = useMemo(() => {
         if (!file?.content) return [];
-        return parseFileTextToHTML(file.content, handleImageClick);
+        return parseFileTextToHTML(file.content, handleImageClick, isFileTreeOpened);
     }, [file?.content, handleImageClick]);
 
     const {
@@ -221,7 +223,11 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                     <div className={styles['openedFile__likes']}>
                         <div
                             className={`${styles['openedFile__likes-amount']} ${styles[likesClass]}`}>{file.likes}</div>
-                        <HeartBtn/>
+                        {
+                            isLiked ?
+                                <LikedHeartBtn onClick={() => handleTryToLikeFile()}/> :
+                                <HeartBtn onClick={() => handleTryToLikeFile()}/>
+                        }
                     </div>
                     <div className={styles['openedFile__title']}>
                         <div className={styles['openedFile__title-email']}>{viewedUser?.email}</div>
@@ -232,11 +238,6 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 <div className={styles['openedFile__rightSide']}>
                     {isMobile ?
                         <div className={styles['buttons']}>
-                            <LikeSvg
-                                className={isLiked
-                                    ? `${styles['buttons-preview']} ${styles['buttons-preview-liked']}`
-                                    : `${styles['buttons-preview']}`}
-                                onClick={() => handleTryToLikeFile()}/>
                             <OpenButtonsSvg
                                 className={`${styles['buttons-open']}`}
                                 onClick={() => setIsBurgerMenuOpened(!isBurgerMenuOpened)}/>
@@ -251,13 +252,6 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                                 </div>}
                         </div> :
                         <div className={styles['links']}>
-                            <div
-                                onClick={() => handleTryToLikeFile()}
-                                className={styles['openedFile__like']}
-                                style={{color: isLiked ? 'rgb(129, 162, 190)' : '#8D9191'}}
-                            >
-                                Like
-                            </div>
                             {isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && (
                                 <div className={styles['openedFile__editAndDelete']}>
                                     <div
@@ -294,22 +288,19 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                     onCancelEditedFileChange={handleCancelEditedFileChanges}
                     parseFileTextToHTML={parseFileTextToHTMLMemo}
                     onImageClick={handleImageClick}
+                    isFileTreeOpened={isFileTreeOpened}
                 />
             ) : (
                 <div className={styles['openedFile__content']}>{contentElements}</div>
             )}
-            {
-                !isEditing && (
-                    <div className={styles['openedFile__footer']}>
-                        Last edited by:
-                        <span
-                            onClick={() => handleGoToUsersPage(file.lastEditor)}
-                            className={styles['openedFile__editor']}>
+            <div className={styles['openedFile__footer']}>
+                Last edited by:
+                <span
+                    onClick={() => handleGoToUsersPage(file.lastEditor)}
+                    className={styles['openedFile__editor']}>
                             {file.lastEditor}
                         </span>
-                    </div>
-                )
-            }
+            </div>
             <div
                 style={{display: isFileTreeOpened ? 'none' : 'flex'}}
                 className={emptyStyles['fileTree']}

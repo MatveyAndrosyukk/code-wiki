@@ -16,6 +16,7 @@ import {uploadImageAsync} from "../../../../../../services/uploadImageAsync";
 import {AppContext} from "../../../../../../context/AppContext";
 import extractImagesName from "../../../../../../utils/functions/extractImageNames";
 import {isUserAdminOrOwner} from "../../../../../../utils/functions/permissions-utils/isUserAdminOrOwner";
+import {useDebouncedValue} from "../../../../../../utils/hooks/useDebouncedValue";
 
 interface EditFileViewProps {
     file: CreateFilePayload;
@@ -53,13 +54,11 @@ const EditFileView: React.FC<EditFileViewProps> = (
     const [addedImagesWhileEditing, setAddedImagesWhileEditing] = useState<string[]>([]);
     const [amountOfImagesInTextArea, setAmountOfImagesInTextArea] = useState<string[]>([]);
     const [previewContent, setPreviewContent] = useState<React.ReactNode>([]);
+    const debouncedTextareaContent = useDebouncedValue(textareaContent, 300);
 
     useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            setPreviewContent(parseFileTextToHTML(textareaContent, onImageClick, isFileTreeOpened));
-        }, 300);
-        return () => clearTimeout(timeoutId);
-    }, [textareaContent, onImageClick, parseFileTextToHTML, isFileTreeOpened]);
+        setPreviewContent(parseFileTextToHTML(debouncedTextareaContent, onImageClick, isFileTreeOpened));
+    }, [debouncedTextareaContent, onImageClick, parseFileTextToHTML, isFileTreeOpened]);
 
     const {
         contentError,
@@ -72,8 +71,9 @@ const EditFileView: React.FC<EditFileViewProps> = (
     }, [file.content]);
 
     useEffect(() => {
-        setAmountOfImagesInTextArea(extractImagesName(textareaContent));
-    }, [textareaContent]);
+        const images = extractImagesName(debouncedTextareaContent);
+        setAmountOfImagesInTextArea(images);
+    }, [debouncedTextareaContent]);
 
     useEffect(() => {
         setTextareaContent(file.content);
@@ -86,17 +86,19 @@ const EditFileView: React.FC<EditFileViewProps> = (
 
     useEffect(() => {
         const currentLength = textareaContent.length;
+        const imagesLength = amountOfImagesInTextArea.length;
+
         if (currentLength > 65000 && !isUserAdminOrOwner(loggedInUser)) {
             setContentError(`Your note is too long (${currentLength}/65000).`);
             return;
         }
 
-        if (amountOfImagesInTextArea.length > 5 && !isUserAdminOrOwner(loggedInUser)) {
-            setContentError(`You have inserted too many pictures (${amountOfImagesInTextArea.length}/5).`);
+        if (imagesLength > 5 && !isUserAdminOrOwner(loggedInUser)) {
+            setContentError(`You have inserted too many pictures (${imagesLength}/5).`);
         } else {
             setContentError('');
         }
-    }, [amountOfImagesInTextArea.length, loggedInUser, setContentError, textareaContent.length]);
+    }, [textareaContent.length, amountOfImagesInTextArea.length, loggedInUser, setContentError]);
 
     const pasteTag = useCallback((tag: string) => {
         const textarea = textareaRef.current;

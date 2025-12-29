@@ -17,12 +17,14 @@ export async function performLoginAsync(email: string, password: string): Promis
         const errorData = await response.json().catch(() => null);
         console.log(errorData)
         const message = errorData?.message;
-        if (message === 'This email is not registered') {
+        if (message[0] === 'Incorrect email address') {
             throw new Error('Incorrect email address');
-        } else if (message === 'This email address is banned') {
-            throw new Error('This email address is banned');
+        } else if (message[0] === 'User is banned') {
+            throw new Error('Your account was banned');
+        } else if (message[0] === 'Password is incorrect'){
+            throw new Error('Incorrect password');
         }
-        throw new Error('Incorrect password');
+        throw new Error('Incorrect email or password');
     }
 
     return response.json();

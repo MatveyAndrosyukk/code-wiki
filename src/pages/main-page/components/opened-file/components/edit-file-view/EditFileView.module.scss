@@ -80,7 +80,6 @@
   &__body {
     display: flex;
     flex-direction: column;
-    gap: 16px;
     flex: 1 1 auto;
     @media (max-width: 425px) {
       margin-top: 3px;
@@ -106,6 +105,15 @@
     color: #E8E8E6;
     scrollbar-width: thin;
     scrollbar-color: #8D9191 #202222;
+  }
+
+  &__error {
+    color: #FFB4AD;
+    font-size: 13px;
+    align-self: flex-start;
+    height: 18px;
+    margin-left: 12px;
+    margin-top: 10px;
   }
 
   &__preview {

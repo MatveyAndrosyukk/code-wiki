@@ -55,7 +55,7 @@ const VirtualizedRow: React.FC<VirtualizedRowProps> = ({
     return (
         <div
             className={styles['file-list__node']}
-            style={{ paddingLeft: `${depth * 22}px` }}
+            style={{ paddingLeft: `${(depth - 1) * 22}px` }}
             key={file.id}
         >
             <div className={styles['file-list__node-container']}>

@@ -15,6 +15,7 @@ import {CreateFilePayload} from "../../../../../../store/thunks/files/createFile
 import {uploadImageAsync} from "../../../../../../services/uploadImageAsync";
 import {AppContext} from "../../../../../../context/AppContext";
 import extractImagesName from "../../../../../../utils/functions/extractImageNames";
+import {isUserAdminOrOwner} from "../../../../../../utils/functions/permissions-utils/isUserAdminOrOwner";
 
 interface EditFileViewProps {
     file: CreateFilePayload;
@@ -45,11 +46,12 @@ const EditFileView: React.FC<EditFileViewProps> = (
 ) => {
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
-    const {fileState} = context;
+    const {fileState, loggedInUser} = context;
     const [textareaContent, setTextareaContent] = useState(file.content);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [addedImagesWhileEditing, setAddedImagesWhileEditing] = useState<string[]>([]);
+    const [amountOfImagesInTextArea, setAmountOfImagesInTextArea] = useState<string[]>([]);
     const [previewContent, setPreviewContent] = useState<React.ReactNode>([]);
 
     useEffect(() => {
@@ -60,7 +62,9 @@ const EditFileView: React.FC<EditFileViewProps> = (
     }, [textareaContent, onImageClick, parseFileTextToHTML, isFileTreeOpened]);
 
     const {
+        contentError,
         setIsFileContentChanged,
+        setContentError,
     } = fileState
 
     useEffect(() => {
@@ -68,13 +72,31 @@ const EditFileView: React.FC<EditFileViewProps> = (
     }, [file.content]);
 
     useEffect(() => {
+        setAmountOfImagesInTextArea(extractImagesName(textareaContent));
+    }, [textareaContent]);
+
+    useEffect(() => {
         setTextareaContent(file.content);
         setIsFileContentChanged(false);
-    }, [file.content, file.id, setIsFileContentChanged]);
+    }, [file.content, setIsFileContentChanged]);
 
     useEffect(() => {
         textareaRef.current?.focus();
     }, []);
+
+    useEffect(() => {
+        const currentLength = textareaContent.length;
+        if (currentLength > 65000 && !isUserAdminOrOwner(loggedInUser)) {
+            setContentError(`Your note is too long (${currentLength}/65000).`);
+            return;
+        }
+
+        if (amountOfImagesInTextArea.length > 5 && !isUserAdminOrOwner(loggedInUser)) {
+            setContentError(`You have inserted too many pictures (${amountOfImagesInTextArea.length}/5).`);
+        } else {
+            setContentError('');
+        }
+    }, [amountOfImagesInTextArea.length, loggedInUser, setContentError, textareaContent.length]);
 
     const pasteTag = useCallback((tag: string) => {
         const textarea = textareaRef.current;
@@ -105,6 +127,10 @@ const EditFileView: React.FC<EditFileViewProps> = (
     }, [setTextareaContent, setIsFileContentChanged, textareaRef]);
 
     const handleSelectImage = useCallback(async (file: File) => {
+        if (contentError.includes("You have inserted too many pictures")) {
+            return;
+        }
+
         try {
             const data = await uploadImageAsync(file);
             if (data && data.fileName) {
@@ -114,7 +140,7 @@ const EditFileView: React.FC<EditFileViewProps> = (
         } catch (error) {
             console.error("Failed to upload image:", error);
         }
-    }, [pasteTag]);
+    }, [contentError, pasteTag]);
 
     const handleOpenFileDialog = useCallback(() => {
         fileInputRef.current?.click();
@@ -267,6 +293,7 @@ const EditFileView: React.FC<EditFileViewProps> = (
                     value={textareaContent}
                     onChange={handleChangeTextareaContent}
                 />
+                <div className={styles['editFileView__error']}>{contentError}</div>
                 <div className={styles['editFileView__preview']}>
                     <div className={styles['editFileView__preview-title']}>Preview</div>
                     <div

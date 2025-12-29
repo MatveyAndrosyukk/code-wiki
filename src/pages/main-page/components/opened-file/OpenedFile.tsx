@@ -99,10 +99,11 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const contentElements = useMemo(() => {
         if (!file?.content) return [];
         return parseFileTextToHTML(file.content, handleImageClick, isFileTreeOpened);
-    }, [file?.content, handleImageClick]);
+    }, [file?.content, handleImageClick, isFileTreeOpened]);
 
     const {
         isEditing,
+        contentError,
         setIsEditing,
         setIsFileContentChanged,
         handleLikeFile,
@@ -117,22 +118,32 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const handleSaveEditedFileChanges = useCallback(async (
         newContent: string,
         addedImages: string[],
-        onSuccess: () => void) => {
-        if (!file) return
+        onSuccess: () => void
+    ) => {
+        if (!file) return;
+        if (contentError) return;
 
-        dispatch(updateFileContent({id: file.id as number, content: newContent, editor: loggedInUser?.email}))
+        try {
+            await dispatch(updateFileContent({
+                id: file.id as number,
+                content: newContent,
+                editor: loggedInUser?.email
+            })).unwrap();
 
-        if (addedImages.length > 0) {
-            const savedImages: string[] = extractImagesName(newContent);
+            const savedImages = extractImagesName(newContent);
             const extraImages = addedImages.filter(image => !savedImages.includes(image));
-            await deleteExtraImagesAsync(extraImages);
+
+            if (extraImages.length > 0) {
+                await deleteExtraImagesAsync(extraImages);
+            }
+
+            setIsEditing(false);
+            setIsFileContentChanged(false);
+            onSuccess();
+        } catch (error) {
+            console.error('Ошибка сохранения:', error);
         }
-
-        setIsEditing(false)
-        setIsFileContentChanged(false)
-
-        onSuccess();
-    }, [dispatch, file, loggedInUser?.email, setIsEditing, setIsFileContentChanged])
+    }, [contentError, dispatch, file, loggedInUser?.email, setIsEditing, setIsFileContentChanged]);
 
     const handleCancelEditedFileChanges = useCallback(async (
         addedImages: string[],

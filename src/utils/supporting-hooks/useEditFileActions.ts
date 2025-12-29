@@ -9,8 +9,10 @@ export interface EditFileViewState {
     setIsFileContentChanged: Dispatch<SetStateAction<boolean>>;
     isTryToSwitchWhileEditing: boolean;
     setIsTryToSwitchWhileEditing: Dispatch<SetStateAction<boolean>>;
-    switchedFileId: number | null
-    setSwitchedFileId: Dispatch<SetStateAction<number | null>>
+    switchedFileId: number | null;
+    setSwitchedFileId: Dispatch<SetStateAction<number | null>>;
+    contentError: string;
+    setContentError: Dispatch<SetStateAction<string>>;
     handleTryToOpenFile: (targetFileId: number | null) => void;
     handleRejectSwitch: () => void;
     handleConfirmSwitch: () => void;
@@ -22,6 +24,7 @@ export default function useEditFileActions(): EditFileViewState {
     const [isFileContentChanged, setIsFileContentChanged] = useState<boolean>(false);
     const [isTryToSwitchWhileEditing, setIsTryToSwitchWhileEditing] = useState<boolean>(false);
     const [switchedFileId, setSwitchedFileId] = useState<number | null>(null);
+    const [contentError, setContentError] = useState<string>('');
 
     const handleTryToOpenFile = useCallback((targetFileId: number | null) => {
         if (isEditing && isFileContentChanged) {
@@ -60,6 +63,8 @@ export default function useEditFileActions(): EditFileViewState {
         setIsTryToSwitchWhileEditing,
         switchedFileId,
         setSwitchedFileId,
+        contentError,
+        setContentError,
         handleTryToOpenFile,
         handleRejectSwitch,
         handleConfirmSwitch

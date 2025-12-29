@@ -52,14 +52,14 @@ const LoginModal: FC = () => {
                             className={`${styles['modal__switch']}`}
                             onClick={handleSwitchAuthorization}/>
                     </div>
-                    <p className={
+                    <div className={
                         loginMessage || registerMessage
                             ? modalStyles.modal__message
                             : (loginError || registerError)
                                 ? modalStyles.modal__error
                                 : `${modalStyles.modal__message} ${modalStyles.hidden}`
                     }>
-                        {loginMessage || registerMessage || loginError || registerError}</p>
+                        {loginMessage || registerMessage || loginError || registerError}</div>
                     <input
                         ref={loginModalInputRef}
                         type='text'

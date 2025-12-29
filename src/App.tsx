@@ -9,10 +9,11 @@ function App() {
         <Router>
             <Routes>
                 <Route path="/" element={<MainPageWrapper/>}/>
-                <Route path="/:email" element={<MainPageWrapper/>}/>
                 <Route path="/verify" element={<VerifyPage/>}/>
                 <Route path="/resetPassword" element={<MainPageWrapper/>}/>
+                <Route path="/:email" element={<MainPageWrapper/>}/>
             </Routes>
+
         </Router>
     );
 }

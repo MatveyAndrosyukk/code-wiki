@@ -25,7 +25,13 @@ export const addUserWhoCanEdit = createAsyncThunk<User, UserWhoCanEditPayload>(
         );
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || JSON.stringify(errorData));
+            console.log(errorData.message);
+            if (errorData.message.includes('User with email')) {
+                throw new Error('User does not exists');
+            }else {
+                throw new Error(errorData.message || JSON.stringify(errorData));
+            }
+
         }
         return await response.json();
     }

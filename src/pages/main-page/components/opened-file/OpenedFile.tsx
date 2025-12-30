@@ -189,6 +189,16 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         return navigate(`/${encodeURIComponent(user as string)}`)
     }, [navigate])
 
+    const handleOpenEditionMode = useCallback(() => {
+        setIsEditing(true);
+        setIsBurgerMenuOpened(false);
+    }, [setIsEditing])
+
+    const handleDeleteFile = useCallback((file: File) => {
+        handleOpenDeleteModal(file, viewedUser)
+        setIsBurgerMenuOpened(false);
+    }, [handleOpenDeleteModal, viewedUser])
+
     if (!file) {
         return (
             <div className={styles['openedFile']}>
@@ -247,38 +257,52 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                     </div>
                 </div>
                 <div className={styles['openedFile__rightSide']}>
-                    {isMobile ?
+                    {isMobile ? (
                         <div className={styles['buttons']}>
                             <OpenButtonsSvg
                                 className={`${styles['buttons-open']}`}
                                 onClick={() => setIsBurgerMenuOpened(!isBurgerMenuOpened)}/>
-                            {isBurgerMenuOpened &&
+                            {isBurgerMenuOpened && !isEditing && (
                                 <div className={styles['buttons-menu']}>
                                     <EditFileSvg
                                         className={`${styles['buttons-menu-item']}`}
-                                        onClick={() => setIsEditing(true)}/>
+                                        onClick={() => handleOpenEditionMode()}/>
                                     <DeleteFileSvg
                                         className={`${styles['buttons-menu-item']}`}
-                                        onClick={() => handleOpenDeleteModal(file, viewedUser)}/>
-                                </div>}
-                        </div> :
+                                        onClick={() => handleDeleteFile(file)}/>
+                                </div>
+                            )}
+                            {isBurgerMenuOpened && isEditing && (
+                                <div className={styles['buttons-menu']}>
+                                    <DeleteFileSvg
+                                        className={`${styles['buttons-menu-item']}`}
+                                        onClick={() => handleDeleteFile(file)}/>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
                         <div className={styles['links']}>
                             {isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && (
-                                <div className={styles['openedFile__editAndDelete']}>
-                                    <div
-                                        className={styles['openedFile__edit']}
-                                        onClick={() => setIsEditing(true)}
-                                    >
-                                        Edit
-                                    </div>
+                                <div
+                                    className={styles['openedFile__editAndDelete']}>
+                                    {!isEditing && (
+                                        <div
+                                            className={styles['openedFile__edit']}
+                                            onClick={() => setIsEditing(true)}
+                                        >
+                                            Edit
+                                        </div>
+                                    )}
                                     <div
                                         onClick={() => handleOpenDeleteModal(file, viewedUser)}
-                                        className={styles['openedFile__delete']}>
+                                        className={styles['openedFile__delete']}
+                                    >
                                         Delete
                                     </div>
                                 </div>
                             )}
-                        </div>}
+                        </div>
+                    )}
                 </div>
             </div>
 

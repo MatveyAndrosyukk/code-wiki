@@ -289,12 +289,12 @@ const EditFileView: React.FC<EditFileViewProps> = (
                 </div>
             </div>
             <div className={styles['editFileView__body']}>
-                <textarea
-                    ref={textareaRef}
-                    className={styles['editFileView__textarea']}
-                    value={textareaContent}
-                    onChange={handleChangeTextareaContent}
-                />
+                    <textarea
+                        ref={textareaRef}
+                        className={styles['editFileView__textarea']}
+                        value={textareaContent}
+                        onChange={handleChangeTextareaContent}
+                    />
                 <div className={styles['editFileView__error']}>{contentError}</div>
                 <div className={styles['editFileView__preview']}>
                     <div className={styles['editFileView__preview-title']}>Preview</div>

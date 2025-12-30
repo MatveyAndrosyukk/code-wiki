@@ -154,21 +154,26 @@ const UserModal: FC<LoginModalProps> = (
                             />
                         </div>
                     </div>
-                    <div className={styles['modal__permission']}>
-                        <input
-                            ref={userModalInputRef}
-                            type="text"
-                            className={`${styles['modal__input']} ${styles['modal__permission-input']}`}
-                            placeholder={isScreenSmall ? 'Permit edition by email' : 'Email'}
-                            value={userModalValue}
-                            onChange={(e) => setUserModalValue(e.target.value)}
-                        />
-                        <button
-                            className={styles['modal__button']}
-                            onClick={handleAddUserWhoCanEdit}
-                        >
-                            {isScreenSmall ? 'Permit' : 'Permit edition'}
-                        </button>
+                    <div className={styles['modal__editors-manager']}>
+                        <div className={styles['editors-manager__title']}>
+
+                        </div>
+                        <div className={styles['editors-manager__body']}>
+                            <input
+                                ref={userModalInputRef}
+                                type="text"
+                                className={`${styles['modal__input']} ${styles['editors-manager-input']}`}
+                                placeholder='Permit edition by email'
+                                value={userModalValue}
+                                onChange={(e) => setUserModalValue(e.target.value)}
+                            />
+                            <button
+                                className={styles['editors-manager-button']}
+                                onClick={handleAddUserWhoCanEdit}
+                            >
+                                Permit
+                            </button>
+                        </div>
                     </div>
                     {addEditorError ? (
                         <p className={`${styles['modal__name-symbol-error']} ${styles['modal__email-error']}`}>
@@ -179,29 +184,29 @@ const UserModal: FC<LoginModalProps> = (
                             User with this email does not exist
                         </p>)}
                     <div
-                        className={styles['modal__users']}
+                        className={styles['modal__editors']}
                         style={usersWhoCanEdit.length > 3 ? {overflowY: "auto"} : {overflowY: "hidden"}}>
                         {usersWhoCanEdit.map((user: User) => (
                             <div
                                 key={user.email}
-                                className={styles['modal__user']}
+                                className={styles['editor']}
                                 onClick={() => handleGoToUsersPage(user)}>
-                                <div className={styles['modal__user-left']}>
-                                    <div className={styles['modal__user-name']}>
-                                        <div className={styles['modal__user-name-text']}>
-                                            {user.name}
-                                        </div>
-                                        <div className={styles['modal__user-email']}>
-                                            {`(${user.email})`}
-                                        </div>
+                                <div className={styles['editor__left']}>
+                                    <div className={styles['editor__left-name']}>
+                                        {user.name}
+                                    </div>
+                                    <div className={styles['editor__left-email']}>
+                                        {`(${user.email})`}
                                     </div>
                                 </div>
-                                <img
-                                    alt={'Delete this user'}
-                                    onClick={(event) => handleDeleteUserWhoCanEdit(user.email, event)}
-                                    src={DeleteUserSvg}
-                                    className={styles['modal__user-delete']}>
-                                </img>
+                                <div className={styles['editor__right']}>
+                                    <img
+                                        alt={'Delete this user'}
+                                        onClick={(event) => handleDeleteUserWhoCanEdit(user.email, event)}
+                                        src={DeleteUserSvg}
+                                        className={styles['editor__right-delete']}>
+                                    </img>
+                                </div>
                             </div>
                         ))}
                     </div>

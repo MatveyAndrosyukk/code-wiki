@@ -19,6 +19,7 @@ import EnterEmailModal from "../../ui-components/enter-email-modal/EnterEmailMod
 import ResetPasswordModal from "../../ui-components/reset-password-modal/ResetPasswordModal";
 import {isUserOwner} from "../../utils/functions/permissions-utils/isUserOwner";
 import BanModal from "../../ui-components/ban-modal/BanModal";
+import findPathToFile from "../../utils/functions/findFilePath";
 
 interface MainPageProps {
     emailParam?: string | undefined;
@@ -29,7 +30,7 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
     const dispatch = useDispatch<AppDispatch>();
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
-    const {viewedUser, loggedInUser, authState} = context;
+    const {viewedUser, loggedInUser, authState, files} = context;
     const openedFile = useSelector((state: RootState) => findOpenedFile(state.fileTree.files));
     const authorizedUserEmail = localStorage.getItem('email');
     const currentUserEmail = emailParam || authorizedUserEmail;
@@ -109,12 +110,12 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
     }, [viewedUser, dispatch, loggedInUser?.email]);
 
     useEffect(() => {
-        if (viewedUser) {
-            document.title = `DocuWiki - ${viewedUser.email}`;
-        } else {
-            document.title = 'DocuWiki';
+        if (openedFile) {
+            document.title = findPathToFile(files, openedFile.id)?.join('/') as string
+        }else {
+            document.title = "DocuWiki"
         }
-    }, [viewedUser]);
+    }, [files, openedFile]);
 
     return (
         <div className={styles['main']}>

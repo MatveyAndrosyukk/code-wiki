@@ -12,13 +12,17 @@
   scrollbar-color: #8D9191 #202222;
 
   &__header {
-    height: 35px;
+    min-height: 35px;
     display: flex;
+    height: 35px;
+    flex-shrink: 0;
+    align-items: center;
     justify-content: space-between;
 
-    @media (max-width: 425px) {
+    @media (max-width: 435px) {
       flex-direction: column;
       align-items: flex-start;
+      height: 43px;
     }
 
     &-edit {
@@ -26,6 +30,7 @@
       align-items: center;
       justify-content: center;
       gap: 13px;
+      height: 21px;
       padding-left: 9px;
 
       div {
@@ -52,9 +57,14 @@
       font-size: 12px;
       gap: 7px;
       margin-right: 7px;
+      position: absolute;
+      right: 9px;
 
-      @media (max-width: 425px) {
+      @media (max-width: 435px) {
         margin-left: 11px;
+        position: relative;
+        right: 0;
+        margin-bottom: 4px;
       }
     }
 

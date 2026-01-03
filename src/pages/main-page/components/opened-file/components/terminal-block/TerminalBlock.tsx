@@ -11,7 +11,7 @@ const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
 
     return (
         <pre className={styles['terminal-block']}>
-            <div className={styles['terminal-block-header']}>
+            <div className={styles['terminal-block-title']}>
                 Terminal
             </div>
             {lines.map((line, i) => {

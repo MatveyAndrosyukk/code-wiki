@@ -5,6 +5,11 @@
     font-size: 13px;
     margin-bottom: 9px;
     align-self: flex-start;
+    text-align: left;
+    justify-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
   }
 
   &__buttons {

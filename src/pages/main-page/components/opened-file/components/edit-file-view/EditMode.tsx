@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
-import styles from './EditFileView.module.scss';
+import styles from './EditMode.module.scss';
 import {ReactComponent as BoldImage} from './images/edit-file-view__bold.svg'
 import {ReactComponent as ItalicImage} from './images/edit-file-view__italic.svg'
 import {ReactComponent as UnderlinedImage} from './images/edit-file-view__underlined.svg'
@@ -35,7 +35,7 @@ interface EditFileViewProps {
     onImageClick: (imageUrl: string) => void | null;
 }
 
-const EditFileView: React.FC<EditFileViewProps> = (
+const EditMode: React.FC<EditFileViewProps> = (
     {
         file,
         onSaveEditedFileChanges,
@@ -193,9 +193,9 @@ const EditFileView: React.FC<EditFileViewProps> = (
     }, [setTextareaContent, setIsFileContentChanged, textareaRef]);
 
     return (
-        <div className={styles['editFileView']}>
-            <div className={styles['editFileView__header']}>
-                <div className={styles['editFileView__header-edit']}>
+        <div className={styles['edit-mode']}>
+            <div className={styles['edit-mode__header']}>
+                <div className={styles['header__edit-buttons']}>
                     <div
                         title='Bold'
                         onClick={() => {
@@ -272,9 +272,9 @@ const EditFileView: React.FC<EditFileViewProps> = (
                         onChange={changeFileHandler}
                     />
                 </div>
-                <div className={styles['editFileView__header-buttons']}>
+                <div className={styles['header__action-buttons']}>
                     <button
-                        className={styles['editFileView__header-save']}
+                        className={styles['header__action-buttons-save']}
                         onClick={() => onSaveEditedFileChanges(
                             textareaContent,
                             addedImagesWhileEditing,
@@ -284,22 +284,22 @@ const EditFileView: React.FC<EditFileViewProps> = (
                         onClick={() => onCancelEditedFileChange(
                             addedImagesWhileEditing,
                             () => setAddedImagesWhileEditing([]))}
-                        className={styles['editFileView__header-cancel']}>Cancel
+                        className={styles['header__action-buttons-cancel']}>Cancel
                     </button>
                 </div>
             </div>
-            <div className={styles['editFileView__body']}>
+            <div className={styles['edit-mode__body']}>
                     <textarea
                         ref={textareaRef}
-                        className={styles['editFileView__textarea']}
+                        className={styles['body__textarea']}
                         value={textareaContent}
                         onChange={handleChangeTextareaContent}
                     />
-                <div className={styles['editFileView__error']}>{contentError}</div>
-                <div className={styles['editFileView__preview']}>
-                    <div className={styles['editFileView__preview-title']}>Preview</div>
+                <div className={styles['edit-mode__error']}>{contentError}</div>
+                <div className={styles['body__preview']}>
+                    <div className={styles['body__preview-title']}>Preview</div>
                     <div
-                        className={styles['editFileView__preview-content']}>{previewContent}</div>
+                        className={styles['body__preview-content']}>{previewContent}</div>
                 </div>
             </div>
             <SwitchWhileEditModal
@@ -310,4 +310,4 @@ const EditFileView: React.FC<EditFileViewProps> = (
     );
 };
 
-export default EditFileView;
+export default EditMode;

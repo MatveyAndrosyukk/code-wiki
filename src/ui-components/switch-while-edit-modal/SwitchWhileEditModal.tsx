@@ -43,9 +43,8 @@ const SwitchWhileEditModal: FC<SwitchWhileEditModalProps> = (
                     <p
                         className={`${modalStyles['modal__title']} ${styles['modal__title']}`}
                     >
-                        Are you sure that you want to open another file?
-                        <br/>
-                        You will lose all your unsaved changes.
+                        <div>Are you sure that you want to open another file?</div>
+                        <div>You will lose all your unsaved changes.</div>
                     </p>
                     <div className={modalStyles['modal__buttons']}>
                         <button

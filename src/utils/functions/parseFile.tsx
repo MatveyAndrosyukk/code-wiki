@@ -58,7 +58,7 @@ function parseInline(
             const innerContent = match[2];
             const children = parseInline(innerContent, onImageClick);
             parts.push(
-                <a key={index} className={styles['openedFile__content-link']} href={href} target="_blank"
+                <a key={index} className={styles['opened-file__content-link']} href={href} target="_blank"
                    rel="noopener noreferrer">
                     {children}
                 </a>
@@ -71,13 +71,13 @@ function parseInline(
             let className = '';
             switch (tag) {
                 case 'u':
-                    className = styles['openedFile__content-underline'];
+                    className = styles['opened-file__content--underline'];
                     break;
                 case 'b':
-                    className = styles['openedFile__content-bold'];
+                    className = styles['opened-file__content--bold'];
                     break;
                 case 'i':
-                    className = styles['openedFile__content-italic'];
+                    className = styles['opened-file__content--italic'];
                     break;
             }
 
@@ -102,7 +102,7 @@ function parseInline(
             const innerContent = match[1];
             const children = parseInline(innerContent, onImageClick);
             parts.push(
-                <span key={index} className={styles['openedFile__content-spanCode']}>
+                <span key={index} className={styles['opened-file__content-span-code']}>
             {children}
         </span>
             );
@@ -145,7 +145,7 @@ export function parseFileTextToHTML(
 
             const codeText = codeLines.join('\n');
             elements.push(
-                <div key={`code-${i}`} className={styles['openedFile__content-code']}>
+                <div key={`code-${i}`} className={styles['opened-file__content-code']}>
                     <CodeBlock
                         code={codeText}
                         isFileTreeOpened={isFileTreeOpened}/>
@@ -164,7 +164,7 @@ export function parseFileTextToHTML(
             i++;
 
             elements.push(
-                <div key={`terminal-${i}`} className={styles['openedFile__content-terminal']}>
+                <div key={`terminal-${i}`} className={styles['opened-file__content-terminal']}>
                     <TerminalBlock commands={terminalLines.join('\n')}/>
                 </div>
             );
@@ -173,7 +173,7 @@ export function parseFileTextToHTML(
 
         if (line === '[`l`]') {
             elements.push(
-                <div key={`line-${i}`} className={styles['openedFile__content-line']}/>
+                <div key={`line-${i}`} className={styles['opened-file__content-line']}/>
             );
             i++;
             continue;
@@ -188,7 +188,7 @@ export function parseFileTextToHTML(
             }
             i++;
             elements.push(
-                <div key={`point-${i}`} className={styles['openedFile__content-point']}>
+                <div key={`point-${i}`} className={styles['opened-file__content-point']}>
                     {pointLines.join('\n')}
                 </div>
             );
@@ -197,7 +197,7 @@ export function parseFileTextToHTML(
 
         if (line.length > 0) {
             elements.push(
-                <div key={`text-${i}`} className={styles['openedFile__content-text']}>
+                <div key={`text-${i}`} className={styles['opened-file__content-text']}>
                     {parseInline(line, onImageClick)}
                 </div>
             );

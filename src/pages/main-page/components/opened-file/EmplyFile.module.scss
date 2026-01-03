@@ -1,4 +1,4 @@
-.emptyFile {
+.empty-file {
   &__content {
     padding: 0 9px;
     height: calc(100% - 31px);
@@ -7,7 +7,7 @@
     justify-content: center;
   }
 
-  &__bookWrapper {
+  &__book-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -27,13 +27,14 @@
   }
 }
 
-.book-svg {
-  width: 200px;
-  height: 200px;
-  perspective: 600px;
+.book-wrapper {
+  &__svg{
+    width: 200px;
+    height: 200px;
+    perspective: 600px;
+  }
 
-  .book-left,
-  .book-right {
+  &__right, &__left {
     transform-origin: 11px 12px;
     animation-duration: 2s;
     animation-timing-function: ease-in-out;
@@ -41,12 +42,12 @@
     animation-direction: alternate;
   }
 
-  .book-left {
-    animation-name: openLeft;
+  &__right {
+    animation-name: openRight;
   }
 
-  .book-right {
-    animation-name: openRight;
+  &__left{
+    animation-name: openLeft;
   }
 }
 
@@ -68,7 +69,7 @@
   }
 }
 
-.fileTree {
+.file-tree {
   width: 30px;
   height: 30px;
   background-color: #202222;

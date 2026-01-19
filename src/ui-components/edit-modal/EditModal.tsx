@@ -53,8 +53,8 @@ const EditModal: FC = () => {
                     ) : (
                         <p className={`${modalStyles['modal__error']} ${styles['edit-modal__error']}`}>
                             {copiedFile?.type === FileType.Folder
-                                ? "Folder with this name exists:"
-                                : "File with this name exists:"}
+                                ? "Folder with this name exists"
+                                : "File with this name exists"}
                         </p>
                     ) :
                     (
@@ -65,8 +65,8 @@ const EditModal: FC = () => {
                         ) : (
                             <p className={`${modalStyles['modal__error']} ${styles['edit-modal__error']} ${modalStyles['modal__hidden']}`}>
                                 {copiedFile?.type === FileType.Folder
-                                    ? "Folder with this name exists:"
-                                    : "File with this name exists:"}
+                                    ? "Folder with this name exists"
+                                    : "File with this name exists"}
                             </p>
                         )
 

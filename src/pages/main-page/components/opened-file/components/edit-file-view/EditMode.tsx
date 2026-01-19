@@ -20,13 +20,6 @@ import {useDebouncedValue} from "../../../../../../utils/hooks/useDebouncedValue
 
 interface EditFileViewProps {
     file: CreateFilePayload;
-    onSaveEditedFileChanges: (
-        newContent: string,
-        addedImages: string[],
-        onSuccess: () => void) => void,
-    onCancelEditedFileChange: (
-        addedImages: string[],
-        onSuccess: () => void) => void;
     parseFileTextToHTML: (
         content: string,
         onImageClick: (imageUrl: string) => void | null,
@@ -38,8 +31,6 @@ interface EditFileViewProps {
 const EditMode: React.FC<EditFileViewProps> = (
     {
         file,
-        onSaveEditedFileChanges,
-        onCancelEditedFileChange,
         parseFileTextToHTML,
         onImageClick,
         isFileTreeOpened,
@@ -64,6 +55,8 @@ const EditMode: React.FC<EditFileViewProps> = (
         contentError,
         setIsFileContentChanged,
         setContentError,
+        handleSaveEditedFileChanges,
+        handleCancelEditedFileChanges,
     } = fileState
 
     useEffect(() => {
@@ -99,6 +92,37 @@ const EditMode: React.FC<EditFileViewProps> = (
             setContentError('');
         }
     }, [textareaContent.length, amountOfImagesInTextArea.length, loggedInUser, setContentError]);
+
+    const handleSaveEdition = useCallback(async (
+            newContent: string,
+            addedImages: string[],
+        ) => {
+            if (!file) return;
+            try {
+                await handleSaveEditedFileChanges(
+                    file.id as number,
+                    newContent,
+                    addedImages,
+                    loggedInUser?.email
+                );
+                setAddedImagesWhileEditing([])
+            } catch (error) {
+                console.error('Save failed:', error);
+            }
+        }
+        , [file, handleSaveEditedFileChanges, loggedInUser?.email]);
+
+    const handleCancelEdition = useCallback(async (
+        addedImages: string[],
+        contentBeforeEdition: string,
+    ) => {
+        try {
+            await handleCancelEditedFileChanges(contentBeforeEdition, addedImages);
+            setAddedImagesWhileEditing([])
+        } catch (error) {
+            console.error('Cancel failed:', error);
+        }
+    }, [handleCancelEditedFileChanges])
 
     const pasteTag = useCallback((tag: string) => {
         const textarea = textareaRef.current;
@@ -275,15 +299,14 @@ const EditMode: React.FC<EditFileViewProps> = (
                 <div className={styles['header__action-buttons']}>
                     <button
                         className={styles['header__action-buttons-save']}
-                        onClick={() => onSaveEditedFileChanges(
+                        onClick={() => handleSaveEdition(
                             textareaContent,
-                            addedImagesWhileEditing,
-                            () => setAddedImagesWhileEditing([]))}>Save
+                            addedImagesWhileEditing)}>Save
                     </button>
                     <button
-                        onClick={() => onCancelEditedFileChange(
+                        onClick={() => handleCancelEdition(
                             addedImagesWhileEditing,
-                            () => setAddedImagesWhileEditing([]))}
+                            file.content)}
                         className={styles['header__action-buttons-cancel']}>Cancel
                     </button>
                 </div>
@@ -303,9 +326,9 @@ const EditMode: React.FC<EditFileViewProps> = (
                 </div>
             </div>
             <SwitchWhileEditModal
-                onCancelEditedFileChange={onCancelEditedFileChange}
-                addedImagesWhileEditing={addedImagesWhileEditing}
-                onSuccessCanceling={() => setAddedImagesWhileEditing([])}/>
+                contentBeforeEdition={file.content}
+                onCancelEditedFileChange={handleCancelEdition}
+                addedImagesWhileEditing={addedImagesWhileEditing}/>
         </div>
     );
 };

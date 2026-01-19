@@ -1,6 +1,10 @@
 import {useDispatch} from "react-redux";
 import {Dispatch, SetStateAction, useCallback, useState} from "react";
 import {openFile} from "../../store/slices/fileTreeSlice";
+import {updateFileContent} from "../../store/thunks/files/updateFileContent";
+import extractImagesName from "../functions/extractImageNames";
+import {deleteExtraImagesAsync} from "../../services/deleteExtraImagesAsync";
+import {AppDispatch} from "../../store";
 
 export interface EditFileViewState {
     isEditing: boolean;
@@ -16,10 +20,20 @@ export interface EditFileViewState {
     handleTryToOpenFile: (targetFileId: number | null) => void;
     handleRejectSwitch: () => void;
     handleConfirmSwitch: () => void;
+    handleSaveEditedFileChanges: (
+        fileId: number,
+        newContent: string,
+        addedImages: string[],
+        editorEmail?: string
+    ) => Promise<void>;
+    handleCancelEditedFileChanges: (
+        contentBeforeEdition: string,
+        addedImages: string[],
+    ) => Promise<void>;
 }
 
 export default function useEditFileActions(): EditFileViewState {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isFileContentChanged, setIsFileContentChanged] = useState<boolean>(false);
     const [isTryToSwitchWhileEditing, setIsTryToSwitchWhileEditing] = useState<boolean>(false);
@@ -54,6 +68,54 @@ export default function useEditFileActions(): EditFileViewState {
         setSwitchedFileId(null);
     }, [setIsTryToSwitchWhileEditing, setSwitchedFileId]);
 
+    const handleSaveEditedFileChanges = useCallback(async (
+        fileId: number,
+        newContent: string,
+        addedImages: string[],
+        editorEmail?: string
+    ) => {
+        if (!editorEmail) {
+            console.error('Editor email is required');
+            return;
+        }
+        if (contentError) return;
+
+        try {
+            await dispatch(updateFileContent({
+                id: fileId,
+                content: newContent,
+                editor: editorEmail
+            })).unwrap();
+
+            const savedImages = extractImagesName(newContent);
+            const extraImages = addedImages.filter(image => !savedImages.includes(image));
+
+            if (extraImages.length > 0) {
+                await deleteExtraImagesAsync(extraImages);
+            }
+
+            setIsEditing(false);
+            setIsFileContentChanged(false);
+
+        } catch (error) {
+            console.error('Ошибка сохранения:', error);
+            throw error;
+        }
+    }, [contentError, dispatch]);
+
+    const handleCancelEditedFileChanges = useCallback(async (
+        contentBeforeEdition: string,
+        addedImages: string[]) => {
+        if (addedImages.length > 0) {
+            const savedImages: string[] = extractImagesName(contentBeforeEdition || '');
+            const extraImages = addedImages.filter(image => !savedImages.includes(image));
+            await deleteExtraImagesAsync(extraImages);
+        }
+
+        setIsEditing(false)
+        setIsFileContentChanged(false)
+    }, [setIsEditing, setIsFileContentChanged])
+
     return {
         isEditing,
         setIsEditing,
@@ -67,6 +129,8 @@ export default function useEditFileActions(): EditFileViewState {
         setContentError,
         handleTryToOpenFile,
         handleRejectSwitch,
-        handleConfirmSwitch
+        handleConfirmSwitch,
+        handleSaveEditedFileChanges,
+        handleCancelEditedFileChanges
     }
 }

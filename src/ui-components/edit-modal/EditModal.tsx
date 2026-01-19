@@ -42,16 +42,16 @@ const EditModal: FC = () => {
             className={modalStyles['modal__overlay']}
         >
             <div className={modalStyles['modal__form']}>
-                <div className={`${styles['modal__title']} ${modalStyles['modal__title']}`}>
+                <div className={`${styles['edit-modal__title']} ${modalStyles['modal__title']}`}>
                     {modalOpenState.title}
                 </div>
                 {isNameConflictReason() ?
                     modalError ? (
-                        <p className={`${modalStyles['modal__error']} ${styles['modal__error']}`}>
+                        <p className={`${modalStyles['modal__error']} ${styles['edit-modal__error']}`}>
                             {modalError}
                         </p>
                     ) : (
-                        <p className={`${modalStyles['modal__error']} ${styles['modal__error']}`}>
+                        <p className={`${modalStyles['modal__error']} ${styles['edit-modal__error']}`}>
                             {copiedFile?.type === FileType.Folder
                                 ? "Folder with this name exists:"
                                 : "File with this name exists:"}
@@ -59,11 +59,11 @@ const EditModal: FC = () => {
                     ) :
                     (
                         modalError ? (
-                            <p className={`${modalStyles['modal__error']} ${styles['modal__error']}`}>
+                            <p className={`${modalStyles['modal__error']} ${styles['edit-modal__error']}`}>
                                 {modalError}
                             </p>
                         ) : (
-                            <p className={`${modalStyles['modal__error']} ${styles['modal__error']} ${modalStyles['modal__hidden']}`}>
+                            <p className={`${modalStyles['modal__error']} ${styles['edit-modal__error']} ${modalStyles['modal__hidden']}`}>
                                 {copiedFile?.type === FileType.Folder
                                     ? "Folder with this name exists:"
                                     : "File with this name exists:"}
@@ -75,7 +75,7 @@ const EditModal: FC = () => {
                 <input
                     ref={modalInputRef}
                     type='text'
-                    className={styles['modal__input']}
+                    className={styles['edit-modal__input']}
                     placeholder={"Enter the title"}
                     value={modalValue}
                     onChange={(e) => setModalValue(e.target.value)}

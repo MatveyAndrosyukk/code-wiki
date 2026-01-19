@@ -43,13 +43,13 @@ const LoginModal: FC = () => {
             isOpen={isLoginModalOpen}
             onClose={handleCloseAuthModal}
         >
-            <div className={`${modalStyles.modal__overlay} ${styles.modal__overlay}`}>
-                <div className={`${modalStyles.modal__form} ${styles.modal__form}`}>
-                    <div className={`${styles['modal__header']}`}>
-                        <p className={`${styles['modal__form-text']}`}>
+            <div className={`${modalStyles['modal__overlay']} ${styles['login-modal__overlay']}`}>
+                <div className={`${modalStyles['modal__form']} ${styles['login-modal__form']}`}>
+                    <div className={`${styles['login-modal__header']}`}>
+                        <p className={`${styles['login-modal__form-text']}`}>
                             {isRegisterModal ? 'Register' : 'Login'}</p>
                         <SwitchAuthSvg
-                            className={`${styles['modal__switch']}`}
+                            className={`${styles['login-modal__switch']}`}
                             onClick={handleSwitchAuthorization}/>
                     </div>
                     <div className={
@@ -84,10 +84,10 @@ const LoginModal: FC = () => {
                             onChange={(e) => handleChangeRePasswordInput(e)}
                         />
                     }
-                    <div className={`${styles['modal__footer']}`}>
+                    <div className={`${styles['login-modal__footer']}`}>
                         <div className={`${styles['footer__left']}`}>
                             <p
-                                className={`${styles['modal__forgot-password']}`}
+                                className={`${styles['login-modal__forgot-password']}`}
                                 onClick={handleOpenEnterEmailModal}>
                                 Forgot password?
                             </p>

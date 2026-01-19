@@ -19,14 +19,14 @@ const DeleteModal: FC = () => {
     return (<Modal isOpen={deleteModalState.open}
                    onClose={handleCancelDeleteFile}>
         <div
-            className={`${modalStyles['modal__overlay']} ${styles['modal__overlay']}`}
+            className={`${modalStyles['modal__overlay']} ${styles['delete-modal__overlay']}`}
         >
             <div className={modalStyles['modal__form']}>
-                <p className={`${modalStyles['modal__text']} ${styles['modal__text']}`}>
+                <p className={`${modalStyles['modal__text']} ${styles['delete-modal__text']}`}>
                     {deleteModalState.file?.type === FileType.Folder ? (
                         <>
                             Delete folder{" "}
-                            <span className={styles['modal__text-highlighted']}>
+                            <span className={styles['delete-modal__text-highlighted']}>
                                 "{deleteModalState.file.name}"
                             </span>{" "}
                             and all its contents?
@@ -34,7 +34,7 @@ const DeleteModal: FC = () => {
                     ) : (
                         <>
                             Delete file{" "}
-                            <span className={styles['modal__text-highlighted']}>
+                            <span className={styles['delete-modal__text-highlighted']}>
                                 "{deleteModalState.file?.name}"
                             </span>
                             ?
@@ -43,13 +43,13 @@ const DeleteModal: FC = () => {
                 </p>
                 <div className={modalStyles['modal__buttons']}>
                     <button
-                        className={styles['modal__buttons-delete']}
+                        className={styles['delete-modal__buttons-delete']}
                         onClick={handleConfirmDeleteFile}
                     >
                         OK
                     </button>
                     <button
-                        className={styles['modal__buttons-cancel']}
+                        className={styles['delete-modal__buttons-cancel']}
                         onClick={handleCancelDeleteFile}
                     >
                         Cancel

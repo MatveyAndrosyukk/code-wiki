@@ -47,7 +47,7 @@ export type ModalActionsState = CopyPasteState & {
     handleOpenRenameModal: (file: File) => void;
     handleCloseModal: () => void;
     handleConfirmModalByReason: (modalState: ModalOpenState & { title: string }) => void;
-    handleOpenModalByReason: (modalState: ModalOpenState) => void;
+        handleOpenModalByReason: (modalState: ModalOpenState) => void;
 }
 
 export default function useModalActions(

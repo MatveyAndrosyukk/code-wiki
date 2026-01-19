@@ -1,4 +1,4 @@
-.modal {
+.login-modal {
   &__overlay {
     padding: 11px;
   }
@@ -41,6 +41,7 @@
     width: 100%;
     justify-content: space-between;
     padding: 0 5px;
+    margin-top: 10px;
   }
 
   &__register {

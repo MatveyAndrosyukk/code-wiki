@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useContext, useEffect, useState} from 'react';
+import React, {FC, useCallback, useContext, useState} from 'react';
 import styles from './UserModal.module.scss'
 import commonStyles from '../../styles/Common.module.scss'
 import modalStyles from '../modal/ModalContent.module.scss'
@@ -22,7 +22,6 @@ const UserModal: FC<LoginModalProps> = (
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
     const {loggedInUser} = context;
-    const [isScreenSmall, setIsScreenSmall] = useState<boolean>(window.innerWidth <= 750);
     const [showCopyMessage, setShowCopyMessage] = useState(false);
 
     const {
@@ -46,17 +45,6 @@ const UserModal: FC<LoginModalProps> = (
         handleDeleteUserWhoCanEdit,
         handleCloseUserModal,
     } = userModalState
-
-    useEffect(() => {
-        const handleResize = () => {
-            setIsScreenSmall(window.innerWidth <= 750);
-        };
-
-        window.addEventListener('resize', handleResize);
-        handleResize();
-
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     const handleCopyProfileLink = useCallback(() => {
         if (!loggedInUser?.email) return;
@@ -84,30 +72,30 @@ const UserModal: FC<LoginModalProps> = (
             isOpen={isUserModalOpen}
             onClose={handleCloseUserModal}
         >
-            <div className={`${modalStyles.modal__overlay} ${styles.modal__overlay}`}>
-                <div className={`${modalStyles.modal__form} ${styles.modal__form}`}>
-                    <div className={styles['modal__head']}>
+            <div className={`${modalStyles['modal__overlay']} ${styles['user-modal__overlay']}`}>
+                <div className={`${modalStyles['modal__form']} ${styles['user-modal__form']}`}>
+                    <div className={styles['user-modal__head']}>
                         {showCopyMessage && (
                             <div className={commonStyles['common__notification']}>
                                 Link copied to clipboard
                             </div>
                         )}
-                        <div className={styles['modal__head-name']}>
-                            <div className={styles['modal__name']}>
+                        <div className={styles['user-modal__head-name']}>
+                            <div className={styles['user-modal__name']}>
                                 {isEditingName ? (
                                     <div>
                                         {editedNameError ? (
-                                            <p className={styles['modal__name-symbol-error']}>
+                                            <p className={styles['user-modal__name-symbol-error']}>
                                                 {editedNameError}
                                             </p>
                                         ) : (
-                                            <p className={styles['modal__name-invisible-error']}>
+                                            <p className={styles['user-modal__name-invisible-error']}>
                                                 Username is too long
                                             </p>
                                         )}
                                         <input
                                             ref={nameInputRef}
-                                            className={styles['modal__name-change-input']}
+                                            className={styles['user-modal__name-change-input']}
                                             value={editedName}
                                             onChange={(e) => setEditedName(e.target.value)}
                                             onKeyDown={handleKeyDownWhileEditing}
@@ -116,45 +104,45 @@ const UserModal: FC<LoginModalProps> = (
                                     </div>
                                 ) : (
                                     <div>
-                                        <p className={styles['modal__name-invisible-error']}>
+                                        <p className={styles['user-modal__name-invisible-error']}>
                                             Username is too long
                                         </p>
-                                        <div className={styles['modal__username']}>
+                                        <div className={styles['user-modal__username']}>
                                             <div
                                                 onClick={() => setIsEditingName(true)}
-                                                className={styles['modal__username-name']}>
+                                                className={styles['user-modal__username-name']}>
                                                 {loggedInUser?.name}
                                             </div>
                                         </div>
                                     </div>
                                 )}
                             </div>
-                            <div className={styles['modal__email']}>
+                            <div className={styles['user-modal__email']}>
                                 {"(" + loggedInUser?.email + ")"}
                             </div>
                             {changeNameError ? (
                                 <p
-                                    className={`${styles['modal__name-symbol-error']} ${styles['modal__email-error']}`}
+                                    className={`${styles['user-modal__name-symbol-error']} ${styles['user-modal__email-error']}`}
                                 >
                                     {changeNameError}
                                 </p>
                             ) : (
-                                <p className={`${styles['modal__name-invisible-error']} ${styles['modal__email-error']}`}>
+                                <p className={`${styles['user-modal__name-invisible-error']} ${styles['user-modal__email-error']}`}>
                                     Username is too long
                                 </p>
                             )}
                         </div>
-                        <div className={styles['modal__head-link']}>
+                        <div className={styles['user-modal__head-link']}>
                             <img
                                 src={CopyLinkSvg}
                                 alt="Copy link"
                                 title="Copy profile link"
-                                className={styles['modal__head-link-icon']}
+                                className={styles['user-modal__head-link-icon']}
                                 onClick={handleCopyProfileLink}
                             />
                         </div>
                     </div>
-                    <div className={styles['modal__editors-manager']}>
+                    <div className={styles['user-modal__editors-manager']}>
                         <div className={styles['editors-manager__title']}>
 
                         </div>
@@ -162,7 +150,7 @@ const UserModal: FC<LoginModalProps> = (
                             <input
                                 ref={userModalInputRef}
                                 type="text"
-                                className={`${styles['modal__input']} ${styles['editors-manager-input']}`}
+                                className={`${styles['user-modal__input']} ${styles['editors-manager-input']}`}
                                 placeholder='Permit edition by email'
                                 value={userModalValue}
                                 onChange={(e) => setUserModalValue(e.target.value)}
@@ -176,15 +164,15 @@ const UserModal: FC<LoginModalProps> = (
                         </div>
                     </div>
                     {addEditorError ? (
-                        <p className={`${styles['modal__name-symbol-error']} ${styles['modal__email-error']}`}>
+                        <p className={`${styles['user-modal__name-symbol-error']} ${styles['user-modal__email-error']}`}>
                             {addEditorError}
                         </p>) : (
-                        <p className={`${styles['modal__name-symbol-error']} ${styles['modal__email-error']}`}
+                        <p className={`${styles['user-modal__name-symbol-error']} ${styles['user-modal__email-error']}`}
                            style={{color: 'transparent'}}>
                             User with this email does not exist
                         </p>)}
                     <div
-                        className={styles['modal__editors']}
+                        className={styles['user-modal__editors']}
                         style={usersWhoCanEdit.length > 3 ? {overflowY: "auto"} : {overflowY: "hidden"}}>
                         {usersWhoCanEdit.map((user: User) => (
                             <div

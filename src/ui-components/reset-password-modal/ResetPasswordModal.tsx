@@ -54,12 +54,12 @@ const ResetPasswordModal: FC<ResetPasswordModalProps> = ({resetToken}) => {
             }}>
             <div className={`${modalStyles['modal__overlay']}`}>
                 <div className={`${modalStyles['modal__form']}`}>
-                    <div className={`${modalStyles['modal__header']} ${styles['modal__header']}`}>
+                    <div className={`${modalStyles['modal__header']} ${styles['reset-password-modal__header']}`}>
                         <p className={`${modalStyles['modal__title']}`}>
                             Password recovery
                         </p>
                         <CloseModalSvg
-                            className={`${styles['modal__close']}`}
+                            className={`${styles['reset-password-modal__close']}`}
                             onClick={handleCloseResetPasswordModal}/>
                     </div>
                     <p className={
@@ -69,7 +69,7 @@ const ResetPasswordModal: FC<ResetPasswordModalProps> = ({resetToken}) => {
                                 : `${modalStyles.modal__message} ${modalStyles.hidden}`
                     }>
                         {resetPasswordMessage || resetPasswordError}</p>
-                    <div className={`${styles['modal__body']}`}>
+                    <div className={`${styles['reset-password-modal__body']}`}>
                         <input
                             type='password'
                             className={`${modalStyles['modal__input']}`}
@@ -88,7 +88,7 @@ const ResetPasswordModal: FC<ResetPasswordModalProps> = ({resetToken}) => {
                             onChange={(e) => handleChangeRepeatPassword(e)}
                         />
                         <button
-                            className={`${modalStyles['modal__button']} ${styles['modal__button-button']}`}
+                            className={`${modalStyles['modal__button']} ${styles['reset-password-modal__button-button']}`}
                             disabled={resetPasswordLoading}
                             onClick={() => handleClickResetPassword(resetToken)}>
                             {resetPasswordLoading ? 'Reset...' : 'Reset'}

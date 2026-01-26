@@ -1,4 +1,4 @@
-@import "../../../../styles/Mixins.module.scss";
+@use '../../../../styles/Mixins.module.scss' as *;
 
 .header {
   height: 70px;

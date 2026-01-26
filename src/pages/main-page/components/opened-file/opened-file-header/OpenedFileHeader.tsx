@@ -95,51 +95,53 @@ const OpenedFileHeader:React.FC<OpenedFileHeaderProps> = (
                 </div>
             </div>
             <div className={styles['header__right-side']}>
-                {isMobile ? (
-                    <div className={styles['header__buttons']}>
-                        <OpenButtonsSvg
-                            className={`${styles['buttons-menu-open']}`}
-                            onClick={() => setIsBurgerMenuOpened(!isBurgerMenuOpened)}/>
-                        {isBurgerMenuOpened && !isEditing && (
-                            <div className={styles['buttons-menu']}>
-                                <EditFileSvg
-                                    className={`${styles['buttons-menu-item']}`}
-                                    onClick={() => onOpenEditionMode()}/>
-                                <DeleteFileSvg
-                                    className={`${styles['buttons-menu-item']}`}
-                                    onClick={() => onDeleteFile(file)}/>
-                            </div>
-                        )}
-                        {isBurgerMenuOpened && isEditing && (
-                            <div className={styles['buttons-menu']}>
-                                <DeleteFileSvg
-                                    className={`${styles['buttons-menu-item']}`}
-                                    onClick={() => onDeleteFile(file)}/>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <div className={styles['header__links']}>
-                        {isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && (
-                            <div
-                                className={styles['links__container']}>
-                                {!isEditing && (
-                                    <div
-                                        className={styles['links__edit']}
-                                        onClick={() => setIsEditing(true)}
-                                    >
-                                        Edit
+                {/* ✅ ПРОВЕРКА ПРАВ ДО МЕНЮ! */}
+                {isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && (
+                    <>
+                        {isMobile ? (
+                            <div className={styles['header__buttons']}>
+                                <OpenButtonsSvg
+                                    className={`${styles['buttons-menu-open']}`}
+                                    onClick={() => setIsBurgerMenuOpened(!isBurgerMenuOpened)}/>
+                                {isBurgerMenuOpened && !isEditing && (
+                                    <div className={styles['buttons-menu']}>
+                                        <EditFileSvg
+                                            className={`${styles['buttons-menu-item']}`}
+                                            onClick={() => onOpenEditionMode()}/>
+                                        <DeleteFileSvg
+                                            className={`${styles['buttons-menu-item']}`}
+                                            onClick={() => onDeleteFile(file)}/>
                                     </div>
                                 )}
-                                <div
-                                    onClick={() => onOpenDeleteModal(file, viewedUser)}
-                                    className={styles['links__delete']}
-                                >
-                                    Delete
+                                {isBurgerMenuOpened && isEditing && (
+                                    <div className={styles['buttons-menu']}>
+                                        <DeleteFileSvg
+                                            className={`${styles['buttons-menu-item']}`}
+                                            onClick={() => onDeleteFile(file)}/>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className={styles['header__links']}>
+                                <div className={styles['links__container']}>
+                                    {!isEditing && (
+                                        <div
+                                            className={styles['links__edit']}
+                                            onClick={() => setIsEditing(true)}
+                                        >
+                                            Edit
+                                        </div>
+                                    )}
+                                    <div
+                                        onClick={() => onOpenDeleteModal(file, viewedUser)}
+                                        className={styles['links__delete']}
+                                    >
+                                        Delete
+                                    </div>
                                 </div>
                             </div>
                         )}
-                    </div>
+                    </>
                 )}
             </div>
         </div>

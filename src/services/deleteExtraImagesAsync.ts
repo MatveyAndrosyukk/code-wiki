@@ -7,13 +7,13 @@ export async function deleteExtraImagesAsync(extraImages: string[]) {
 
     const token = localStorage.getItem("token");
 
-    const response = await fetch(`${API_BASE_URL}/images`, {
-        method: 'DELETE',
+    const response = await fetch(`${API_BASE_URL}/images/delete`, {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({extraImages: extraImages}),
+        body: JSON.stringify({delete_urls: extraImages}),
     })
 
     if (!response.ok) {

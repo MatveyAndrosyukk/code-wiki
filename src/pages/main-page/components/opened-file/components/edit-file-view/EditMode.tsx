@@ -161,7 +161,7 @@ const EditMode: React.FC<EditFileViewProps> = (
             const data = await uploadImageAsync(file);
             if (data && data.fileName) {
                 pasteTag(`[image/${data.fileName}]`);
-                setAddedImagesWhileEditing(prev => [...prev, data.fileName]);
+                setAddedImagesWhileEditing(prev => [...prev, data.fileName.split(':')[1]]);
             }
         } catch (error) {
             console.error("Failed to upload image:", error);

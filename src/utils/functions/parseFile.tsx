@@ -2,7 +2,6 @@ import styles from '../../pages/main-page/components/opened-file/OpenedFile.modu
 import React, {ReactNode} from "react";
 import CodeBlock from "../../pages/main-page/components/opened-file/components/code-block/CodeBlock";
 import TerminalBlock from "../../pages/main-page/components/opened-file/components/terminal-block/TerminalBlock";
-import API_BASE_URL from "../../config/api-config";
 
 function parseInline(
     text: string,
@@ -87,8 +86,9 @@ function parseInline(
                 </span>
             );
         } else if (type === 'image') {
-            const fileName = match[1];
-            const imageUrl = `${API_BASE_URL}/images/${fileName}`;
+            const fileName = match[1].split(':')[0];
+            console.log(fileName)
+            const imageUrl = `https://i.ibb.co/${fileName}`;
             parts.push(
                 <img
                     key={index}

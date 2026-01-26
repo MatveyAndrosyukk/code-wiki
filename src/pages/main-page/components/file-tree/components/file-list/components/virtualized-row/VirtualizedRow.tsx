@@ -80,7 +80,9 @@ const VirtualizedRow: React.FC<VirtualizedRowProps> = ({
                         onClick={() => handleTryToOpenFile(file.id)}
                     >
                         <FileImg className={styles['file-list__node-image']} />
-                        <span className={styles['file-list__node-text']}>{file.name}</span>
+                        <span
+                            style={{fontWeight: file.status === FileStatus.Opened ? 'bold' : 'normal'}}
+                            className={styles['file-list__node-text']}>{file.name}</span>
                     </div>
                 )}
             </div>

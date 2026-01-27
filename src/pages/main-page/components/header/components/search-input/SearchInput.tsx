@@ -21,7 +21,7 @@ const SearchInput: React.FC<SearchProps> = ({onClick, searchType}) => {
     const [isInputFocused, setIsInputFocused] = useState(false);
     const searchInputBlockRef = useRef<HTMLDivElement>(null);
     const [results, setResults] = useState<SearchResult[]>([]);
-    const [isNarrowScreen, setIsNarrowScreen] = useState(window.innerWidth < 720);
+    const [isNarrowScreen, setIsNarrowScreen] = useState(window.innerWidth < 457);
 
     useEffect(() => {
         function handleResize() {

@@ -1,14 +1,5 @@
-@mixin adaptive-size($property, $maxValue, $minValue, $minScreen: 320, $maxScreen: 1920) {
-  #{$property}: #{$maxValue};
-
-  @media (max-width: #{$maxScreen}px) and (min-width: #{$minScreen}px) {
-    #{$property}: calc(
-            #{$minValue}px + (#{$maxValue}px - #{$minValue}px) *
-            ((100vw - #{$minScreen}px) / (#{$maxScreen}px - #{$minScreen}px))
-    );
-  }
-
-  @media (max-width: #{$minScreen}px) {
-    #{$property}: #{$minValue}px;
-  }
+@mixin adaptive-size($property, $maxValue, $minValue, $minScreen: 320px, $maxScreen: 550px) {
+  #{$property}: clamp(#{$minValue},
+  calc(#{$minValue} + (#{$maxValue} - #{$minValue}) * ((100vw - #{$minScreen}) / (#{$maxScreen} - #{$minScreen}))),
+  #{$maxValue});
 }

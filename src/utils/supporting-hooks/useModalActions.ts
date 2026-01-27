@@ -47,7 +47,7 @@ export type ModalActionsState = CopyPasteState & {
     handleOpenRenameModal: (file: File) => void;
     handleCloseModal: () => void;
     handleConfirmModalByReason: (modalState: ModalOpenState & { title: string }) => void;
-        handleOpenModalByReason: (modalState: ModalOpenState) => void;
+    handleOpenModalByReason: (modalState: ModalOpenState) => void;
 }
 
 export default function useModalActions(
@@ -112,7 +112,10 @@ export default function useModalActions(
                     'Folder',
                     null
                 )));
-                break;
+                setModalValue('');
+                setIsModalOpen(false);
+                setModalOpenState({reason: null, id: null, title: null});
+                return;
 
             case ActionType.RenameFile:
                 if (handleNameConflictInFolder(
@@ -123,7 +126,10 @@ export default function useModalActions(
                     handleOpenModalByReason
                 )) return;
                 dispatch(updateFileName({id: id as number, name: trimmedTitle}));
-                break;
+                setModalValue('');
+                setIsModalOpen(false);
+                setModalOpenState({reason: null, id: null, title: null});
+                return;
 
             case ActionType.AddFolder:
                 if (handleNameConflictInFolder(
@@ -139,7 +145,10 @@ export default function useModalActions(
                     'Folder',
                     id
                 )));
-                break;
+                setModalValue('');
+                setIsModalOpen(false);
+                setModalOpenState({reason: null, id: null, title: null});
+                return;
 
             case ActionType.AddFile:
                 if (handleNameConflictInFolder(
@@ -147,23 +156,25 @@ export default function useModalActions(
                     id,
                     trimmedTitle,
                     ActionType.ResolveNameConflictAddFile,
-                    handleOpenModalByReason)) return;
+                    handleOpenModalByReason
+                )) return;
                 if (viewedUser && viewedUser.amountOfFiles >= 20) {
                     setModalError(`You can't create more than 20 files`);
                     return;
                 }
-                const result = dispatch(createFile(createFilePayload(
+                dispatch(createFile(createFilePayload(
                     trimmedTitle,
                     localStorage.getItem('email'),
                     'File',
                     id
                 )));
-                await result;
-
                 if (viewedUser) {
                     dispatch(fetchViewedUserByEmail(viewedUser.email));
                 }
-                break;
+                setModalValue('');
+                setIsModalOpen(false);
+                setModalOpenState({reason: null, id: null, title: null});
+                return;
 
             case ActionType.ResolveNameConflictRoot:
                 if (isNameExistsInRoot(files, trimmedTitle)) return;
@@ -173,7 +184,10 @@ export default function useModalActions(
                     'Folder',
                     null
                 )));
-                break;
+                setModalValue('');
+                setIsModalOpen(false);
+                setModalOpenState({reason: null, id: null, title: null});
+                return;
 
             case ActionType.ResolveNameConflictPaste:
                 if (handleNameConflictInFolder(
@@ -183,7 +197,6 @@ export default function useModalActions(
                     ActionType.ResolveNameConflictPaste,
                     handleOpenModalByReason
                 )) return;
-
                 if (copyPasteActions.copiedFile) {
                     copyPasteActions.setCopiedFile({
                         ...copyPasteActions.copiedFile,
@@ -191,8 +204,10 @@ export default function useModalActions(
                     });
                     setPendingPasteId(id)
                 }
-
-                break;
+                setModalValue('');
+                setIsModalOpen(false);
+                setModalOpenState({reason: null, id: null, title: null});
+                return;
 
             case ActionType.ResolveNameConflictAddFile:
                 if (handleNameConflictInFolder(
@@ -206,18 +221,19 @@ export default function useModalActions(
                     setModalError(`You can't create more than 20 files`);
                     return;
                 }
-                const addFileAfterNameConflict = dispatch(createFile(createFilePayload(
+                dispatch(createFile(createFilePayload(
                     trimmedTitle,
                     localStorage.getItem('email'),
                     'File',
                     id
                 )));
-                await addFileAfterNameConflict;
-
                 if (viewedUser) {
                     dispatch(fetchViewedUserByEmail(viewedUser.email));
                 }
-                break;
+                setModalValue('');
+                setIsModalOpen(false);
+                setModalOpenState({reason: null, id: null, title: null});
+                return;
 
             case ActionType.ResolveNameConflictAddFolder:
                 if (handleNameConflictInFolder(
@@ -233,7 +249,10 @@ export default function useModalActions(
                     'Folder',
                     id
                 )));
-                break;
+                setModalValue('');
+                setIsModalOpen(false);
+                setModalOpenState({reason: null, id: null, title: null});
+                return;
 
             case ActionType.ResolveNameConflictRename:
                 if (handleNameConflictInFolder(
@@ -249,16 +268,16 @@ export default function useModalActions(
                         name: trimmedTitle
                     }));
                 }
-                break;
+                setModalValue('');
+                setIsModalOpen(false);
+                setModalOpenState({reason: null, id: null, title: null});
+                return;
 
             default:
                 return;
         }
-
-        setModalValue('');
-        setIsModalOpen(false);
-        setModalOpenState({reason: null, id: null, title: null});
     }, [files, dispatch, handleOpenModalByReason, viewedUser, copyPasteActions]);
+
 
     const handleOpenRenameModal = useCallback((file: File) => {
         handleOpenModalByReason({reason: ActionType.RenameFile, id: file.id, title: 'Rename file'});

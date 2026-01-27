@@ -19,6 +19,8 @@ export const createFile = createAsyncThunk<CreateFilePayload, CreateFilePayload>
     async (body) => {
         const token = localStorage.getItem('token');
 
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
         const response = await fetch(`${API_BASE_URL}/files`, {
             method: 'POST',
             headers: {
